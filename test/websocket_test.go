@@ -17,20 +17,15 @@ func TestStream_SubscribeToTickers(t *testing.T) {
 	ftx := goftx.New()
 
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	symbol := "ETH/BTC"
 	data, err := ftx.Stream.SubscribeToTickers(ctx, symbol)
 	require.NoError(t, err)
 
 	go func() {
-		<-ctx.Done()
-		<-time.After(time.Second)
-		if _, ok := <-data; !ok {
-			t.Fail()
-		}
+		time.Sleep(10)
+		cancel()
 	}()
-
 	count := 0
 	for msg := range data {
 		require.Equal(t, symbol, msg.Symbol)
@@ -56,15 +51,9 @@ func TestStream_SubscribeToMarkets(t *testing.T) {
 	data, err := ftx.Stream.SubscribeToMarkets(ctx)
 	require.NoError(t, err)
 
-	go func() {
-		<-ctx.Done()
-		<-time.After(time.Second)
-		if _, ok := <-data; !ok {
-			t.Fail()
-		}
-	}()
 	asset1, asset2 := "ETH", "BTC"
 	symbol := fmt.Sprintf("%s/%s", asset1, asset2)
+
 	count := 0
 	for msg := range data {
 		if msg.Name != symbol {
