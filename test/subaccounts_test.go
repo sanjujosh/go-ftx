@@ -14,7 +14,7 @@ func TestSubAccounts_CRUD(t *testing.T) {
 	godotenv.Load()
 
 	ftx := goftx.New(
-		goftx.WithAuth(os.Getenv("FTX_KEY"), os.Getenv("FTX_SECRET")),
+		goftx.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
