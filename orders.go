@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/grishinsana/goftx/models"
 	"github.com/pkg/errors"
+	"github.com/uscott/goftx/models"
 )
 
 const (

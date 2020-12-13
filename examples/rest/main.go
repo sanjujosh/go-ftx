@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/grishinsana/goftx"
+	"github.com/uscott/goftx"
 )
 
 func main() {

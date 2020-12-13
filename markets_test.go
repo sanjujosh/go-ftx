@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/grishinsana/goftx/models"
+	"github.com/uscott/goftx/models"
 )
 
 func TestMarkets_GetMarkets(t *testing.T) {

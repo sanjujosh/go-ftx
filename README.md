@@ -1,9 +1,11 @@
 # goftx
 FTX exchange golang library
 
+Forked from https://github.com/grishinsana/goftx
+
 ### Install
 ```shell script
-go get github.com/grishinsana/goftx
+go get github.com/uscott/goftx
 ```
 
 ### Usage
@@ -31,7 +33,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/grishinsana/goftx"
+	"github.com/uscott/goftx"
 )
 
 func main() {
@@ -62,7 +64,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/grishinsana/goftx"
+	"github.com/uscott/goftx"
 )
 
 func main() {
