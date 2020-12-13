@@ -11,6 +11,11 @@ import (
 	"github.com/uscott/goftx/models"
 )
 
+var (
+	PtrInt   = goftx.PtrInt
+	PtrInt64 = goftx.PtrInt64
+)
+
 func TestMarkets_GetMarkets(t *testing.T) {
 	ftx := goftx.New()
 

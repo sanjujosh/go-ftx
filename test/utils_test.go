@@ -11,6 +11,11 @@ import (
 	"github.com/uscott/goftx/models"
 )
 
+var (
+	PtrInt   = goftx.PtrInt
+	PtrInt64 = goftx.PtrInt64
+)
+
 func TestPrepareQueryParams(t *testing.T) {
 	tests := []struct {
 		params   interface{}
@@ -88,12 +93,4 @@ func TestPrepareQueryParams(t *testing.T) {
 			require.Equal(t, v, value, msg)
 		}
 	}
-}
-
-func PtrInt(i int) *int {
-	return &i
-}
-
-func PtrInt64(i int64) *int64 {
-	return &i
 }
