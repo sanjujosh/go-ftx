@@ -22,23 +22,30 @@ func TestStream_SubscribeToTickers(t *testing.T) {
 	data, err := ftx.Stream.SubscribeToTickers(ctx, symbol)
 	require.NoError(t, err)
 
+	done := make(chan struct{})
 	go func() {
 		time.Sleep(10)
 		cancel()
+		done <- struct{}{}
 	}()
 	count := 0
-	for msg := range data {
-		require.Equal(t, symbol, msg.Symbol)
-		require.Equal(t, models.Update, msg.Type)
-		require.True(t, msg.Last.IsPositive())
-		require.True(t, msg.Ask.IsPositive())
-		require.True(t, msg.Bid.IsPositive())
-		require.True(t, msg.AskSize.IsPositive())
-		require.True(t, msg.BidSize.IsPositive())
-		require.True(t, msg.Bid.LessThanOrEqual(msg.Ask))
-		count++
+	for {
+		select {
+		case <-done:
+			require.True(t, count > 0)
+			return
+		case msg := <-data:
+			require.Equal(t, symbol, msg.Symbol)
+			require.Equal(t, models.Update, msg.Type)
+			require.True(t, msg.Last.IsPositive())
+			require.True(t, msg.Ask.IsPositive())
+			require.True(t, msg.Bid.IsPositive())
+			require.True(t, msg.AskSize.IsPositive())
+			require.True(t, msg.BidSize.IsPositive())
+			require.True(t, msg.Bid.LessThanOrEqual(msg.Ask))
+			count++
+		}
 	}
-	require.True(t, count > 0)
 }
 
 func TestStream_SubscribeToMarkets(t *testing.T) {
