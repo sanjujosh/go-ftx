@@ -18,14 +18,14 @@ func TestPrepareQueryParams(t *testing.T) {
 		err      error
 	}{
 		{
-			params: &GetTradesParams{
+			params: &models.GetTradesParams{
 				Limit: nil,
 			},
 			expected: map[string]string{},
 			err:      nil,
 		},
 		{
-			params: &GetTradesParams{
+			params: &models.GetTradesParams{
 				Limit:     PtrInt(10),
 				StartTime: PtrInt(20),
 				EndTime:   PtrInt(30),
@@ -38,7 +38,7 @@ func TestPrepareQueryParams(t *testing.T) {
 			err: nil,
 		},
 		{
-			params: &GetTradesParams{
+			params: &models.GetTradesParams{
 				Limit:     PtrInt(10),
 				StartTime: PtrInt(20),
 				EndTime:   PtrInt(0),
@@ -51,14 +51,14 @@ func TestPrepareQueryParams(t *testing.T) {
 			err: nil,
 		},
 		{
-			params: &goftx.GetHistoricalPricesParams{
+			params: &models.GetHistoricalPricesParams{
 				Limit: PtrInt(10),
 			},
 			expected: map[string]string{},
 			err:      errors.New("required field: resolution"),
 		},
 		{
-			params: &goftx.GetHistoricalPricesParams{
+			params: &models.GetHistoricalPricesParams{
 				Resolution: models.Minute,
 				Limit:      PtrInt(10),
 				StartTime:  PtrInt(20),
