@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -12,12 +13,13 @@ import (
 )
 
 func TestStream_SubscribeToTickers(t *testing.T) {
+
 	ftx := goftx.New()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	symbol := "ETH/BTC"
-
-	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
-
 	data, err := ftx.Stream.SubscribeToTickers(ctx, symbol)
 	require.NoError(t, err)
 
@@ -45,11 +47,11 @@ func TestStream_SubscribeToTickers(t *testing.T) {
 }
 
 func TestStream_SubscribeToMarkets(t *testing.T) {
+
 	ftx := goftx.New()
 
-	symbol := "ETH/BTC"
-
-	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	data, err := ftx.Stream.SubscribeToMarkets(ctx)
 	require.NoError(t, err)
@@ -61,7 +63,8 @@ func TestStream_SubscribeToMarkets(t *testing.T) {
 			t.Fail()
 		}
 	}()
-
+	asset1, asset2 := "ETH", "BTC"
+	symbol := fmt.Sprintf("%s/%s", asset1, asset2)
 	count := 0
 	for msg := range data {
 		if msg.Name != symbol {
@@ -69,20 +72,21 @@ func TestStream_SubscribeToMarkets(t *testing.T) {
 		}
 		require.Equal(t, symbol, msg.Name)
 		require.Equal(t, true, msg.Enabled)
-		require.Equal(t, "BTC", msg.QuoteCurrency)
-		require.Equal(t, "ETH", msg.BaseCurrency)
+		require.Equal(t, asset2, msg.QuoteCurrency)
+		require.Equal(t, asset1, msg.BaseCurrency)
 		count++
 	}
 	require.True(t, count > 0)
 }
 
 func TestStream_SubscribeToTrades(t *testing.T) {
+
 	ftx := goftx.New()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	symbol := "BTC-PERP"
-
-	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second)
-
 	data, err := ftx.Stream.SubscribeToTrades(ctx, symbol)
 	require.NoError(t, err)
 
@@ -105,12 +109,13 @@ func TestStream_SubscribeToTrades(t *testing.T) {
 }
 
 func TestStream_SubscribeToOrderBooks(t *testing.T) {
+
 	ftx := goftx.New()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	symbol := "ETH/BTC"
-
-	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
-
 	data, err := ftx.Stream.SubscribeToOrderBooks(ctx, symbol)
 	require.NoError(t, err)
 

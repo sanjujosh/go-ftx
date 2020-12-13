@@ -142,7 +142,9 @@ func (s *Stream) serve(
 		for {
 			select {
 			case <-ctx.Done():
-				err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+				err := conn.WriteMessage(
+					websocket.CloseMessage,
+					websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 				if err != nil {
 					s.printf("write close msg: %v", err)
 					return
@@ -157,7 +159,10 @@ func (s *Stream) serve(
 				return
 			case <-time.After(pingPeriod):
 				s.printf("PING")
-				err := conn.WriteControl(websocket.PingMessage, []byte(`{"op": "pong"}`), time.Now().Add(10*time.Second))
+				err := conn.WriteControl(
+					websocket.PingMessage,
+					[]byte(`{"op": "pong"}`),
+					time.Now().Add(10*time.Second))
 				if err != nil && err != websocket.ErrCloseSent {
 					s.printf("write ping: %v", err)
 				}
@@ -203,9 +208,11 @@ func (s *Stream) subscribe(conn *websocket.Conn, requests []models.WSRequest) er
 	return nil
 }
 
-func (s *Stream) SubscribeToTickers(ctx context.Context, symbols ...string) (chan *models.TickerResponse, error) {
+func (s *Stream) SubscribeToTickers(
+	ctx context.Context, symbols ...string) (chan *models.TickerResponse, error) {
+
 	if len(symbols) == 0 {
-		return nil, errors.New("symbols is missing")
+		return nil, errors.New("symbols missing")
 	}
 
 	requests := make([]models.WSRequest, 0, len(symbols))

@@ -126,7 +126,7 @@ func (c *Client) prepareRequest(request Request) (*http.Request, error) {
 
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set(keyHeader, c.apiKey)
-		req.Header.Set(signHeader, c.signture(payload))
+		req.Header.Set(signHeader, c.signature(payload))
 		req.Header.Set(tsHeader, nonce)
 	}
 
@@ -179,7 +179,7 @@ func (c *Client) prepareQueryParams(params interface{}) map[string]string {
 	return result
 }
 
-func (c *Client) signture(payload string) string {
+func (c *Client) signature(payload string) string {
 	mac := hmac.New(sha256.New, []byte(c.secret))
 	mac.Write([]byte(payload))
 	return hex.EncodeToString(mac.Sum(nil))

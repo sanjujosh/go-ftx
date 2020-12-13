@@ -34,7 +34,9 @@ func main() {
 }
 
 func subscribeToTickers(ctx context.Context, client *goftx.Client) {
+
 	data, err := client.Stream.SubscribeToTickers(ctx, "ETH/BTC")
+
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
