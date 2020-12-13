@@ -24,7 +24,7 @@ func TestStream_SubscribeToTickers(t *testing.T) {
 
 	done := make(chan struct{})
 	go func() {
-		time.Sleep(10)
+		time.Sleep(10 * time.Second)
 		cancel()
 		done <- struct{}{}
 	}()
