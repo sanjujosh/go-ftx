@@ -1,4 +1,4 @@
-package goftx
+package test
 
 import (
 	"fmt"
@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/uscott/goftx"
 )
 
 func TestClient_GetServerTime(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	serverTime, err := ftx.GetServerTime()
 	require.NoError(t, err)

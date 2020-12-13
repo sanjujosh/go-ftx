@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/uscott/goftx"
@@ -10,7 +11,7 @@ import (
 
 func main() {
 	client := goftx.New(
-		goftx.WithAuth("API-KEY", "API-SECRET"),
+		goftx.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 		goftx.WithHTTPClient(&http.Client{
 			Timeout: 5 * time.Second,
 		}),

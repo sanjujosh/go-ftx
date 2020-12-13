@@ -1,4 +1,4 @@
-package goftx
+package test
 
 import (
 	"context"
@@ -7,11 +7,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/uscott/goftx"
 	"github.com/uscott/goftx/models"
 )
 
 func TestStream_SubscribeToTickers(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	symbol := "ETH/BTC"
 
@@ -44,7 +45,7 @@ func TestStream_SubscribeToTickers(t *testing.T) {
 }
 
 func TestStream_SubscribeToMarkets(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	symbol := "ETH/BTC"
 
@@ -76,7 +77,7 @@ func TestStream_SubscribeToMarkets(t *testing.T) {
 }
 
 func TestStream_SubscribeToTrades(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	symbol := "BTC-PERP"
 
@@ -104,7 +105,7 @@ func TestStream_SubscribeToTrades(t *testing.T) {
 }
 
 func TestStream_SubscribeToOrderBooks(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	symbol := "ETH/BTC"
 

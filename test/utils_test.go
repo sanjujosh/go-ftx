@@ -1,4 +1,4 @@
-package goftx
+package test
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/uscott/goftx"
 	"github.com/uscott/goftx/models"
 )
 
@@ -50,14 +51,14 @@ func TestPrepareQueryParams(t *testing.T) {
 			err: nil,
 		},
 		{
-			params: &GetHistoricalPricesParams{
+			params: &goftx.GetHistoricalPricesParams{
 				Limit: PtrInt(10),
 			},
 			expected: map[string]string{},
 			err:      errors.New("required field: resolution"),
 		},
 		{
-			params: &GetHistoricalPricesParams{
+			params: &goftx.GetHistoricalPricesParams{
 				Resolution: models.Minute,
 				Limit:      PtrInt(10),
 				StartTime:  PtrInt(20),
@@ -75,7 +76,7 @@ func TestPrepareQueryParams(t *testing.T) {
 
 	for i, test := range tests {
 		msg := fmt.Sprintf("test #%d", i+1)
-		result, err := PrepareQueryParams(test.params)
+		result, err := goftx.PrepareQueryParams(test.params)
 		if err != nil {
 			require.NotNil(t, test.err)
 			require.Equal(t, test.err.Error(), err.Error(), msg)

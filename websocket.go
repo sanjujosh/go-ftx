@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	wsUrl = "wss://ftx.com/ws/"
-
+	wsUrl             = "wss://ftx.com/ws/"
 	websocketTimeout  = time.Second * 60
 	pingPeriod        = (websocketTimeout * 9) / 10
 	reconnectCount    = int(10)
@@ -32,6 +31,7 @@ type Stream struct {
 }
 
 func (s *Stream) SetReconnectionCount(count int) {
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -87,7 +87,9 @@ func (s *Stream) connect(requests ...models.WSRequest) (*websocket.Conn, error) 
 	return conn, nil
 }
 
-func (s *Stream) serve(ctx context.Context, requests ...models.WSRequest) (chan interface{}, error) {
+func (s *Stream) serve(
+	ctx context.Context, requests ...models.WSRequest) (chan interface{}, error) {
+
 	conn, err := s.connect(requests...)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -166,7 +168,9 @@ func (s *Stream) serve(ctx context.Context, requests ...models.WSRequest) (chan 
 	return eventsC, nil
 }
 
-func (s *Stream) reconnect(ctx context.Context, requests []models.WSRequest) (*websocket.Conn, error) {
+func (s *Stream) reconnect(
+	ctx context.Context, requests []models.WSRequest) (*websocket.Conn, error) {
+
 	for i := 1; i < s.wsReconnectionCount; i++ {
 		conn, err := s.connect(requests...)
 		if err == nil {
@@ -242,6 +246,7 @@ func (s *Stream) SubscribeToTickers(ctx context.Context, symbols ...string) (cha
 }
 
 func (s *Stream) SubscribeToMarkets(ctx context.Context) (chan *models.Market, error) {
+
 	eventsC, err := s.serve(ctx, models.WSRequest{
 		Channel: models.MarketsChannel,
 		Op:      models.Subscribe,
@@ -283,9 +288,11 @@ func (s *Stream) SubscribeToMarkets(ctx context.Context) (chan *models.Market, e
 	return marketsC, nil
 }
 
-func (s *Stream) SubscribeToTrades(ctx context.Context, symbols ...string) (chan *models.TradeResponse, error) {
+func (s *Stream) SubscribeToTrades(
+	ctx context.Context, symbols ...string) (chan *models.TradeResponse, error) {
+
 	if len(symbols) == 0 {
-		return nil, errors.New("symbols is missing")
+		return nil, errors.New("symbols missing")
 	}
 
 	requests := make([]models.WSRequest, 0, len(symbols))
@@ -330,7 +337,9 @@ func (s *Stream) SubscribeToTrades(ctx context.Context, symbols ...string) (chan
 	return tradesC, nil
 }
 
-func (s *Stream) SubscribeToOrderBooks(ctx context.Context, symbols ...string) (chan *models.OrderBookResponse, error) {
+func (s *Stream) SubscribeToOrderBooks(
+	ctx context.Context, symbols ...string) (chan *models.OrderBookResponse, error) {
+
 	if len(symbols) == 0 {
 		return nil, errors.New("symbols is missing")
 	}

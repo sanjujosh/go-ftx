@@ -1,4 +1,4 @@
-package goftx
+package test
 
 import (
 	"testing"
@@ -7,11 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/uscott/goftx"
 	"github.com/uscott/goftx/models"
 )
 
 func TestMarkets_GetMarkets(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	markets, err := ftx.Markets.GetMarkets()
 	assert.NoError(t, err)
@@ -19,7 +20,7 @@ func TestMarkets_GetMarkets(t *testing.T) {
 }
 
 func TestMarkets_GetMarketByName(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	req := require.New(t)
 
@@ -55,7 +56,7 @@ func TestMarkets_GetMarketByName(t *testing.T) {
 }
 
 func TestMarkets_GetOrderBook(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	req := require.New(t)
 
@@ -83,7 +84,7 @@ func TestMarkets_GetOrderBook(t *testing.T) {
 }
 
 func TestMarkets_GetTrades(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	req := require.New(t)
 
@@ -117,7 +118,7 @@ func TestMarkets_GetTrades(t *testing.T) {
 }
 
 func TestMarkets_GetHistoricalPrices(t *testing.T) {
-	ftx := New()
+	ftx := goftx.New()
 
 	req := require.New(t)
 
@@ -128,20 +129,22 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 	})
 
 	t.Run("success_with_resolution", func(t *testing.T) {
-		prices, err := ftx.Markets.GetHistoricalPrices("ETH/BTC", &GetHistoricalPricesParams{
-			Resolution: models.Minute,
-		})
+		prices, err := ftx.Markets.GetHistoricalPrices(
+			"ETH/BTC", &goftx.GetHistoricalPricesParams{
+				Resolution: models.Minute,
+			})
 		req.NoError(err)
 		req.NotNil(prices)
 	})
 
 	t.Run("success_with_params", func(t *testing.T) {
-		prices, err := ftx.Markets.GetHistoricalPrices("ETH/BTC", &GetHistoricalPricesParams{
-			Resolution: models.Minute,
-			Limit:      PtrInt(10),
-			StartTime:  PtrInt(int(time.Now().Add(-5 * time.Hour).Unix())),
-			EndTime:    PtrInt(int(time.Now().Unix())),
-		})
+		prices, err := ftx.Markets.GetHistoricalPrices(
+			"ETH/BTC", &goftx.GetHistoricalPricesParams{
+				Resolution: models.Minute,
+				Limit:      PtrInt(10),
+				StartTime:  PtrInt(int(time.Now().Add(-5 * time.Hour).Unix())),
+				EndTime:    PtrInt(int(time.Now().Unix())),
+			})
 		req.NoError(err)
 		req.NotNil(prices)
 		req.Len(prices, 10)

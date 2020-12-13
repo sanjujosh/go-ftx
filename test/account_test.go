@@ -1,4 +1,4 @@
-package goftx
+package test
 
 import (
 	"os"
@@ -8,13 +8,14 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/uscott/goftx"
 )
 
 func TestAccount_GetAccountInformation(t *testing.T) {
 	godotenv.Load()
 
-	ftx := New(
-		WithAuth(os.Getenv("FTX_KEY"), os.Getenv("FTX_SECRET")),
+	ftx := goftx.New(
+		goftx.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
@@ -27,8 +28,8 @@ func TestAccount_GetAccountInformation(t *testing.T) {
 func TestAccount_GetPositions(t *testing.T) {
 	godotenv.Load()
 
-	ftx := New(
-		WithAuth(os.Getenv("FTX_KEY"), os.Getenv("FTX_SECRET")),
+	ftx := goftx.New(
+		goftx.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
@@ -41,8 +42,8 @@ func TestAccount_GetPositions(t *testing.T) {
 func TestAccount_ChangeAccountLeverage(t *testing.T) {
 	godotenv.Load()
 
-	ftx := New(
-		WithAuth(os.Getenv("FTX_KEY"), os.Getenv("FTX_SECRET")),
+	ftx := goftx.New(
+		goftx.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
