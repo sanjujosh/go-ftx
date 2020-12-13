@@ -96,7 +96,7 @@ func TestMarkets_GetTrades(t *testing.T) {
 
 	t.Run("success_with_limit", func(t *testing.T) {
 		limit := 10
-		trades, err := ftx.Markets.GetTrades("ETH/BTC", &GetTradesParams{
+		trades, err := ftx.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
 			Limit: &limit,
 		})
 		req.NoError(err)
@@ -106,7 +106,7 @@ func TestMarkets_GetTrades(t *testing.T) {
 
 	t.Run("success_with_params", func(t *testing.T) {
 		limit := 10
-		trades, err := ftx.Markets.GetTrades("ETH/BTC", &GetTradesParams{
+		trades, err := ftx.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
 			Limit:     &limit,
 			StartTime: PtrInt(int(time.Now().Add(-5 * time.Hour).Unix())),
 			EndTime:   PtrInt(int(time.Now().Unix())),
@@ -130,7 +130,7 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 
 	t.Run("success_with_resolution", func(t *testing.T) {
 		prices, err := ftx.Markets.GetHistoricalPrices(
-			"ETH/BTC", &goftx.GetHistoricalPricesParams{
+			"ETH/BTC", &models.GetHistoricalPricesParams{
 				Resolution: models.Minute,
 			})
 		req.NoError(err)
@@ -139,7 +139,7 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 
 	t.Run("success_with_params", func(t *testing.T) {
 		prices, err := ftx.Markets.GetHistoricalPrices(
-			"ETH/BTC", &goftx.GetHistoricalPricesParams{
+			"ETH/BTC", &models.GetHistoricalPricesParams{
 				Resolution: models.Minute,
 				Limit:      PtrInt(10),
 				StartTime:  PtrInt(int(time.Now().Add(-5 * time.Hour).Unix())),
