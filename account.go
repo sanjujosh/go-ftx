@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 
-	"github.com/uscott/goftx/models"
+	"github.com/uscott/go-ftx/models"
 )
 
 const (

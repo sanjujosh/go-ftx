@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
-	"github.com/uscott/goftx"
-	"github.com/uscott/goftx/models"
+	goftx "github.com/uscott/go-ftx"
+	"github.com/uscott/go-ftx/models"
 )
 
 var (

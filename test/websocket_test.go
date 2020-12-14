@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/uscott/goftx"
-	"github.com/uscott/goftx/models"
+	goftx "github.com/uscott/go-ftx"
+	"github.com/uscott/go-ftx/models"
 )
 
 const sleepDuration time.Duration = 5 * time.Second

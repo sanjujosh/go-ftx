@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/uscott/goftx"
+	goftx "github.com/uscott/go-ftx"
 )
 
 func main() {

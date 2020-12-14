@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/uscott/goftx"
+	goftx "github.com/uscott/go-ftx"
 )
 
 func main() {

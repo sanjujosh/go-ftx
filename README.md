@@ -5,7 +5,7 @@ Forked from https://github.com/grishinsana/goftx
 
 ### Install
 ```shell script
-go get github.com/uscott/goftx
+go get github.com/uscott/go-ftx
 ```
 
 ### Usage
@@ -33,7 +33,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/uscott/goftx"
+	"github.com/uscott/go-ftx"
 )
 
 func main() {
@@ -64,18 +64,18 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/uscott/goftx"
+	"github.com/uscott/go-ftx"
 )
 
 func main() {
     sigs := make(chan os.Signal, 1)
     signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-    
+
     ctx, cancel := context.WithCancel(context.Background())
-    
+
     client := goftx.New()
     client.Stream.SetDebugMode(true)
-    
+
     data, err := client.Stream.SubscribeToTickers(ctx, "ETH/BTC")
     if err != nil {
         log.Fatalf("%+v", err)

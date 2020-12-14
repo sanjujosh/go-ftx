@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/uscott/go-ftx/models"
 	"github.com/uscott/goftx"
-	"github.com/uscott/goftx/models"
 )
 
 var (
