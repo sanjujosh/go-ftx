@@ -102,14 +102,16 @@ func main() {
 ```
 
 ### Websocket Debug Mode
-If need, it is possible to set debug mode to look error and system messages in stream methods
+If needed, it is possible to set debug mode to look at error and system messages in stream methods
 ```go
     client := goftx.New()
     client.Stream.SetDebugMode(true)
 ```
 
 ### No Logged In Error
-"Not logged in" errors usually come from a wrong signatures. FTX released an article on how to authenticate https://blog.ftx.com/blog/api-authentication/
+"Not logged in" errors usually come from wrong signatures.
+
+FTX released an article on how to authenticate https://blog.ftx.com/blog/api-authentication/
 
 If you have unauthorized error to private methods, then you need to use SetServerTimeDiff()
 ```go
