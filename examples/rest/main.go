@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
-	ftx "github.com/uscott/go-ftx/api"
+	"github.com/uscott/go-ftx/api"
 )
 
 func main() {
-	client := ftx.New(
-		ftx.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
-		ftx.WithHTTPClient(&http.Client{
+	client := api.New(
+		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
+		api.WithHTTPClient(&http.Client{
 			Timeout: 5 * time.Second,
 		}),
 	)

@@ -8,19 +8,19 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	ftx "github.com/uscott/go-ftx/api"
+	"github.com/uscott/go-ftx/api"
 )
 
 func TestAccount_GetAccountInformation(t *testing.T) {
 	godotenv.Load()
 
-	ftx := ftx.New(
-		ftx.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
+	ftx := api.New(
+		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := ftx.SetServerTimeDiff()
+	err := api.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	account, err := ftx.Account.GetAccountInformation()
+	account, err := api.Account.GetAccountInformation()
 	assert.NoError(t, err)
 	assert.NotNil(t, account)
 }
@@ -28,13 +28,13 @@ func TestAccount_GetAccountInformation(t *testing.T) {
 func TestAccount_GetPositions(t *testing.T) {
 	godotenv.Load()
 
-	ftx := ftx.New(
-		ftx.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
+	ftx := api.New(
+		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := ftx.SetServerTimeDiff()
+	err := api.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	positions, err := ftx.Account.GetPositions()
+	positions, err := api.Account.GetPositions()
 	assert.NoError(t, err)
 	assert.NotNil(t, positions)
 }
@@ -42,18 +42,18 @@ func TestAccount_GetPositions(t *testing.T) {
 func TestAccount_ChangeAccountLeverage(t *testing.T) {
 	godotenv.Load()
 
-	ftx := ftx.New(
-		ftx.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
+	ftx := api.New(
+		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := ftx.SetServerTimeDiff()
+	err := api.SetServerTimeDiff()
 	require.NoError(t, err)
 
 	leverage := decimal.New(10, 0)
 
-	err = ftx.Account.ChangeAccountLeverage(leverage)
+	err = api.Account.ChangeAccountLeverage(leverage)
 	assert.NoError(t, err)
 
-	account, err := ftx.Account.GetAccountInformation()
+	account, err := api.Account.GetAccountInformation()
 	assert.NoError(t, err)
 	assert.NotNil(t, account)
 	assert.True(t, leverage.Equal(account.Leverage))

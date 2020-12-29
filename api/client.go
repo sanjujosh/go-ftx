@@ -1,4 +1,4 @@
-package ftx
+package api
 
 import (
 	"bytes"
