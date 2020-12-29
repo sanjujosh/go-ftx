@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	ftx "github.com/uscott/go-ftx"
+	ftx "github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
 )
 
