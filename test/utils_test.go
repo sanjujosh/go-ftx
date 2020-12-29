@@ -11,11 +11,6 @@ import (
 	"github.com/uscott/go-ftx/models"
 )
 
-var (
-	PtrInt   = ftx.PtrInt
-	PtrInt64 = ftx.PtrInt64
-)
-
 func TestPrepareQueryParams(t *testing.T) {
 	tests := []struct {
 		params   interface{}
@@ -31,9 +26,9 @@ func TestPrepareQueryParams(t *testing.T) {
 		},
 		{
 			params: &models.GetTradesParams{
-				Limit:     PtrInt(10),
-				StartTime: PtrInt(20),
-				EndTime:   PtrInt(30),
+				Limit:     ftx.PtrInt(10),
+				StartTime: ftx.PtrInt(20),
+				EndTime:   ftx.PtrInt(30),
 			},
 			expected: map[string]string{
 				"limit":      "10",
@@ -44,9 +39,9 @@ func TestPrepareQueryParams(t *testing.T) {
 		},
 		{
 			params: &models.GetTradesParams{
-				Limit:     PtrInt(10),
-				StartTime: PtrInt(20),
-				EndTime:   PtrInt(0),
+				Limit:     ftx.PtrInt(10),
+				StartTime: ftx.PtrInt(20),
+				EndTime:   ftx.PtrInt(0),
 			},
 			expected: map[string]string{
 				"limit":      "10",
@@ -57,7 +52,7 @@ func TestPrepareQueryParams(t *testing.T) {
 		},
 		{
 			params: &models.GetHistoricalPricesParams{
-				Limit: PtrInt(10),
+				Limit: ftx.PtrInt(10),
 			},
 			expected: map[string]string{},
 			err:      errors.New("required field: resolution"),
@@ -65,9 +60,9 @@ func TestPrepareQueryParams(t *testing.T) {
 		{
 			params: &models.GetHistoricalPricesParams{
 				Resolution: models.Minute,
-				Limit:      PtrInt(10),
-				StartTime:  PtrInt(20),
-				EndTime:    PtrInt(0),
+				Limit:      ftx.PtrInt(10),
+				StartTime:  ftx.PtrInt(20),
+				EndTime:    ftx.PtrInt(0),
 			},
 			expected: map[string]string{
 				"resolution": "60",
