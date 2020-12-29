@@ -22,6 +22,13 @@ func TestMarkets_GetMarkets(t *testing.T) {
 	markets, err := ftx.Markets.GetMarkets()
 	assert.NoError(t, err)
 	assert.NotNil(t, markets)
+	for _, p := range markets {
+		m := *p
+		if m.Type != "future" {
+			continue
+		}
+		t.Logf("Underlying: %s\n", m.Underlying)
+	}
 }
 
 func TestMarkets_GetMarketByName(t *testing.T) {

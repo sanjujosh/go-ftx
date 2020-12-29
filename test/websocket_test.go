@@ -86,6 +86,28 @@ func TestStream_SubscribeToMarkets(t *testing.T) {
 	}
 }
 
+func TestStream_ListMarkets(t *testing.T) {
+
+	ftx, ctx, done := prepForTest()
+
+	data, _ := ftx.Stream.SubscribeToMarkets(ctx)
+
+	count := 0
+	for {
+		select {
+		case <-done:
+			require.True(t, count > 0)
+			return
+		case msg := <-data:
+			t.Logf("Name: %s\n", msg.Name)
+			t.Logf("Type: %s\n", msg.Type)
+			t.Logf("Base Currency:  %s\n", msg.BaseCurrency)
+			t.Logf("Quote Currency: %s\n", msg.QuoteCurrency)
+			t.Logf("Underlying:     %s\n", msg.Underlying)
+			count++
+		}
+	}
+}
 func TestStream_SubscribeToTrades(t *testing.T) {
 
 	ftx, ctx, done := prepForTest()

@@ -11,6 +11,7 @@ type Market struct {
 	Underlying     string          `json:"underlying"`
 	BaseCurrency   string          `json:"baseCurrency"`
 	QuoteCurrency  string          `json:"quoteCurrency"`
+	Type           string          `json:"type"`
 	Enabled        bool            `json:"enabled"`
 	Ask            decimal.Decimal `json:"ask"`
 	Bid            decimal.Decimal `json:"bid"`
