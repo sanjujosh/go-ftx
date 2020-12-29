@@ -8,7 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/uscott/go-ftx"
+	ftx "github.com/uscott/go-ftx/api"
 )
 
 func TestAccount_GetAccountInformation(t *testing.T) {
