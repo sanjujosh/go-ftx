@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/uscott/ftx"
+	"github.com/uscott/go-ftx"
 )
 
 func TestSubAccounts_CRUD(t *testing.T) {

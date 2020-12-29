@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uscott/ftx"
+	"github.com/uscott/go-ftx"
 )
 
 func TestClient_GetServerTime(t *testing.T) {
