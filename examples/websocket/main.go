@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	goftx "github.com/uscott/go-ftx"
+	ftx "github.com/uscott/go-ftx"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	client := goftx.New()
+	client := ftx.New()
 	client.Stream.SetDebugMode(true)
 
 	// subscribeToTickers(ctx, client)
@@ -33,7 +33,7 @@ func main() {
 	time.Sleep(5 * time.Second)
 }
 
-func subscribeToTickers(ctx context.Context, client *goftx.Client) {
+func subscribeToTickers(ctx context.Context, client *ftx.Client) {
 
 	data, err := client.Stream.SubscribeToTickers(ctx, "ETH/BTC")
 
@@ -56,7 +56,7 @@ func subscribeToTickers(ctx context.Context, client *goftx.Client) {
 	}()
 }
 
-func subscribeToMarkets(ctx context.Context, client *goftx.Client) {
+func subscribeToMarkets(ctx context.Context, client *ftx.Client) {
 	data, err := client.Stream.SubscribeToMarkets(ctx)
 	if err != nil {
 		log.Fatalf("%+v", err)
@@ -77,7 +77,7 @@ func subscribeToMarkets(ctx context.Context, client *goftx.Client) {
 	}()
 }
 
-func subscribeToTrades(ctx context.Context, client *goftx.Client) {
+func subscribeToTrades(ctx context.Context, client *ftx.Client) {
 	data, err := client.Stream.SubscribeToTrades(ctx, "BTC-PERP")
 	if err != nil {
 		log.Fatalf("%+v", err)
@@ -98,7 +98,7 @@ func subscribeToTrades(ctx context.Context, client *goftx.Client) {
 	}()
 }
 
-func subscribeToOrderBooks(ctx context.Context, client *goftx.Client) {
+func subscribeToOrderBooks(ctx context.Context, client *ftx.Client) {
 	data, err := client.Stream.SubscribeToOrderBooks(ctx, "BTC/USDT")
 	if err != nil {
 		log.Fatalf("%+v", err)

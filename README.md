@@ -1,7 +1,7 @@
-# goftx
+# ftx
 FTX exchange golang library
 
-Forked from https://github.com/grishinsana/goftx
+Forked from https://github.com/grishinsana/ftx
 
 ### Install
 ```shell script
@@ -37,9 +37,9 @@ import (
 )
 
 func main() {
-	client := goftx.New(
-		goftx.WithAuth("API-KEY", "API-SECRET"),
-		goftx.WithHTTPClient(&http.Client{
+	client := ftx.New(
+		ftx.WithAuth("API-KEY", "API-SECRET"),
+		ftx.WithHTTPClient(&http.Client{
 			Timeout: 5 * time.Second,
 		}),
 	)
@@ -73,7 +73,7 @@ func main() {
 
     ctx, cancel := context.WithCancel(context.Background())
 
-    client := goftx.New()
+    client := ftx.New()
     client.Stream.SetDebugMode(true)
 
     data, err := client.Stream.SubscribeToTickers(ctx, "ETH/BTC")
@@ -104,7 +104,7 @@ func main() {
 ### Websocket Debug Mode
 If needed, it is possible to set debug mode to look at error and system messages in stream methods
 ```go
-    client := goftx.New()
+    client := ftx.New()
     client.Stream.SetDebugMode(true)
 ```
 

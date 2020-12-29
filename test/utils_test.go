@@ -7,13 +7,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
-	goftx "github.com/uscott/go-ftx"
+	ftx "github.com/uscott/go-ftx"
 	"github.com/uscott/go-ftx/models"
 )
 
 var (
-	PtrInt   = goftx.PtrInt
-	PtrInt64 = goftx.PtrInt64
+	PtrInt   = ftx.PtrInt
+	PtrInt64 = ftx.PtrInt64
 )
 
 func TestPrepareQueryParams(t *testing.T) {
@@ -81,7 +81,7 @@ func TestPrepareQueryParams(t *testing.T) {
 
 	for i, test := range tests {
 		msg := fmt.Sprintf("test #%d", i+1)
-		result, err := goftx.PrepareQueryParams(test.params)
+		result, err := ftx.PrepareQueryParams(test.params)
 		if err != nil {
 			require.NotNil(t, test.err)
 			require.Equal(t, test.err.Error(), err.Error(), msg)

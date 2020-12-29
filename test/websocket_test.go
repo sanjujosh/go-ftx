@@ -8,14 +8,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	goftx "github.com/uscott/go-ftx"
+	ftx "github.com/uscott/go-ftx"
 	"github.com/uscott/go-ftx/models"
 )
 
 const sleepDuration time.Duration = 5 * time.Second
 
-func prepForTest() (*goftx.Client, context.Context, chan struct{}) {
-	ftx := goftx.New()
+func prepForTest() (*ftx.Client, context.Context, chan struct{}) {
+	ftx := ftx.New()
 	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan struct{})
 	go func() {

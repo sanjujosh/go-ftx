@@ -1,4 +1,4 @@
-package goftx
+package ftx
 
 import (
 	"encoding/json"

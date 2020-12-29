@@ -7,17 +7,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/uscott/ftx"
 	"github.com/uscott/go-ftx/models"
-	"github.com/uscott/goftx"
 )
 
 var (
-	PtrInt   = goftx.PtrInt
-	PtrInt64 = goftx.PtrInt64
+	PtrInt   = ftx.PtrInt
+	PtrInt64 = ftx.PtrInt64
 )
 
 func TestMarkets_GetMarkets(t *testing.T) {
-	ftx := goftx.New()
+	ftx := ftx.New()
 
 	markets, err := ftx.Markets.GetMarkets()
 	assert.NoError(t, err)
@@ -25,7 +25,7 @@ func TestMarkets_GetMarkets(t *testing.T) {
 }
 
 func TestMarkets_GetMarketByName(t *testing.T) {
-	ftx := goftx.New()
+	ftx := ftx.New()
 
 	req := require.New(t)
 
@@ -61,7 +61,7 @@ func TestMarkets_GetMarketByName(t *testing.T) {
 }
 
 func TestMarkets_GetOrderBook(t *testing.T) {
-	ftx := goftx.New()
+	ftx := ftx.New()
 
 	req := require.New(t)
 
@@ -89,7 +89,7 @@ func TestMarkets_GetOrderBook(t *testing.T) {
 }
 
 func TestMarkets_GetTrades(t *testing.T) {
-	ftx := goftx.New()
+	ftx := ftx.New()
 
 	req := require.New(t)
 
@@ -123,7 +123,7 @@ func TestMarkets_GetTrades(t *testing.T) {
 }
 
 func TestMarkets_GetHistoricalPrices(t *testing.T) {
-	ftx := goftx.New()
+	ftx := ftx.New()
 
 	req := require.New(t)
 
