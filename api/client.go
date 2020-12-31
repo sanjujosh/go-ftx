@@ -49,6 +49,7 @@ type Client struct {
 	serverTimeDiff time.Duration
 	SubAccounts
 	Markets
+	Futures
 	Account
 	Stream
 	Orders
