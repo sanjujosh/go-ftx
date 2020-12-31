@@ -12,8 +12,8 @@ type Future struct {
 	Change1h            decimal.Decimal `json:"change1h,omitempty"`
 	Change24h           decimal.Decimal `json:"change24h,omitempty"`
 	ChangeBod           decimal.Decimal `json:"changeBod,omitempty"`
-	VolumeUsd24h        decimal.Decimal `json:"volumeUsd24h,omitempty"`
-	Volume              decimal.Decimal `json:"volume,omitempty"`
+	VolumeUsd24h        float64         `json:"volumeUsd24h,omitempty"`
+	Volume              float64         `json:"volume,omitempty"`
 	Description         string          `json:"description,omitempty"`
 	Enabled             bool            `json:"enabled,omitempty"`
 	Expired             bool            `json:"expired,omitempty"`
