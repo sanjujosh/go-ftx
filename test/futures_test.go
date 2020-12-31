@@ -15,7 +15,7 @@ func TestFutures_GetFutures(t *testing.T) {
 
 	futures, err := ftx.Futures.GetFutures()
 	assert.NoError(t, err)
-	assert.NotNil(t.future)
+	assert.NotNil(t, futures)
 	for _, p := range futures {
 		fmt.Printf("Description: %s\n", p.Description)
 		fmt.Printf("Expiration:  %+v\n", tm.Format0(p.Expiry))
