@@ -18,12 +18,12 @@ func TestOrders_GetOpenOrders(t *testing.T) {
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := api.SetServerTimeDiff()
+	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
 	market := "ETH/BTC"
 
-	orders, err := api.Orders.GetOpenOrders(market)
+	orders, err := ftx.Orders.GetOpenOrders(market)
 	assert.NoError(t, err)
 	assert.NotNil(t, orders)
 }
@@ -34,12 +34,12 @@ func TestOrders_GetOrdersHistory(t *testing.T) {
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := api.SetServerTimeDiff()
+	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
 	market := "ETH/BTC"
 
-	orders, err := api.Orders.GetOrdersHistory(&models.GetOrdersHistoryParams{
+	orders, err := ftx.Orders.GetOrdersHistory(&models.GetOrdersHistoryParams{
 		Market:    &market,
 		Limit:     nil,
 		StartTime: nil,
@@ -55,13 +55,13 @@ func TestOrders_GetOpenTriggerOrders(t *testing.T) {
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := api.SetServerTimeDiff()
+	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
 	market := "ETH/BTC"
 	orderType := models.Stop
 
-	orders, err := api.Orders.GetOpenTriggerOrders(&models.GetOpenTriggerOrdersParams{
+	orders, err := ftx.Orders.GetOpenTriggerOrders(&models.GetOpenTriggerOrdersParams{
 		Market: &market,
 		Type:   &orderType,
 	})
@@ -75,12 +75,12 @@ func TestOrders_GetOrderTriggers(t *testing.T) {
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := api.SetServerTimeDiff()
+	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
 	orderID := int64(1111)
 
-	triggers, err := api.Orders.GetOrderTriggers(orderID)
+	triggers, err := ftx.Orders.GetOrderTriggers(orderID)
 
 	// 400 - Bad Request, orderID doesn't exist
 	assert.Error(t, err)
