@@ -31,7 +31,7 @@ func TestStream_SubscribeToTickers(t *testing.T) {
 	ftx, ctx, done := prepForTest()
 
 	symbol := "ETH/BTC"
-	data, err := api.Stream.SubscribeToTickers(ctx, symbol)
+	data, err := ftx.Stream.SubscribeToTickers(ctx, symbol)
 	require.NoError(t, err)
 
 	count := 0
@@ -60,7 +60,7 @@ func TestStream_SubscribeToMarkets(t *testing.T) {
 
 	ftx, ctx, done := prepForTest()
 
-	data, err := api.Stream.SubscribeToMarkets(ctx)
+	data, err := ftx.Stream.SubscribeToMarkets(ctx)
 	require.NoError(t, err)
 
 	asset1, asset2 := "ETH", "BTC"
@@ -90,7 +90,7 @@ func TestStream_ListMarkets(t *testing.T) {
 
 	ftx, ctx, done := prepForTest()
 
-	data, _ := api.Stream.SubscribeToMarkets(ctx)
+	data, _ := ftx.Stream.SubscribeToMarkets(ctx)
 
 	count := 0
 	for {
@@ -113,7 +113,7 @@ func TestStream_SubscribeToTrades(t *testing.T) {
 	ftx, ctx, done := prepForTest()
 
 	symbol := "BTC-PERP"
-	data, err := api.Stream.SubscribeToTrades(ctx, symbol)
+	data, err := ftx.Stream.SubscribeToTrades(ctx, symbol)
 	require.NoError(t, err)
 
 	lastID := int64(0)
@@ -138,7 +138,7 @@ func TestStream_SubscribeToOrderBooks(t *testing.T) {
 	ftx, ctx, done := prepForTest()
 
 	symbol := "ETH/BTC"
-	data, err := api.Stream.SubscribeToOrderBooks(ctx, symbol)
+	data, err := ftx.Stream.SubscribeToOrderBooks(ctx, symbol)
 	require.NoError(t, err)
 
 	count := 0
