@@ -17,10 +17,10 @@ func TestAccount_GetAccountInformation(t *testing.T) {
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := api.SetServerTimeDiff()
+	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	account, err := api.Account.GetAccountInformation()
+	account, err := ftx.Account.GetAccountInformation()
 	assert.NoError(t, err)
 	assert.NotNil(t, account)
 }
@@ -31,10 +31,10 @@ func TestAccount_GetPositions(t *testing.T) {
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := api.SetServerTimeDiff()
+	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	positions, err := api.Account.GetPositions()
+	positions, err := ftx.Account.GetPositions()
 	assert.NoError(t, err)
 	assert.NotNil(t, positions)
 }
@@ -45,15 +45,15 @@ func TestAccount_ChangeAccountLeverage(t *testing.T) {
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	err := api.SetServerTimeDiff()
+	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
 	leverage := decimal.New(10, 0)
 
-	err = api.Account.ChangeAccountLeverage(leverage)
+	err = ftx.Account.ChangeAccountLeverage(leverage)
 	assert.NoError(t, err)
 
-	account, err := api.Account.GetAccountInformation()
+	account, err := ftx.Account.GetAccountInformation()
 	assert.NoError(t, err)
 	assert.NotNil(t, account)
 	assert.True(t, leverage.Equal(account.Leverage))

@@ -19,7 +19,7 @@ var (
 func TestMarkets_GetMarkets(t *testing.T) {
 	ftx := api.New()
 
-	markets, err := api.Markets.GetMarkets()
+	markets, err := ftx.Markets.GetMarkets()
 	assert.NoError(t, err)
 	assert.NotNil(t, markets)
 	for _, p := range markets {
@@ -44,7 +44,7 @@ func TestMarkets_GetMarketByName(t *testing.T) {
 			Enabled:       true,
 		}
 
-		market, err := api.Markets.GetMarketByName(expected.Name)
+		market, err := ftx.Markets.GetMarketByName(expected.Name)
 		req.NoError(err)
 		req.NotNil(market)
 		req.Equal(expected.Name, market.Name)
@@ -61,7 +61,7 @@ func TestMarkets_GetMarketByName(t *testing.T) {
 			Enabled:       true,
 		}
 
-		market, err := api.Markets.GetMarketByName(expected.Name)
+		market, err := ftx.Markets.GetMarketByName(expected.Name)
 		req.Error(err)
 		req.Nil(market)
 	})
@@ -73,14 +73,14 @@ func TestMarkets_GetOrderBook(t *testing.T) {
 	req := require.New(t)
 
 	t.Run("success", func(t *testing.T) {
-		ob, err := api.Markets.GetOrderBook("ETH/BTC", nil)
+		ob, err := ftx.Markets.GetOrderBook("ETH/BTC", nil)
 		req.NoError(err)
 		req.NotNil(ob)
 	})
 
 	t.Run("success_with_depth", func(t *testing.T) {
 		depth := 30
-		ob, err := api.Markets.GetOrderBook("ETH/BTC", &depth)
+		ob, err := ftx.Markets.GetOrderBook("ETH/BTC", &depth)
 		req.NoError(err)
 		req.NotNil(ob)
 		req.Len(ob.Asks, depth)
@@ -89,7 +89,7 @@ func TestMarkets_GetOrderBook(t *testing.T) {
 
 	t.Run("failed_market", func(t *testing.T) {
 		depth := 30
-		ob, err := api.Markets.GetOrderBook("failed", &depth)
+		ob, err := ftx.Markets.GetOrderBook("failed", &depth)
 		req.Error(err)
 		req.Nil(ob)
 	})
@@ -101,14 +101,14 @@ func TestMarkets_GetTrades(t *testing.T) {
 	req := require.New(t)
 
 	t.Run("success", func(t *testing.T) {
-		trades, err := api.Markets.GetTrades("ETH/BTC", nil)
+		trades, err := ftx.Markets.GetTrades("ETH/BTC", nil)
 		req.NoError(err)
 		req.NotNil(trades)
 	})
 
 	t.Run("success_with_limit", func(t *testing.T) {
 		limit := 10
-		trades, err := api.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
+		trades, err := ftx.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
 			Limit: &limit,
 		})
 		req.NoError(err)
@@ -118,7 +118,7 @@ func TestMarkets_GetTrades(t *testing.T) {
 
 	t.Run("success_with_params", func(t *testing.T) {
 		limit := 10
-		trades, err := api.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
+		trades, err := ftx.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
 			Limit:     &limit,
 			StartTime: PtrInt(int(time.Now().Add(-5 * time.Hour).Unix())),
 			EndTime:   PtrInt(int(time.Now().Unix())),
@@ -135,13 +135,13 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 	req := require.New(t)
 
 	t.Run("failed", func(t *testing.T) {
-		prices, err := api.Markets.GetHistoricalPrices("ETH/BTC", nil)
+		prices, err := ftx.Markets.GetHistoricalPrices("ETH/BTC", nil)
 		req.Error(err)
 		req.Nil(prices)
 	})
 
 	t.Run("success_with_resolution", func(t *testing.T) {
-		prices, err := api.Markets.GetHistoricalPrices(
+		prices, err := ftx.Markets.GetHistoricalPrices(
 			"ETH/BTC", &models.GetHistoricalPricesParams{
 				Resolution: models.Minute,
 			})
@@ -150,7 +150,7 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 	})
 
 	t.Run("success_with_params", func(t *testing.T) {
-		prices, err := api.Markets.GetHistoricalPrices(
+		prices, err := ftx.Markets.GetHistoricalPrices(
 			"ETH/BTC", &models.GetHistoricalPricesParams{
 				Resolution: models.Minute,
 				Limit:      PtrInt(10),
