@@ -28,7 +28,7 @@ func TestFutures_GetFutures(t *testing.T) {
 	}
 }
 
-const futName string = "Bitcoin March 2019 Futures"
+const futName string = "BTC-0329"
 
 func TestFutures_GetFutureByName(t *testing.T) {
 
