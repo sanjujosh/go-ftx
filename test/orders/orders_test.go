@@ -41,7 +41,7 @@ func TestOrders_GetOrdersHistory(t *testing.T) {
 
 	market := "ETH/BTC"
 
-	orders, err := ftx.Orders.GetOrdersHistory(&models.GetOrdersHistoryParams{
+	orders, err := ftx.Orders.GetOrdersHistory(&models.OrdersHistoryParams{
 		Market:    &market,
 		Limit:     nil,
 		StartTime: nil,
@@ -63,7 +63,7 @@ func TestOrders_GetOpenTriggerOrders(t *testing.T) {
 	market := "ETH/BTC"
 	orderType := models.Stop
 
-	orders, err := ftx.Orders.GetOpenTriggerOrders(&models.GetOpenTriggerOrdersParams{
+	orders, err := ftx.Orders.GetOpenTriggerOrders(&models.OpenTriggerOrdersParams{
 		Market: &market,
 		Type:   &orderType,
 	})
@@ -99,8 +99,8 @@ func TestOrders_PlaceOrder(t *testing.T) {
 
 	order, err := ftx.Orders.PlaceOrder(&models.PlaceOrderParams{
 		Market: api.PtrString("BTC-PERP"),
-		Side:   api.PtrString("Buy"),
-		Price:  api.PtrDecimal(decimal.NewFromFloat(30e3)),
+		Side:   api.PtrString("sell"),
+		Price:  api.PtrDecimal(decimal.NewFromFloat(40e3)),
 		Type:   api.PtrString("limit"),
 		Size:   api.PtrDecimal(decimal.NewFromFloat(0.001 / 2)),
 	})
