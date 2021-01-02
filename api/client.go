@@ -66,6 +66,7 @@ func New(opts ...Option) *Client {
 
 	client.SubAccounts = SubAccounts{client: client}
 	client.Markets = Markets{client: client}
+	client.Futures = Futures{client: client}
 	client.Account = Account{client: client}
 	client.Orders = Orders{client: client}
 	client.Stream = Stream{
