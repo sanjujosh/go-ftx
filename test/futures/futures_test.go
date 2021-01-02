@@ -69,5 +69,50 @@ func TestFutures_GetFundingRates(t *testing.T) {
 		}
 		t.Logf("Rates: %+v\n", *p)
 	}
-	
+
+}
+
+const index string = "BTC"
+
+func TestFutures_GetIndexWeights(t *testing.T) {
+
+	ftx := api.New()
+
+	weights, err := ftx.Futures.GetIndexWeights(index)
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Weights: %+v\n", weights)
+}
+
+func TestFutures_GetExpiredFutures(t *testing.T) {
+
+	ftx := api.New()
+	futures, err := ftx.Futures.GetExpiredFutures()
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	for _, p := range futures {
+		if p == nil {
+			t.Fatal("nil pointer")
+		}
+		t.Logf("Expired Future: %+v\n", *p)
+	}
+}
+
+func TestFutures_GetHistoricalIndex(t *testing.T) {
+
+	ftx := api.New()
+	limit, resolution, now := 30, 60, time.Now()
+	histIndex, err := ftx.Futures.GetHistoricalIndex(&models.HistoricalIndexParams{
+		IndexName:  api.PtrString(index),
+		Resolution: api.PtrInt(resolution),
+		Limit:      api.PtrInt(limit),
+		StartTime:  api.PtrInt(int(now.Add(-5 * time.Hour).Unix())),
+		EndTime:    api.PtrInt(int(now.Unix())),
+	})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Historical Index: %+v\n", *histIndex)
 }
