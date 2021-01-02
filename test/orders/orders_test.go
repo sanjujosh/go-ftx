@@ -6,6 +6,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -99,9 +100,9 @@ func TestOrders_PlaceOrder(t *testing.T) {
 	order, err := ftx.Orders.PlaceOrder(&models.PlaceOrderParams{
 		Market: api.PtrString("BTC-PERP"),
 		Side:   api.PtrString("Buy"),
-		Price:  api.PtrDecimal(30e3),
+		Price:  api.PtrDecimal(decimal.NewFromFloat(30e3)),
 		Type:   api.PtrString("limit"),
-		Size:   api.PtrDecimal(0.001 / 2),
+		Size:   api.PtrDecimal(decimal.NewFromFloat(0.001 / 2)),
 	})
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
