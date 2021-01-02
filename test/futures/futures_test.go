@@ -18,13 +18,16 @@ func TestFutures_GetFutures(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, p := range futures {
+	for i, p := range futures {
 		if p == nil {
 			t.Fatal("nil pointer")
 		}
 		fmt.Printf("Description: %s\n", p.Description)
 		fmt.Printf("Expiration:  %+v\n", p.Expiry.Format(time.RFC3339))
 		fmt.Printf("Name:        %s\n", p.Name)
+		if i > 10 {
+			break
+		}
 	}
 }
 
@@ -63,11 +66,14 @@ func TestFutures_GetFundingRates(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	for _, p := range rates {
+	for i, p := range rates {
 		if p == nil {
 			t.Fatal("nil pointer")
 		}
 		t.Logf("Rates: %+v\n", *p)
+		if i > 10 {
+			break
+		}
 	}
 
 }
@@ -92,11 +98,14 @@ func TestFutures_GetExpiredFutures(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	for _, p := range futures {
+	for i, p := range futures {
 		if p == nil {
 			t.Fatal("nil pointer")
 		}
 		t.Logf("Expired Future: %+v\n", *p)
+		if i > 10 {
+			break
+		}
 	}
 }
 
@@ -104,8 +113,9 @@ func TestFutures_GetHistoricalIndex(t *testing.T) {
 
 	ftx := api.New()
 	limit, resolution, now := 30, 60, time.Now()
-	histIndex, err := ftx.Futures.GetHistoricalIndex(&models.HistoricalIndexParams{
-		IndexName:  api.PtrString(index),
+	histIndex, err := ftx.Futures.GetHistoricalIndex(
+		index,
+		&models.HistoricalIndexParams{
 		Resolution: api.PtrInt(resolution),
 		Limit:      api.PtrInt(limit),
 		StartTime:  api.PtrInt(int(now.Add(-5 * time.Hour).Unix())),
@@ -114,5 +124,13 @@ func TestFutures_GetHistoricalIndex(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Historical Index: %+v\n", *histIndex)
+	for i, p := range histIndex {
+		if p == nil {
+			t.Fatal("nil pointer")
+		}
+		t.Logf("Historical Index: %+v\n", *p)
+		if i > 10 {
+			break
+		}
+	}
 }

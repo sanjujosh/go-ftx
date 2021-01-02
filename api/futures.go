@@ -15,7 +15,7 @@ const (
 	apiGetFundingRates    = "/funding_rates"
 	apiGetIndexWeights    = "/indexes/%s/weights"
 	apiGetExpiredFutures  = "/expired_futures"
-	apiGetHistoricalIndex = "/indexes"
+	apiGetHistoricalIndex = "/indexes/%s/candles"
 )
 
 type Futures struct {
@@ -118,9 +118,9 @@ func (f *Futures) GetFundingRates(
 	return result, nil
 }
 
-func (f *Futures) GetIndexWeights(marketName string) (*map[string]float64, error) {
+func (f *Futures) GetIndexWeights(index string) (*map[string]float64, error) {
 
-	path := fmt.Sprintf(apiGetIndexWeights, marketName)
+	path := fmt.Sprintf(apiGetIndexWeights, index)
 	request, err := f.client.prepareRequest(Request{
 		Method: http.MethodGet,
 		URL:    fmt.Sprintf("%s%s", apiUrl, path),
@@ -160,15 +160,17 @@ func (f *Futures) GetExpiredFutures() ([]*models.FutureExpired, error) {
 }
 
 func (f *Futures) GetHistoricalIndex(
-	params *models.HistoricalIndexParams) (*models.HistoricalIndex, error) {
+	indexName string,
+	params *models.HistoricalIndexParams) ([]*models.HistoricalIndex, error) {
 
+	path := fmt.Sprintf(apiGetHistoricalIndex, indexName)
 	queryParams, err := PrepareQueryParams(params)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 	request, err := f.client.prepareRequest(Request{
 		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetHistoricalIndex),
+		URL:    fmt.Sprintf("%s%s", apiUrl, path),
 		Params: queryParams,
 	})
 	if err != nil {
@@ -178,9 +180,9 @@ func (f *Futures) GetHistoricalIndex(
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	var result models.HistoricalIndex
+	var result []*models.HistoricalIndex
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return &result, nil
+	return result, nil
 }
