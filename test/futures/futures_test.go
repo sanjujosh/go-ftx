@@ -28,7 +28,7 @@ func TestFutures_GetFutures(t *testing.T) {
 	}
 }
 
-const futName string = "BTC-0329"
+const futName string = "BTC-PERP"
 
 func TestFutures_GetFutureByName(t *testing.T) {
 
@@ -58,10 +58,16 @@ func TestFutures_GetFundingRates(t *testing.T) {
 	rates, err := ftx.Futures.GetFundingRates(&models.FundingRatesParams{
 		StartTime: api.PtrInt(int(now.Add(-5 * time.Hour).Unix())),
 		EndTime:   api.PtrInt(int(now.Unix())),
-		Future:    api.PtrString("BTC-PERP"),
+		Future:    api.PtrString(futName),
 	})
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Rates: %+v\n", rates)
+	for _, p := range rates {
+		if p == nil {
+			t.Fatal("nil pointer")
+		}
+		t.Logf("Rates: %+v\n", *p)
+	}
+	
 }

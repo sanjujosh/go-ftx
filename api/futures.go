@@ -92,7 +92,7 @@ func (f *Futures) GetFutureStats(name string) (*models.FutureStats, error) {
 }
 
 func (f *Futures) GetFundingRates(
-	params *models.FundingRatesParams) (*models.FundingRates, error) {
+	params *models.FundingRatesParams) ([]*models.FundingRates, error) {
 
 	queryParams, err := PrepareQueryParams(params)
 	if err != nil {
@@ -111,11 +111,11 @@ func (f *Futures) GetFundingRates(
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	var result models.FundingRates
+	var result []*models.FundingRates
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return &result, nil
+	return result, nil
 }
 
 func (f *Futures) GetIndexWeights(marketName string) (*map[string]float64, error) {
