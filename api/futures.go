@@ -70,7 +70,7 @@ func (f *Futures) GetFutureByName(name string) (*models.Future, error) {
 	return &result, nil
 }
 
-func (f *Futures) GetFuturesStats(name string) (*models.FutureStats, error) {
+func (f *Futures) GetFutureStats(name string) (*models.FutureStats, error) {
 
 	path := fmt.Sprintf(apiGetFutureStats, name)
 	request, err := f.client.prepareRequest(Request{

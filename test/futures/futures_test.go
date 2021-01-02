@@ -5,7 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/uscott/go-ftx/api"
+	"github.com/uscott/go-ftx/models"
 )
 
 func TestFutures_GetFutures(t *testing.T) {
@@ -24,4 +26,39 @@ func TestFutures_GetFutures(t *testing.T) {
 		fmt.Printf("Expiration:  %+v\n", p.Expiry.Format(time.RFC3339))
 		fmt.Printf("Name:        %s\n", p.Name)
 	}
+}
+
+func TestFutures_GetFutureByName(t *testing.T) {
+
+	ftx := api.New()
+
+	future, err := ftx.Futures.GetFutureByName("BTC-0329")
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Future: %+v\n", future)
+}
+
+func TestFutures_GetFutureStats(t *testing.T) {
+
+	ftx := api.New()
+	stats, err := ftx.Futures.GetFutureStats("BTC-0329")
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Stats: %+v\n", stats)
+}
+
+func TestFutures_GetFundingRates(t *testing.T) {
+
+	ftx := api.New()
+	now := time.Now()
+	rates, err := ftx.Futures.GetFundingRates(&models.FundingRatesParams{
+		StartTime: api.PtrInt(int(now.Add(-5 * time.Hour).Unix())),
+		EndTime:   api.PtrInt(int(now.Unix())),
+	})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Rates: %+v\n", rates)
 }
