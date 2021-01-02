@@ -171,7 +171,10 @@ func (o *Orders) GetTriggerOrdersHistory(
 
 func (o *Orders) PlaceOrder(params *models.PlaceOrderParams) (*models.Order, error) {
 
-	queryParams, err := PrepareQueryParams(params)
+	if params == nil {
+		return nil, fmt.Errorf("nil pointer")
+	}
+	body, err := json.Marshal(*params)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -179,7 +182,7 @@ func (o *Orders) PlaceOrder(params *models.PlaceOrderParams) (*models.Order, err
 		Auth:   true,
 		Method: http.MethodPost,
 		URL:    fmt.Sprintf("%s%s", apiUrl, apiPlaceOrders),
-		Params: queryParams,
+		Body:   body,
 	})
 	if err != nil {
 		return nil, errors.WithStack(err)
