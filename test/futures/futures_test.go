@@ -28,11 +28,13 @@ func TestFutures_GetFutures(t *testing.T) {
 	}
 }
 
+const futName string = "Bitcoin March 2019 Futures"
+
 func TestFutures_GetFutureByName(t *testing.T) {
 
 	ftx := api.New()
 
-	future, err := ftx.Futures.GetFutureByName("BTC-0329")
+	future, err := ftx.Futures.GetFutureByName(futName)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
@@ -42,7 +44,7 @@ func TestFutures_GetFutureByName(t *testing.T) {
 func TestFutures_GetFutureStats(t *testing.T) {
 
 	ftx := api.New()
-	stats, err := ftx.Futures.GetFutureStats("BTC-0329")
+	stats, err := ftx.Futures.GetFutureStats(futName)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
@@ -56,6 +58,7 @@ func TestFutures_GetFundingRates(t *testing.T) {
 	rates, err := ftx.Futures.GetFundingRates(&models.FundingRatesParams{
 		StartTime: api.PtrInt(int(now.Add(-5 * time.Hour).Unix())),
 		EndTime:   api.PtrInt(int(now.Unix())),
+		Future:    api.PtrString("BTC-PERP"),
 	})
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
