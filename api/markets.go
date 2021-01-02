@@ -98,7 +98,9 @@ func (m *Markets) GetOrderBook(marketName string, depth *int) (*models.OrderBook
 	return &result, nil
 }
 
-func (m *Markets) GetTrades(marketName string, params *models.GetTradesParams) ([]*models.Trade, error) {
+func (m *Markets) GetTrades(
+	marketName string, params *models.GetTradesParams) ([]*models.Trade, error) {
+
 	queryParams, err := PrepareQueryParams(params)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -129,6 +131,7 @@ func (m *Markets) GetTrades(marketName string, params *models.GetTradesParams) (
 }
 
 func (m *Markets) GetHistoricalPrices(marketName string, params *models.GetHistoricalPricesParams) ([]*models.HistoricalPrice, error) {
+
 	queryParams, err := PrepareQueryParams(params)
 	if err != nil {
 		return nil, errors.WithStack(err)
