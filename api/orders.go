@@ -10,10 +10,12 @@ import (
 )
 
 const (
-	apiGetOpenOrders    = "/orders"
-	apiGetOrdersHistory = "/orders/history"
-	apiGetTriggerOrders = "/conditional_orders"
-	apiGetOrderTriggers = "/conditional_orders/%d/triggers"
+	apiGetOpenOrders           = "/orders"
+	apiGetOrdersHistory        = "/orders/history"
+	apiGetTriggerOrders        = "/conditional_orders"
+	apiGetOrderTriggers        = "/conditional_orders/%d/triggers"
+	apiGetTriggerOrdersHistory = "/conditional_orders/history"
+	apiPlaceOrders             = apiGetOpenOrders
 )
 
 type Orders struct {
@@ -47,7 +49,9 @@ func (o *Orders) GetOpenOrders(market string) ([]*models.Order, error) {
 	return result, nil
 }
 
-func (o *Orders) GetOrdersHistory(params *models.GetOrdersHistoryParams) ([]*models.Order, error) {
+func (o *Orders) GetOrdersHistory(
+	params *models.OrdersHistoryParams) ([]*models.Order, error) {
+
 	queryParams, err := PrepareQueryParams(params)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -77,7 +81,9 @@ func (o *Orders) GetOrdersHistory(params *models.GetOrdersHistoryParams) ([]*mod
 	return result, nil
 }
 
-func (o *Orders) GetOpenTriggerOrders(params *models.GetOpenTriggerOrdersParams) ([]*models.TriggerOrder, error) {
+func (o *Orders) GetOpenTriggerOrders(
+	params *models.OpenTriggerOrdersParams) ([]*models.TriggerOrder, error) {
+
 	queryParams, err := PrepareQueryParams(params)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -129,4 +135,62 @@ func (o *Orders) GetOrderTriggers(orderID int64) ([]*models.Trigger, error) {
 	}
 
 	return result, nil
+}
+
+func (o *Orders) GetTriggerOrdersHistory(
+	params *models.TriggerOrdersHistoryParams) ([]*models.TriggerOrder, error) {
+
+	queryParams, err := PrepareQueryParams(params)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	request, err := o.client.prepareRequest(Request{
+		Auth:   true,
+		Method: http.MethodGet,
+		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetTriggerOrdersHistory),
+		Params: queryParams,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	response, err := o.client.do(request)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	var result []*models.TriggerOrder
+	err = json.Unmarshal(response, &result)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return result, nil
+}
+
+func (o *Orders) PlaceOrder(params *models.PlaceOrderParams) (*models.Order, error) {
+
+	queryParams, err := PrepareQueryParams(params)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	request, err := o.client.prepareRequest(Request{
+		Auth:   true,
+		Method: http.MethodPost,
+		URL:    fmt.Sprintf("%s%s", apiUrl, apiPlaceOrders),
+		Params: queryParams,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	response, err := o.client.do(request)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	var result models.Order
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &result, nil
 }

@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 func PrepareQueryParams(params interface{}) (map[string]string, error) {
@@ -47,4 +48,12 @@ func PtrInt64(i int64) *int64 {
 
 func PtrString(s string) *string {
 	return &s
+}
+
+func PtrFloat64(f float64) *float64 {
+	return &f
+}
+
+func PtrDecimal(d decimal.Decimal) *decimal.Decimal {
+	return &d
 }

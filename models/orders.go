@@ -19,13 +19,13 @@ type Order struct {
 	Status        Status          `json:"status"`
 	CreatedAt     time.Time       `json:"createdAt"`
 	ReduceOnly    bool            `json:"reduceOnly"`
-	Ioc           bool            `json:"ioc"`
+	IOC           bool            `json:"ioc"`
 	PostOnly      bool            `json:"postOnly"`
 	Future        string          `json:"future"`
 	ClientID      string          `json:"clientId"`
 }
 
-type GetOrdersHistoryParams struct {
+type OrdersHistoryParams struct {
 	Market    *string `json:"market"`
 	Limit     *int    `json:"limit"`
 	StartTime *int    `json:"start_time"`
@@ -56,7 +56,7 @@ type TriggerOrder struct {
 	RetryUntilFilled bool             `json:"retryUntilFilled"`
 }
 
-type GetOpenTriggerOrdersParams struct {
+type OpenTriggerOrdersParams struct {
 	Market *string           `json:"market"`
 	Type   *TriggerOrderType `json:"type"`
 }
@@ -67,4 +67,26 @@ type Trigger struct {
 	OrderSize  float64   `json:"orderSize"`
 	OrderID    int64     `json:"orderId"`
 	Time       time.Time `json:"time"`
+}
+
+type TriggerOrdersHistoryParams struct {
+	Market    *string `json:"market"`
+	Limit     *int    `json:"limit"`
+	StartTime *int    `json:"start_time"`
+	EndTime   *int    `json:"end_time"`
+	Side      *string `json:"side"`
+	Type      *string `json:"type"`
+	OrderType *string `json:"orderType"`
+}
+
+type PlaceOrderParams struct {
+	Market     *string          `json:"market"`
+	Side       *string          `json:"side"`
+	Price      *decimal.Decimal `json:"price"`
+	Type       *string          `json:"type"`
+	Size       *decimal.Decimal `json:"size"`
+	ReduceOnly *bool            `json:"reduceOnly,omitempty"`
+	IOC        *bool            `json:"ioc,omitempty"`
+	PostOnly   *bool            `json:"postOnly,omitempty"`
+	ClientID   *string          `json:"clienId,omitempty"`
 }
