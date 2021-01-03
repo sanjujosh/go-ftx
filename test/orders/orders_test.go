@@ -6,7 +6,6 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -89,7 +88,7 @@ func TestOrders_GetOrderTriggers(t *testing.T) {
 	assert.Nil(t, triggers)
 }
 
-func TestOrders_PlaceOrder(t *testing.T) {
+func TestOrders_PlaceOrderModifyAndCancel(t *testing.T) {
 
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
@@ -97,15 +96,108 @@ func TestOrders_PlaceOrder(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	order, err := ftx.Orders.PlaceOrder(&models.PlaceOrderParams{
-		Market: api.PtrString("BTC-PERP"),
-		Side:   api.PtrString("sell"),
-		Price:  api.PtrDecimal(decimal.NewFromFloat(40e3)),
-		Type:   api.PtrString("limit"),
-		Size:   api.PtrDecimal(decimal.NewFromFloat(0.001 / 2)),
+	order, err := ftx.Orders.PlaceOrder(&models.OrderParams{
+		Market:   api.PtrString("BTC-PERP"),
+		Side:     api.PtrString("buy"),
+		Price:    api.PtrDecimal(30e3),
+		Type:     api.PtrString("limit"),
+		Size:     api.PtrDecimal(0.001 / 2),
+		PostOnly: api.PtrBool(true),
 	})
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
 	t.Logf("Place Order Result: %+v\n", *order)
+	orderID := order.ID
+	order, err = ftx.Orders.ModifyOrder(
+		orderID,
+		&models.ModifyOrderParams{
+			Price: api.PtrDecimal(29.5e3),
+			Size:  api.PtrDecimal(0.001 / 4),
+		})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Modify Order Result: %+v\n", *order)
+	orderID = order.ID
+	if err = ftx.Orders.CancelOrder(orderID); err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+}
+
+func TestOrders_PlaceTriggerOrderModifyAndCancel(t *testing.T) {
+
+	ftx := api.New(
+		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
+	)
+	err := ftx.SetServerTimeDiff()
+	require.NoError(t, err)
+
+	order, err := ftx.Orders.PlaceTriggerOrder(&models.TriggerOrderParams{
+		Market:       api.PtrString("BTC-PERP"),
+		Side:         api.PtrString("sell"),
+		Size:         api.PtrDecimal(0.001 / 2),
+		Type:         api.PtrString("stop"),
+		TriggerPrice: api.PtrDecimal(20e3),
+		OrderPrice:   api.PtrDecimal(19.5e3),
+	})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Place Trigger Order Result: %+v\n", *order)
+	orderID := order.OrderID
+	order, err = ftx.Orders.ModifyTriggerOrder(
+		orderID,
+		&models.ModifyTriggerOrderParams{
+			TriggerPrice: api.PtrDecimal(19e3),
+			OrderPrice:   api.PtrDecimal(18e3),
+		},
+	)
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Modify Trigger Order Result: %+v\n", *order)
+	orderID = order.OrderID
+	if err = ftx.Orders.CancelTriggerOrder(orderID); err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+}
+
+func TestOrders_CancelAll(t *testing.T) {
+
+	ftx := api.New(
+		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
+	)
+	err := ftx.SetServerTimeDiff()
+	require.NoError(t, err)
+
+	order, err := ftx.Orders.PlaceOrder(&models.OrderParams{
+		Market:   api.PtrString("BTC-PERP"),
+		Side:     api.PtrString("buy"),
+		Price:    api.PtrDecimal(30e3),
+		Type:     api.PtrString("limit"),
+		Size:     api.PtrDecimal(0.001 / 2),
+		PostOnly: api.PtrBool(true),
+	})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Place Order Result: %+v\n", *order)
+
+	triggerOrder, err := ftx.Orders.PlaceTriggerOrder(&models.TriggerOrderParams{
+		Market:       api.PtrString("BTC-PERP"),
+		Side:         api.PtrString("sell"),
+		Size:         api.PtrDecimal(0.001 / 2),
+		Type:         api.PtrString("stop"),
+		TriggerPrice: api.PtrDecimal(20e3),
+		OrderPrice:   api.PtrDecimal(19.5e3),
+	})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	t.Logf("Place Trigger Order Result: %+v\n", *triggerOrder)
+
+	if err = ftx.Orders.CancelAllOrders(&models.CancelAllParams{}); err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
 }
