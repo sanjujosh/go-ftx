@@ -79,7 +79,7 @@ type TriggerOrdersHistoryParams struct {
 	OrderType *string `json:"orderType"`
 }
 
-type PlaceOrderParams struct {
+type OrderParams struct {
 	Market     *string          `json:"market"`
 	Side       *string          `json:"side"`
 	Price      *decimal.Decimal `json:"price"`
@@ -89,4 +89,34 @@ type PlaceOrderParams struct {
 	IOC        *bool            `json:"ioc,omitempty"`
 	PostOnly   *bool            `json:"postOnly,omitempty"`
 	ClientID   *string          `json:"clienId,omitempty"`
+}
+
+type TriggerOrderParams struct {
+	Market       *string          `json:"market"`
+	Side         *string          `json:"side"`
+	Size         *decimal.Decimal `json:"size"`
+	Type         *string          `json:"type"`
+	TriggerPrice *decimal.Decimal `json:"triggerPrice"`
+	OrderPrice   *decimal.Decimal `json:"orderPrice"`
+	ReduceOnly   *bool            `json:"reduceOnly,omitempty"`
+	TrailValue   *decimal.Decimal `json:"trailValue,omitempty"`
+}
+
+type ModifyOrderParams struct {
+	Price    *decimal.Decimal `json:"price,omitempty"`
+	Size     *decimal.Decimal `json:"size,omitempty"`
+	ClientID *string          `json:"clientId,omitempty"`
+}
+
+type ModifyTriggerOrderParams struct {
+	TriggerPrice *decimal.Decimal `json:"triggerPrice,omitempty"`
+	Size         *decimal.Decimal `json:"size,omitempty"`
+	OrderPrice   *decimal.Decimal `json:"orderPrice,omitempty"`
+	TrailValue   *decimal.Decimal `json:"trailValue,omitempty"`
+}
+
+type CancelAllParams struct {
+	Market                *string `json:"market,omitempty"`
+	ConditionalOrdersOnly *bool   `json:"conditionalOrdersOnly,omitempty"`
+	LimitOrdersOnly       *bool   `json:"limitOrdersOnly"`
 }

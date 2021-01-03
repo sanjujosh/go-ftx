@@ -54,6 +54,11 @@ func PtrFloat64(f float64) *float64 {
 	return &f
 }
 
-func PtrDecimal(d decimal.Decimal) *decimal.Decimal {
-	return &d
+func PtrDecimal(f float64) *decimal.Decimal {
+	x := decimal.NewFromFloat(f)
+	return &x
+}
+
+func PtrBool(b bool) *bool {
+	return &b
 }
