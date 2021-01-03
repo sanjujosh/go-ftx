@@ -14,7 +14,7 @@ go get github.com/uscott/go-ftx
 
 ### TODO
 - Private Streams
-- Orders
+- Orders (a little bit)
 - Wallet
 - Converts
 - Fills
