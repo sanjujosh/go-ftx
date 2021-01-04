@@ -61,7 +61,6 @@ func (s *SubAccounts) CreateSubaccount(nickname string) (*models.SubAccount, err
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-
 	response, err := s.client.do(request)
 	if err != nil {
 		return nil, errors.WithStack(err)

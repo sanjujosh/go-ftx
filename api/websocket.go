@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -22,6 +23,7 @@ const (
 )
 
 type Stream struct {
+	client                 *Client
 	mu                     *sync.Mutex
 	url                    string
 	dialer                 *websocket.Dialer
@@ -31,25 +33,21 @@ type Stream struct {
 }
 
 func (s *Stream) SetReconnectionCount(count int) {
-
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	s.wsReconnectionCount = count
+	s.mu.Unlock()
 }
 
 func (s *Stream) SetDebugMode(isDebugMode bool) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	s.isDebugMode = isDebugMode
+	s.mu.Unlock()
 }
 
 func (s *Stream) SetReconnectionInterval(interval time.Duration) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	s.wsReconnectionInterval = interval
+	s.mu.Unlock()
 }
 
 func (s *Stream) printf(format string, v ...interface{}) {
@@ -77,7 +75,9 @@ func (s *Stream) connect(requests ...models.WSRequest) (*websocket.Conn, error) 
 		lastPong = time.Now()
 		if time.Now().Sub(lastPong) > websocketTimeout {
 			// TODO handle this case
-			s.printf("PONG response time has been exceeded")
+			errmsg := "PONG response time has been exceeded"
+			s.printf(errmsg)
+			return fmt.Errorf(errmsg) // Handled?
 		} else {
 			s.printf("PONG")
 		}
@@ -100,6 +100,7 @@ func (s *Stream) serve(
 
 	go func() {
 		go func() {
+
 			defer close(doneC)
 
 			for {
