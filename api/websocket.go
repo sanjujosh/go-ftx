@@ -58,6 +58,7 @@ func (s *Stream) printf(format string, v ...interface{}) {
 }
 
 func (s *Stream) connect(requests ...models.WSRequest) (*websocket.Conn, error) {
+
 	conn, _, err := s.dialer.Dial(s.url, nil)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -65,25 +66,23 @@ func (s *Stream) connect(requests ...models.WSRequest) (*websocket.Conn, error) 
 
 	s.printf("connected to %v", s.url)
 
-	err = s.subscribe(conn, requests)
-	if err != nil {
+	if err = s.subscribe(conn, requests); err != nil {
 		return nil, errors.WithStack(err)
 	}
-
 	lastPong := time.Now()
-	conn.SetPongHandler(func(msg string) error {
-		lastPong = time.Now()
-		if time.Now().Sub(lastPong) > websocketTimeout {
-			// TODO handle this case
-			errmsg := "PONG response time has been exceeded"
-			s.printf(errmsg)
-			return fmt.Errorf(errmsg) // Handled?
-		} else {
-			s.printf("PONG")
-		}
-		return nil
-	})
-
+	conn.SetPongHandler(
+		func(msg string) error {
+			lastPong = time.Now()
+			if time.Now().Sub(lastPong) > websocketTimeout {
+				// TODO handle this case
+				errmsg := "PONG response time has been exceeded"
+				s.printf(errmsg)
+				return fmt.Errorf(errmsg) // Handled?
+			} else {
+				s.printf("PONG")
+			}
+			return nil
+		})
 	return conn, nil
 }
 

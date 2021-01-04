@@ -2,8 +2,10 @@ package models
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 type BaseResponse struct {
@@ -29,6 +31,32 @@ type TradeResponse struct {
 type OrderBookResponse struct {
 	OrderBook
 	BaseResponse
+}
+
+type FillResponse struct {
+	Fill
+	BaseResponse
+}
+
+type OrdersResponse struct {
+	Order
+	BaseResponse
+}
+
+type Fill struct {
+	Fee       float64         `json:"fee"`
+	FeeRate   float64         `json:"feeRate"`
+	Future    string          `json:"future"`
+	ID        int64           `json:"id"`
+	Liquidity string          `json:"liquidity"`
+	Market    string          `json:"market"`
+	OrderID   int64           `json:"orderId"`
+	TradeID   int64           `json:"tradeId"`
+	Price     decimal.Decimal `json:"price"`
+	Side      string          `json:"side"`
+	Size      decimal.Decimal `json:"size"`
+	Time      time.Time       `json:"time"`
+	Type      string          `json:"type"`
 }
 
 type WSRequest struct {
@@ -92,6 +120,36 @@ func (wr *WsResponse) MapToOrderBookResponse() (*OrderBookResponse, error) {
 
 	return &OrderBookResponse{
 		OrderBook: book,
+		BaseResponse: BaseResponse{
+			Type:   wr.Type,
+			Symbol: wr.Market,
+		},
+	}, nil
+}
+
+func (wr *WsResponse) MapToFillResponse() (*FillResponse, error) {
+	fill := Fill{}
+	err := json.Unmarshal(wr.Data, &fill)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &FillResponse{
+		Fill: fill,
+		BaseResponse: BaseResponse{
+			Type:   wr.Type,
+			Symbol: wr.Market,
+		},
+	}, nil
+}
+
+func (wr *WsResponse) MapToOrdersResponse() (*OrdersResponse, error) {
+	order := Order{}
+	err := json.Unmarshal(wr.Data, &order)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &OrdersResponse{
+		Order: order,
 		BaseResponse: BaseResponse{
 			Type:   wr.Type,
 			Symbol: wr.Market,

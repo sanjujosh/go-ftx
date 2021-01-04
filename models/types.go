@@ -25,6 +25,8 @@ const (
 	TradesChannel    = Channel("trades")
 	TickerChannel    = Channel("ticker")
 	MarketsChannel   = Channel("markets")
+	FillsChannel     = Channel("fills")
+	OrdersChannel    = Channel("orders")
 )
 
 type Operation string
