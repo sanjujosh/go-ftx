@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -47,6 +48,7 @@ type Client struct {
 	apiKey         string
 	secret         string
 	serverTimeDiff time.Duration
+	sb             *strings.Builder
 	SubAccounts
 	Markets
 	Futures
@@ -56,27 +58,27 @@ type Client struct {
 }
 
 func New(opts ...Option) *Client {
+
 	client := &Client{
 		client: http.DefaultClient,
+		sb:     new(strings.Builder),
 	}
-
 	for _, opt := range opts {
 		opt(client)
 	}
-
 	client.SubAccounts = SubAccounts{client: client}
 	client.Markets = Markets{client: client}
 	client.Futures = Futures{client: client}
 	client.Account = Account{client: client}
 	client.Orders = Orders{client: client}
 	client.Stream = Stream{
+		client:                 client,
 		mu:                     &sync.Mutex{},
 		url:                    wsUrl,
 		dialer:                 websocket.DefaultDialer,
 		wsReconnectionCount:    reconnectCount,
 		wsReconnectionInterval: reconnectInterval,
 	}
-
 	return client
 }
 
@@ -105,6 +107,7 @@ type Request struct {
 }
 
 func (c *Client) prepareRequest(request Request) (*http.Request, error) {
+
 	req, err := http.NewRequest(request.Method, request.URL, bytes.NewBuffer(request.Body))
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -117,15 +120,23 @@ func (c *Client) prepareRequest(request Request) (*http.Request, error) {
 	req.URL.RawQuery = query.Encode()
 
 	if request.Auth {
+		c.sb.Reset()
 		nonce := strconv.FormatInt(time.Now().UTC().Add(c.serverTimeDiff).Unix()*1000, 10)
-		payload := nonce + req.Method + req.URL.Path
+		c.sb.WriteString(nonce)
+		c.sb.WriteString(req.Method)
+		c.sb.WriteString(req.URL.Path)
+		// payload := nonce + req.Method + req.URL.Path
 		if req.URL.RawQuery != "" {
-			payload += "?" + req.URL.RawQuery
+			c.sb.WriteRune('?')
+			c.sb.WriteString(req.URL.RawQuery)
+			// payload += "?" + req.URL.RawQuery
 		}
 		if len(request.Body) > 0 {
-			payload += string(request.Body)
+			c.sb.WriteString(string(request.Body))
+			// payload += string(request.Body)
 		}
-
+		payload := c.sb.String()
+		c.sb.Reset()
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set(keyHeader, c.apiKey)
 		req.Header.Set(signHeader, c.signature(payload))
@@ -183,7 +194,7 @@ func (c *Client) prepareQueryParams(params interface{}) map[string]string {
 
 func (c *Client) signature(payload string) string {
 	mac := hmac.New(sha256.New, []byte(c.secret))
-	mac.Write([]byte(payload))
+	_, _ = mac.Write([]byte(payload))
 	return hex.EncodeToString(mac.Sum(nil))
 }
 
