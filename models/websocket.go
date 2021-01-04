@@ -37,6 +37,11 @@ type WSRequest struct {
 	Op      Operation `json:"op"`
 }
 
+type WSRequestPrivate struct {
+	Args map[string]interface{} `json:"args"`
+	Op   Operation              `json:"op"`
+}
+
 type WsResponse struct {
 	Channel Channel         `json:"channel"`
 	Market  string          `json:"market"`
