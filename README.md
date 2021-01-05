@@ -13,8 +13,8 @@ go get github.com/uscott/go-ftx
 > See examples directory and test cases for more examples
 
 ### TODO
-- Private Streams
-- Orders (a little bit)
+- Private Streams (working on it)
+- Orders (mostly done)
 - Wallet
 - Converts
 - Fills
