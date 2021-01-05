@@ -136,8 +136,7 @@ func (wr *WsResponse) MapToFillResponse() (*FillResponse, error) {
 	return &FillResponse{
 		Fill: fill,
 		BaseResponse: BaseResponse{
-			Type:   wr.Type,
-			Symbol: wr.Market,
+			Type: wr.Type,
 		},
 	}, nil
 }

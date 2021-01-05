@@ -36,41 +36,55 @@ func TestStream_SubscribeToFills(t *testing.T) {
 	)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	defer ftx.CancelAllOrders(&models.CancelAllParams{})
 
 	err := ftx.SetServerTimeDiff()
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	data, err := ftx.Stream.SubscribeToFills(ctx)
 	require.NoError(t, err)
-	perp, err := ftx.Futures.GetFutureByName(swap)
+
+	go func() {
+
+		time.Sleep(sleepDuration / 2)
+
+		perp, err := ftx.Futures.GetFutureByName(swap)
+		if err != nil {
+			t.Fatal(errors.WithStack(err))
+		}
+
+		bid, _ := perp.Bid.Float64()
+		ask, _ := perp.Ask.Float64()
+
+		_, err = ftx.Orders.PlaceOrder(&models.OrderParams{
+			Market:   api.PtrString(swap),
+			Side:     api.PtrString(string(models.Buy)),
+			Price:    api.PtrDecimal(bid - 1),
+			Type:     api.PtrString(string(models.LimitOrder)),
+			Size:     api.PtrDecimal(0.001),
+			PostOnly: api.PtrBool(true),
+		})
+		if err != nil {
+			t.Fatal(errors.WithStack(err))
+		}
+
+		_, err = ftx.Orders.PlaceOrder(&models.OrderParams{
+			Market:   api.PtrString(swap),
+			Side:     api.PtrString(string(models.Sell)),
+			Price:    api.PtrDecimal(ask + 1),
+			Type:     api.PtrString(string(models.LimitOrder)),
+			Size:     api.PtrDecimal(0.001),
+			PostOnly: api.PtrBool(true),
+		})
+		if err != nil {
+			t.Fatal(errors.WithStack(err))
+		}
+	}()
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
 
-	bid, _ := perp.Bid.Float64()
-	ask, _ := perp.Ask.Float64()
-
-	_, err = ftx.Orders.PlaceOrder(&models.OrderParams{
-		Market:   api.PtrString(swap),
-		Side:     api.PtrString(string(models.Buy)),
-		Price:    api.PtrDecimal(bid - 1),
-		Type:     api.PtrString(string(models.LimitOrder)),
-		Size:     api.PtrDecimal(0.001),
-		PostOnly: api.PtrBool(true),
-	})
-	if err != nil {
-		t.Fatal(errors.WithStack(err))
-	}
-
-	_, err = ftx.Orders.PlaceOrder(&models.OrderParams{
-		Market:   api.PtrString(swap),
-		Side:     api.PtrString(string(models.Sell)),
-		Price:    api.PtrDecimal(ask + 1),
-		Type:     api.PtrString(string(models.LimitOrder)),
-		Size:     api.PtrDecimal(0.001),
-		PostOnly: api.PtrBool(true),
-	})
+	data, err := ftx.Stream.SubscribeToFills(ctx)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
@@ -78,15 +92,12 @@ func TestStream_SubscribeToFills(t *testing.T) {
 	done := make(chan struct{})
 	go func() {
 		time.Sleep(sleepDuration)
-		cancel()
 		done <- struct{}{}
 	}()
+
 	for {
 		select {
 		case <-done:
-			if err = ftx.CancelAllOrders(&models.CancelAllParams{}); err != nil {
-				t.Fatal(errors.WithStack(err))
-			}
 			return
 		case msg := <-data:
 			if msg == nil {
