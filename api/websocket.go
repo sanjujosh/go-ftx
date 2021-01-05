@@ -434,6 +434,8 @@ func (s *Stream) SubscribeToOrderBooks(
 	return booksC, nil
 }
 
+// TODO: Get fill and order streams to actually work right
+
 func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillResponse, error) {
 
 	eventsC, err := s.serve(ctx, models.WSRequest{
