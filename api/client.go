@@ -49,12 +49,13 @@ type Client struct {
 	secret         string
 	serverTimeDiff time.Duration
 	sb             *strings.Builder
-	SubAccounts
-	Markets
-	Futures
 	Account
-	Stream
+	Fills
+	Futures
+	Markets
 	Orders
+	SubAccounts
+	Stream
 }
 
 func New(opts ...Option) *Client {
@@ -66,11 +67,12 @@ func New(opts ...Option) *Client {
 	for _, opt := range opts {
 		opt(client)
 	}
-	client.SubAccounts = SubAccounts{client: client}
-	client.Markets = Markets{client: client}
-	client.Futures = Futures{client: client}
 	client.Account = Account{client: client}
+	client.Fills = Fills{client: client}
+	client.Futures = Futures{client: client}
+	client.Markets = Markets{client: client}
 	client.Orders = Orders{client: client}
+	client.SubAccounts = SubAccounts{client: client}
 	client.Stream = Stream{
 		client:                 client,
 		mu:                     &sync.Mutex{},
