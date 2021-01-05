@@ -17,7 +17,6 @@ go get github.com/uscott/go-ftx
 - Orders (mostly done)
 - Wallet
 - Converts
-- Fills
 - Funding Payments
 - Leveraged Tokens
 - Options
