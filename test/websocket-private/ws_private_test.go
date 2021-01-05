@@ -113,11 +113,6 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 		t.Fatal(errors.WithStack(err))
 	}
 
-	go func() {
-		time.Sleep(sleepDuration)
-		done <- struct{}{}
-	}()
-
 	for {
 		select {
 		case <-done:
