@@ -35,7 +35,6 @@ func prepForTest() (*api.Client, *context.Context, chan struct{}) {
 func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 
 	ftx, ctx, done := prepForTest()
-	defer cancel()
 	defer ftx.CancelAllOrders(&models.CancelAllParams{})
 
 	err := ftx.SetServerTimeDiff()
@@ -114,7 +113,6 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 		t.Fatal(errors.WithStack(err))
 	}
 
-	done := make(chan struct{})
 	go func() {
 		time.Sleep(sleepDuration)
 		done <- struct{}{}
