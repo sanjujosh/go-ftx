@@ -17,6 +17,9 @@ func TestFills_GetFills(t *testing.T) {
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
 	require.NoError(t, err)
 
 	for _, side := range []models.Side{models.Buy, models.Sell} {
