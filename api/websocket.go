@@ -463,3 +463,33 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 
 	return fillsC, nil
 }
+
+func (s *Stream) SubscribeToOrders(ctx context.Context) (chan *models.OrdersResponse, error) {
+
+	eventsC, err := s.serve(ctx, models.WSRequest{
+		Channel: models.OrdersChannel,
+		Op:      models.Subscribe,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	ordersC := make(chan *models.OrdersResponse, 1)
+
+	go func() {
+		defer close(ordersC)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case event := <-eventsC:
+				order, ok := event.(*models.OrdersResponse)
+				if !ok {
+					return
+				}
+				ordersC <- order
+			}
+		}
+	}()
+
+	return ordersC, nil
+}

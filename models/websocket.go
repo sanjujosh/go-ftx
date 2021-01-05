@@ -150,8 +150,7 @@ func (wr *WsResponse) MapToOrdersResponse() (*OrdersResponse, error) {
 	return &OrdersResponse{
 		Order: order,
 		BaseResponse: BaseResponse{
-			Type:   wr.Type,
-			Symbol: wr.Market,
+			Type: wr.Type,
 		},
 	}, nil
 }

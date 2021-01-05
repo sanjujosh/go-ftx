@@ -130,7 +130,9 @@ func (m *Markets) GetTrades(
 	return result, nil
 }
 
-func (m *Markets) GetHistoricalPrices(marketName string, params *models.GetHistoricalPricesParams) ([]*models.HistoricalPrice, error) {
+func (m *Markets) GetHistoricalPrices(
+	marketName string, params *models.GetHistoricalPricesParams,
+) ([]*models.HistoricalPrice, error) {
 
 	queryParams, err := PrepareQueryParams(params)
 	if err != nil {
