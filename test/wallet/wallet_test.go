@@ -6,25 +6,24 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/uscott/go-ftx/api"
+	"github.com/uscott/go-ftx/models"
 )
 
-func prepForTest() (*api.Client, error) {
+func prepForTest(t *testing.T) *api.Client {
 
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	if err := ftx.SetServerTimeDiff(); err != nil {
-		return nil, errors.WithStack(err)
+		t.Fatal(errors.WithStack(err))
 	}
-	return ftx, nil
+	return ftx
 }
 
 func TestWallet_GetCoins(t *testing.T) {
 
-	ftx, err := prepForTest()
-	if err != nil {
-		t.Fatal(err)
-	}
+	ftx := prepForTest(t)
+
 	coins, err := ftx.Wallet.GetCoins()
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
@@ -34,5 +33,51 @@ func TestWallet_GetCoins(t *testing.T) {
 			return
 		}
 		t.Logf("Coin: %+v\n", *c)
+	}
+}
+
+func TestWallet_GetBalances(t *testing.T) {
+
+	ftx := prepForTest(t)
+
+	balances, err := ftx.Wallet.GetBalances()
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	for i, bal := range balances {
+		if i > 9 {
+			return
+		}
+		t.Logf("Balance: %+v\n", *bal)
+	}
+}
+
+func TestWallet_GetDepositAddress(t *testing.T) {
+
+	ftx := prepForTest(t)
+
+	address, err := ftx.Wallet.GetDepositAddress("BTC", nil)
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	if address == nil {
+		t.Fatal("nil pointer")
+	}
+	t.Logf("Address: %+v\n", *address)
+}
+
+func TestWallet_GetDepositHistory(t *testing.T) {
+
+	ftx := prepForTest(t)
+
+	hist, err := ftx.Wallet.GetDepositHistory(&models.DepositHistoryParams{})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	for i, h := range hist {
+		if i > 9 {
+			return
+		}
+		t.Logf("Deposit: %+v\n", *h)
 	}
 }
