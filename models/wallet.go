@@ -95,6 +95,14 @@ type AirDrop struct {
 	Time   time.Time       `json:"time"`
 }
 
+type SavedAddressParams struct {
+	Address      *string `json:"address"`
+	AddressName  *string `json:"addressName"`
+	Coin         *string `json:"coin"`
+	IsPrimetrust *bool   `json:"isPrimetrust"`
+	Tag          *string `json:"tag,omitempty"`
+}
+
 type SavedAddress struct {
 	Address          string    `json:"address"`
 	Coin             string    `json:"coin"`
@@ -106,12 +114,4 @@ type SavedAddress struct {
 	Tag              string    `json:"tag"`
 	Whitelisted      bool      `json:"whitelisted"`
 	WhitelistedAfter string    `json:"whitelistedAfter"`
-}
-
-type SavedAddressParams struct {
-	Address      *string `json:"address"`
-	AddressName  *string `json:"addressName"`
-	Coin         *string `json:"coin"`
-	IsPrimetrust *bool   `json:"isPrimetrust"`
-	Tag          *string `json:"tag,omitempty"`
 }

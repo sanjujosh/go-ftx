@@ -16,11 +16,11 @@ const (
 	apiGetDepositAddress    = "/wallet/deposit_address"
 	apiGetDepositHistory    = "/wallet/deposits"
 	apiGetWithdrawalHistory = "/wallet/withdrawals"
-	apiRequestWithdrawals   = apiGetWithdrawalHistory
+	apiRequestWithdrawal    = apiGetWithdrawalHistory
 	apiGetAirdrops          = "wallet/airdrops"
 	apiGetSavedAddresses    = "/wallet/saved_addresses"
 	apiCreateSavedAddresses = apiGetSavedAddresses
-	apiDeleteSavedAddresses = "/wallet/saved_addresses/%d"
+	apiDeleteSavedAddresses = apiGetSavedAddresses
 )
 
 type Wallet struct {
@@ -193,7 +193,7 @@ func (w *Wallet) RequestWithdrawal(
 	params *models.RequestWithdrawalParams,
 ) (*models.Withdrawal, error) {
 
-	url := fmt.Sprintf("%s%s", apiUrl, apiPlaceTriggerOrder)
+	url := fmt.Sprintf("%s%s", apiUrl, apiRequestWithdrawal)
 	response, err := w.client.Post(params, url)
 	if err != nil {
 		return nil, err
@@ -204,4 +204,80 @@ func (w *Wallet) RequestWithdrawal(
 		return nil, errors.WithStack(err)
 	}
 	return &result, nil
+}
+
+func (w *Wallet) GetAirdrops(params *models.AirDropParams) ([]*models.AirDrop, error) {
+
+	url := fmt.Sprintf("%s%s", apiUrl, apiGetAirdrops)
+	response, err := w.client.Get(params, url, true)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*models.AirDrop
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return result, nil
+}
+
+func (w *Wallet) GetSavedAddresses(coin *string) ([]*models.SavedAddress, error) {
+
+	url := fmt.Sprintf("%s%s", apiUrl, apiGetSavedAddresses)
+	params := struct {
+		Coin *string `json:"coin,omitempty"`
+	}{Coin: coin}
+	response, err := w.client.Get(&params, url, true)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*models.SavedAddress
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return result, nil
+}
+
+func (w *Wallet) CreateSavedAddresses(params *models.SavedAddressParams) ([]*models.SavedAddress, error) {
+
+	url := fmt.Sprintf("%s%s", apiUrl, apiCreateSavedAddresses)
+	response, err := w.client.Post(params, url)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*models.SavedAddress
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return result, nil
+}
+
+func (w *Wallet) DeleteSavedAddress(address int64) error {
+
+	params := struct {
+		SavedAddressID *int64 `json:"saved_address_id"`
+	}{SavedAddressID: &address}
+
+	body, err := json.Marshal(&params)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	request, err := w.client.prepareRequest(Request{
+		Auth:   true,
+		Method: http.MethodDelete,
+		URL:    fmt.Sprintf("%s%s", apiUrl, apiDeleteSavedAddresses),
+		Body:   body,
+	})
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	_, err = w.client.do(request)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
 }

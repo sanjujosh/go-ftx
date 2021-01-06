@@ -38,11 +38,11 @@ func TestOrders_GetOrdersHistory(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	market := "ETH/BTC"
+	market := "BTC-PERP"
 
 	orders, err := ftx.Orders.GetOrdersHistory(&models.OrdersHistoryParams{
 		Market:    &market,
-		Limit:     nil,
+		Limit:     api.PtrInt(10),
 		StartTime: nil,
 		EndTime:   nil,
 	})
