@@ -81,3 +81,51 @@ func TestWallet_GetDepositHistory(t *testing.T) {
 		t.Logf("Deposit: %+v\n", *h)
 	}
 }
+
+func TestWallet_GetWithdrawalHistory(t *testing.T) {
+
+	ftx := prepForTest(t)
+
+	hist, err := ftx.Wallet.GetWithdrawalHistory(&models.WithdrawalHistoryParams{})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	for i, h := range hist {
+		if i > 9 {
+			return
+		}
+		t.Logf("Withdrawal: %+v\n", *h)
+	}
+}
+
+func TestWallet_GetAirdrops(t *testing.T) {
+
+	ftx := prepForTest(t)
+
+	drops, err := ftx.Wallet.GetAirdrops(&models.AirDropParams{})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	for i, d := range drops {
+		if i > 9 {
+			return
+		}
+		t.Logf("Drop: %+v\n", *d)
+	}
+}
+
+func TestWallet_GetSavedAddresses(t *testing.T) {
+
+	ftx := prepForTest(t)
+
+	addresses, err := ftx.Wallet.GetSavedAddresses(api.PtrString("BTC"))
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	for i, a := range addresses {
+		if i > 9 {
+			return
+		}
+		t.Logf("Address: %+v\n", *a)
+	}
+}
