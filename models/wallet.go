@@ -31,11 +31,6 @@ type Balance struct {
 	Total decimal.Decimal `json:"total"`
 }
 
-type DepositAddressParams struct {
-	Coin   *string        `json:"coin"`
-	Method *DepositMethod `json:"method,omitempty"`
-}
-
 type DepositAddress struct {
 	Address string `json:"address"`
 	Tag     string `json:"tag"`
