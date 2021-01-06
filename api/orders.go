@@ -58,6 +58,7 @@ func (o *Orders) GetOpenOrders(market string) ([]*models.Order, error) {
 	return result, nil
 }
 
+/*
 func (o *Orders) GetOrdersHistory(
 	params *models.OrdersHistoryParams) ([]*models.Order, error) {
 
@@ -84,6 +85,24 @@ func (o *Orders) GetOrdersHistory(
 	var result []*models.Order
 	err = json.Unmarshal(response, &result)
 	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return result, nil
+}
+*/
+
+func (o *Orders) GetOrdersHistory(
+	params *models.OrdersHistoryParams) ([]*models.Order, error) {
+
+	url := fmt.Sprintf("%s%s", apiUrl, apiGetOrdersHistory)
+	response, err := o.client.Get(params, url, true)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*models.Order
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -178,37 +197,6 @@ func (o *Orders) GetTriggerOrdersHistory(
 
 	return result, nil
 }
-
-/*
-func (o *Orders) PlaceOrder(params *models.OrderParams) (*models.Order, error) {
-
-	if params == nil {
-		return nil, errNilPtr
-	}
-	body, err := json.Marshal(*params)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	request, err := o.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodPost,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiPlaceOrder),
-		Body:   body,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	response, err := o.client.do(request)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	var result models.Order
-	if err = json.Unmarshal(response, &result); err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return &result, nil
-}
-*/
 
 func (o *Orders) PlaceOrder(params *models.OrderParams) (*models.Order, error) {
 

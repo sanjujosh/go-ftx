@@ -86,6 +86,31 @@ func New(opts ...Option) *Client {
 	return client
 }
 
+func (c *Client) Get(params interface{}, url string, auth bool) ([]byte, error) {
+
+	queryParams, err := PrepareQueryParams(params)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	request, err := c.prepareRequest(Request{
+		Auth:   auth,
+		Method: http.MethodGet,
+		URL:    url,
+		Params: queryParams,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return response, nil
+}
+
 func (c *Client) Post(params interface{}, url string) ([]byte, error) {
 
 	body, err := json.Marshal(params)
