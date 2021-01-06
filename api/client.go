@@ -50,6 +50,7 @@ type Client struct {
 	serverTimeDiff time.Duration
 	sb             *strings.Builder
 	Account
+	Convert
 	Fills
 	Futures
 	Markets
@@ -69,6 +70,7 @@ func New(opts ...Option) *Client {
 		opt(client)
 	}
 	client.Account = Account{client: client}
+	client.Convert = Convert{client: client}
 	client.Fills = Fills{client: client}
 	client.Futures = Futures{client: client}
 	client.Markets = Markets{client: client}

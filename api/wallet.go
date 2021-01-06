@@ -239,7 +239,9 @@ func (w *Wallet) GetSavedAddresses(coin *string) ([]*models.SavedAddress, error)
 	return result, nil
 }
 
-func (w *Wallet) CreateSavedAddresses(params *models.SavedAddressParams) ([]*models.SavedAddress, error) {
+func (w *Wallet) CreateSavedAddresses(
+	params *models.SavedAddressParams,
+) ([]*models.SavedAddress, error) {
 
 	url := fmt.Sprintf("%s%s", apiUrl, apiCreateSavedAddresses)
 	response, err := w.client.Post(params, url)
