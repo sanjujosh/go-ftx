@@ -13,7 +13,7 @@ const (
 	apiGetCoins             = "/wallet/coins"
 	apiGetBalances          = "/wallet/balances"
 	apiGetBalancesAll       = "/wallet/all_balances"
-	apiGetDepositAddress    = "/wallet/deposit_address"
+	apiGetDepositAddress    = "/wallet/deposit_address/%s"
 	apiGetDepositHistory    = "/wallet/deposits"
 	apiGetWithdrawalHistory = "/wallet/withdrawals"
 	apiRequestWithdrawal    = apiGetWithdrawalHistory
@@ -103,10 +103,10 @@ func (w *Wallet) GetDepositAddress(
 	coin string, method *models.DepositMethod,
 ) (*models.DepositAddress, error) {
 
-	queryParams, err := PrepareQueryParams(&models.DepositAddressParams{
-		Coin:   &coin,
-		Method: method,
-	})
+	path := fmt.Sprintf(apiGetDepositAddress, coin)
+	queryParams, err := PrepareQueryParams(&struct {
+		Method *models.DepositMethod `json:"method"`
+	}{Method: method})
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -114,7 +114,7 @@ func (w *Wallet) GetDepositAddress(
 	request, err := w.client.prepareRequest(Request{
 		Auth:   true,
 		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetDepositAddress),
+		URL:    fmt.Sprintf("%s%s", apiUrl, path),
 		Params: queryParams,
 	})
 
