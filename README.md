@@ -15,7 +15,7 @@ go get github.com/uscott/go-ftx
 ### TODO
 - Private Streams (working on it)
 - Orders (mostly done)
-- Funding Payments
+- Spot Margin
 - Leveraged Tokens
 - Options
 - SRM Staking
