@@ -52,6 +52,7 @@ type Client struct {
 	Account
 	Convert
 	Fills
+	Funding
 	Futures
 	Markets
 	Orders
@@ -72,6 +73,7 @@ func New(opts ...Option) *Client {
 	client.Account = Account{client: client}
 	client.Convert = Convert{client: client}
 	client.Fills = Fills{client: client}
+	client.Funding = Funding{client: client}
 	client.Futures = Futures{client: client}
 	client.Markets = Markets{client: client}
 	client.Orders = Orders{client: client}
