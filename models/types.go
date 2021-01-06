@@ -81,6 +81,16 @@ const (
 	TakeProfit   = TriggerOrderType("take_profit")
 )
 
+type DepositMethod string
+
+const (
+	Erc20 = DepositMethod("erc20")
+	Trc20 = DepositMethod("trc20")
+	Spl   = DepositMethod("spl")
+	Omni  = DepositMethod("omni")
+	Bep2  = DepositMethod("bep2")
+)
+
 type FTXTime struct {
 	Time time.Time
 }

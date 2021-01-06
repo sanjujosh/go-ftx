@@ -55,6 +55,7 @@ type Client struct {
 	Markets
 	Orders
 	SubAccounts
+	Wallet
 	Stream
 }
 
@@ -73,6 +74,7 @@ func New(opts ...Option) *Client {
 	client.Markets = Markets{client: client}
 	client.Orders = Orders{client: client}
 	client.SubAccounts = SubAccounts{client: client}
+	client.Wallet = Wallet{client: client}
 	client.Stream = Stream{
 		client:                 client,
 		mu:                     &sync.Mutex{},
@@ -82,6 +84,35 @@ func New(opts ...Option) *Client {
 		wsReconnectionInterval: reconnectInterval,
 	}
 	return client
+}
+
+func (c *Client) Post(params interface{}, url string) (interface{}, error) {
+
+	body, err := json.Marshal(params)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	request, err := c.prepareRequest(Request{
+		Auth:   true,
+		Method: http.MethodPost,
+		URL:    url,
+		Body:   body,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	var result interface{}
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return result, nil
 }
 
 func (c *Client) SetServerTimeDiff() error {

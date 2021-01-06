@@ -179,6 +179,7 @@ func (o *Orders) GetTriggerOrdersHistory(
 	return result, nil
 }
 
+/*
 func (o *Orders) PlaceOrder(params *models.OrderParams) (*models.Order, error) {
 
 	if params == nil {
@@ -206,6 +207,17 @@ func (o *Orders) PlaceOrder(params *models.OrderParams) (*models.Order, error) {
 		return nil, errors.WithStack(err)
 	}
 	return &result, nil
+}
+*/
+
+func (o *Orders) PlaceOrder(params *models.OrderParams) (*models.Order, error) {
+
+	url := fmt.Sprintf("%s%s", apiUrl, apiPlaceOrder)
+	result, err := o.client.Post(params, url)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*models.Order), nil
 }
 
 func (o *Orders) PlaceTriggerOrder(

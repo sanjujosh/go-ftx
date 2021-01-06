@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type SubAccount struct {
@@ -10,12 +11,6 @@ type SubAccount struct {
 	Deletable   bool   `json:"deletable"`
 	Editable    bool   `json:"editable"`
 	Competition bool   `json:"competition,omitempty"`
-}
-
-type Balance struct {
-	Coin  string          `json:"coin"`
-	Free  decimal.Decimal `json:"free"`
-	Total decimal.Decimal `json:"total"`
 }
 
 type TransferPayload struct {
