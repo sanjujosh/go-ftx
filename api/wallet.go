@@ -194,9 +194,14 @@ func (w *Wallet) RequestWithdrawal(
 ) (*models.Withdrawal, error) {
 
 	url := fmt.Sprintf("%s%s", apiUrl, apiPlaceTriggerOrder)
-	result, err := w.client.Post(params, url)
+	response, err := w.client.Post(params, url)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*models.Withdrawal), nil
+
+	var result models.Withdrawal
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &result, nil
 }

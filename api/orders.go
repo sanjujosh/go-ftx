@@ -213,11 +213,16 @@ func (o *Orders) PlaceOrder(params *models.OrderParams) (*models.Order, error) {
 func (o *Orders) PlaceOrder(params *models.OrderParams) (*models.Order, error) {
 
 	url := fmt.Sprintf("%s%s", apiUrl, apiPlaceOrder)
-	result, err := o.client.Post(params, url)
+	response, err := o.client.Post(params, url)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*models.Order), nil
+
+	var result models.Order
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &result, nil
 }
 
 func (o *Orders) PlaceTriggerOrder(

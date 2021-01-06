@@ -86,7 +86,7 @@ func New(opts ...Option) *Client {
 	return client
 }
 
-func (c *Client) Post(params interface{}, url string) (interface{}, error) {
+func (c *Client) Post(params interface{}, url string) ([]byte, error) {
 
 	body, err := json.Marshal(params)
 	if err != nil {
@@ -107,12 +107,7 @@ func (c *Client) Post(params interface{}, url string) (interface{}, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-
-	var result interface{}
-	if err = json.Unmarshal(response, &result); err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return result, nil
+	return response, nil
 }
 
 func (c *Client) SetServerTimeDiff() error {
