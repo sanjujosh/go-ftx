@@ -18,6 +18,12 @@ const (
 	Day      = 86400
 )
 
+type NumberTimeLimit struct {
+	Limit     *int   `json:"limit,omitempty"`
+	StartTime *int64 `json:"start_time,omitempty"`
+	EndTime   *int64 `json:"end_time,omitempty"`
+}
+
 type Channel string
 
 const (
@@ -89,6 +95,20 @@ const (
 	Spl   = DepositMethod("spl")
 	Omni  = DepositMethod("omni")
 	Bep2  = DepositMethod("bep2")
+)
+
+type OptionType string
+
+const (
+	Call = OptionType("call")
+	Put  = OptionType("put")
+)
+
+type LiquidityType string
+
+const (
+	Maker = LiquidityType("maker")
+	Taker = LiquidityType("taker")
 )
 
 type FTXTime struct {
