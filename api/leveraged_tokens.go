@@ -27,7 +27,7 @@ func (l *LeveragedTokens) ListLeveragedTokens() ([]*models.LeveragedToken, error
 
 	url := FormURL(apiListLeveragedTokens)
 
-	response, err := l.client.Get(nil, url, false)
+	response, err := l.client.Get(&struct{}{}, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -43,7 +43,7 @@ func (l *LeveragedTokens) GetTokenInfo(token string) (*models.TokenInfo, error) 
 
 	url := FormURL(fmt.Sprintf(apiGetTokenInfo, token))
 
-	response, err := l.client.Get(nil, url, false)
+	response, err := l.client.Get(&struct{}{}, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -60,7 +60,7 @@ func (l *LeveragedTokens) GetLeveragedTokenBalances() (
 
 	url := FormURL(apiGetLeveragedTokenBalances)
 
-	response, err := l.client.Get(nil, url, true)
+	response, err := l.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -77,7 +77,7 @@ func (l *LeveragedTokens) ListLeveragedTokenCreationRequests() (
 
 	url := FormURL(apiListLeveragedTokenCreationRequests)
 
-	response, err := l.client.Get(nil, url, true)
+	response, err := l.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -114,7 +114,7 @@ func (l *LeveragedTokens) ListLeveragedTokenRedemptionRequests() (
 
 	url := FormURL(apiListLeveragedTokenRedemptionRequests)
 
-	response, err := l.client.Get(nil, url, true)
+	response, err := l.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
