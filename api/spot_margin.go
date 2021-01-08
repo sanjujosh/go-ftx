@@ -100,7 +100,7 @@ func (s *SpotMargin) GetBorrowHistory() (*models.BorrowHistory, error) {
 
 	url := FormURL(apiGetBorrowHistory)
 
-	response, err := s.client.Get(nil, url, true)
+	response, err := s.client.Get(&struct{}{}, url, true)
 
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -118,7 +118,7 @@ func (s *SpotMargin) GetLendingHistory() (*models.LendingHistory, error) {
 
 	url := FormURL(apiGetLendingHistory)
 
-	response, err := s.client.Get(nil, url, true)
+	response, err := s.client.Get(&struct{}{}, url, true)
 
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -136,7 +136,7 @@ func (s *SpotMargin) GetLendingOffers() ([]*models.LendingOffer, error) {
 
 	url := FormURL(apiGetLendingOffers)
 
-	response, err := s.client.Get(nil, url, true)
+	response, err := s.client.Get(&struct{}{}, url, true)
 
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -154,7 +154,7 @@ func (s *SpotMargin) GetLendingInfo() (*models.LendingInfo, error) {
 
 	url := FormURL(apiGetLendingInfo)
 
-	response, err := s.client.Get(nil, url, true)
+	response, err := s.client.Get(&struct{}{}, url, true)
 
 	if err != nil {
 		return nil, errors.WithStack(err)
