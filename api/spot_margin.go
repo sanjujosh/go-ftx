@@ -58,7 +58,7 @@ func (s *SpotMargin) GetLendingRates() ([]*models.LendingRate, error) {
 	return result, nil
 }
 
-func (s *SpotMargin) GetBorrowSummary() (*models.BorrowedAmount, error) {
+func (s *SpotMargin) GetBorrowSummary() ([]*models.BorrowedAmount, error) {
 
 	url := FormURL(apiGetBorrowSummary)
 
@@ -67,12 +67,12 @@ func (s *SpotMargin) GetBorrowSummary() (*models.BorrowedAmount, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	result := models.BorrowedAmount{}
+	var result []* models.BorrowedAmount{}
 
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return &result, nil
+	return result, nil
 }
 
 func (s *SpotMargin) GetMarketInfo(market string) (*models.SpotMarginMarketInfo, error) {

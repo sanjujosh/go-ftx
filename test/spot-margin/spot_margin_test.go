@@ -59,7 +59,12 @@ func TestSpotMargin_GetBorrowSummary(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Summary: %+v\n", *summary)
+	for i, s := range summary {
+		if i > 9 {
+			return
+		}
+		t.Logf("Summary: %+v\n", *s)
+	}
 }
 
 func TestSpotMargin_GetMarketInfo(t *testing.T) {
