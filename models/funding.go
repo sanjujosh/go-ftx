@@ -6,7 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type FundingPayments struct {
+type FundingPayment struct {
 	Future  string          `json:"future"`
 	ID      int64           `json:"id"`
 	Payment decimal.Decimal `json:"payment"`

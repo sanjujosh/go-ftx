@@ -18,7 +18,7 @@ type Funding struct {
 
 func (f *Funding) GetFundingPayments(
 	future *string, start, end *int64,
-) (*models.FundingPayments, error) {
+) ([]*models.FundingPayment, error) {
 
 	params := struct {
 		Future    *string `json:"future,omitempty"`
@@ -32,9 +32,9 @@ func (f *Funding) GetFundingPayments(
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	var result models.FundingPayments
+	var result []*models.FundingPayment
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return &result, nil
+	return result, nil
 }
