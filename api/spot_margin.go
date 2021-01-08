@@ -29,7 +29,7 @@ func (s *SpotMargin) GetBorrowRates() ([]*models.BorrowRate, error) {
 
 	url := fmt.Sprintf("%s%s", apiUrl, apiGetBorrowRates)
 
-	response, err := s.client.Get(nil, url, true)
+	response, err := s.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -46,7 +46,7 @@ func (s *SpotMargin) GetLendingRates() ([]*models.LendingRate, error) {
 
 	url := fmt.Sprintf("%s%s", apiUrl, apiGetLendingRates)
 
-	response, err := s.client.Get(nil, url, true)
+	response, err := s.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -62,7 +62,7 @@ func (s *SpotMargin) GetBorrowSummary() (*models.BorrowedAmount, error) {
 
 	url := FormURL(apiGetBorrowSummary)
 
-	response, err := s.client.Get(nil, url, false)
+	response, err := s.client.Get(&struct{}{}, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
