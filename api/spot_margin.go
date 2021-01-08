@@ -96,7 +96,7 @@ func (s *SpotMargin) GetMarketInfo(market string) (*models.SpotMarginMarketInfo,
 	return &result, nil
 }
 
-func (s *SpotMargin) GetBorrowHistory() (*models.BorrowHistory, error) {
+func (s *SpotMargin) GetBorrowHistory() ([]*models.BorrowHistory, error) {
 
 	url := FormURL(apiGetBorrowHistory)
 
@@ -106,15 +106,15 @@ func (s *SpotMargin) GetBorrowHistory() (*models.BorrowHistory, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	result := models.BorrowHistory{}
+	var result []*models.BorrowHistory
 
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return &result, nil
+	return result, nil
 }
 
-func (s *SpotMargin) GetLendingHistory() (*models.LendingHistory, error) {
+func (s *SpotMargin) GetLendingHistory() ([]*models.LendingHistory, error) {
 
 	url := FormURL(apiGetLendingHistory)
 
@@ -124,12 +124,12 @@ func (s *SpotMargin) GetLendingHistory() (*models.LendingHistory, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	result := models.LendingHistory{}
+	var result []*models.LendingHistory
 
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return &result, nil
+	return result, nil
 }
 
 func (s *SpotMargin) GetLendingOffers() ([]*models.LendingOffer, error) {
@@ -150,7 +150,7 @@ func (s *SpotMargin) GetLendingOffers() ([]*models.LendingOffer, error) {
 	return result, nil
 }
 
-func (s *SpotMargin) GetLendingInfo() (*models.LendingInfo, error) {
+func (s *SpotMargin) GetLendingInfo() ([]*models.LendingInfo, error) {
 
 	url := FormURL(apiGetLendingInfo)
 
@@ -160,12 +160,12 @@ func (s *SpotMargin) GetLendingInfo() (*models.LendingInfo, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	result := models.LendingInfo{}
+	var result []*models.LendingInfo
 
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return &result, nil
+	return result, nil
 }
 
 func (s *SpotMargin) SubmitLendingOffer(

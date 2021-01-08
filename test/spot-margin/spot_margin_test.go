@@ -81,7 +81,12 @@ func TestSpotMargin_GetBorrowHistory(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Info: %+v\n", *hist)
+	for i, h := range hist {
+		if i > 9 {
+			return
+		}
+		t.Logf("Hist: %+v\n", *h)
+	}
 }
 
 func TestSpotMargin_GetLendingHistory(t *testing.T) {
@@ -92,7 +97,12 @@ func TestSpotMargin_GetLendingHistory(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Info: %+v\n", *hist)
+	for i, h := range hist {
+		if i > 9 {
+			return
+		}
+		t.Logf("Hist: %+v\n", *h)
+	}
 }
 
 func TestSpotMargin_GetLendingOffers(t *testing.T) {
@@ -119,5 +129,10 @@ func TestSpotMargin_GetLendingInfo(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Info: %+v\n", *info)
+	for i, x := range info {
+		if i > 9 {
+			return
+		}
+		t.Logf("Info: %+v\n", *x)
+	}
 }
