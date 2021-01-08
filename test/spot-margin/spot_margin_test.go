@@ -71,7 +71,7 @@ func TestSpotMargin_GetMarketInfo(t *testing.T) {
 
 	ftx := prepForTest(t)
 
-	info, err := ftx.SpotMargin.GetMarketInfo("BTC")
+	info, err := ftx.SpotMargin.GetMarketInfo("BTC/USD")
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
