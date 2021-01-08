@@ -111,6 +111,14 @@ const (
 	Taker = LiquidityType("taker")
 )
 
+type UnstakeRequestStatus string
+
+const (
+	Pending   = UnstakeRequestStatus("pending")
+	Cancelled = UnstakeRequestStatus("cancelled")
+	Processed = UnstakeRequestStatus("processed")
+)
+
 type FTXTime struct {
 	Time time.Time
 }
