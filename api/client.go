@@ -56,6 +56,7 @@ type Client struct {
 	Futures
 	Markets
 	Orders
+	SpotMargin
 	SubAccounts
 	Wallet
 	Stream
@@ -77,6 +78,7 @@ func New(opts ...Option) *Client {
 	client.Futures = Futures{client: client}
 	client.Markets = Markets{client: client}
 	client.Orders = Orders{client: client}
+	client.SpotMargin = SpotMargin{client: client}
 	client.SubAccounts = SubAccounts{client: client}
 	client.Wallet = Wallet{client: client}
 	client.Stream = Stream{

@@ -38,6 +38,10 @@ func PrepareQueryParams(params interface{}) (map[string]string, error) {
 	return result, nil
 }
 
+func FormURL(s string) string {
+	return fmt.Sprintf("%s%s", apiUrl, s)
+}
+
 func PtrInt(i int) *int {
 	return &i
 }

@@ -29,8 +29,6 @@ type Orders struct {
 	client *Client
 }
 
-var errNilPtr = fmt.Errorf("nil pointer")
-
 func (o *Orders) GetOpenOrders(market string) ([]*models.Order, error) {
 	request, err := o.client.prepareRequest(Request{
 		Auth:   true,
@@ -217,7 +215,7 @@ func (o *Orders) PlaceTriggerOrder(
 	params *models.TriggerOrderParams) (*models.TriggerOrder, error) {
 
 	if params == nil {
-		return nil, errNilPtr
+		return nil, models.ErrNilPtr
 	}
 	body, err := json.Marshal(*params)
 	if err != nil {
@@ -247,7 +245,7 @@ func (o *Orders) ModifyOrder(
 	orderID int64, params *models.ModifyOrderParams) (*models.Order, error) {
 
 	if params == nil {
-		return nil, errNilPtr
+		return nil, models.ErrNilPtr
 	}
 	path := fmt.Sprintf(apiModifyOrder, orderID)
 
@@ -280,7 +278,7 @@ func (o *Orders) ModifyTriggerOrder(
 	params *models.ModifyTriggerOrderParams) (*models.TriggerOrder, error) {
 
 	if params == nil {
-		return nil, errNilPtr
+		return nil, models.ErrNilPtr
 	}
 	path := fmt.Sprintf(apiModifyTriggerOrder, orderID)
 	body, err := json.Marshal(*params)
@@ -365,7 +363,7 @@ func (o *Orders) CancelTriggerOrder(orderID int64) error {
 func (o *Orders) CancelAllOrders(params *models.CancelAllParams) error {
 
 	if params == nil {
-		return errNilPtr
+		return models.ErrNilPtr
 	}
 	body, err := json.Marshal(*params)
 	if err != nil {

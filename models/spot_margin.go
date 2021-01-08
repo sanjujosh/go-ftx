@@ -19,7 +19,7 @@ type BorrowedAmount struct {
 	Size decimal.Decimal `json:"size"`
 }
 
-type MarginMarketInfo struct {
+type SpotMarginMarketInfo struct {
 	Coin         string          `json:"coin"`
 	Borrowed     decimal.Decimal `json:"borrowed"`
 	Free         decimal.Decimal `json:"free"`

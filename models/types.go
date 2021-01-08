@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
 	"time"
 )
@@ -119,9 +120,16 @@ const (
 	Processed = UnstakeRequestStatus("processed")
 )
 
+type Succeeded struct {
+	Success bool        `json:"success"`
+	Result  interface{} `json:"result"`
+}
+
 type FTXTime struct {
 	Time time.Time
 }
+
+var ErrNilPtr = fmt.Errorf("nil pointer")
 
 func (f *FTXTime) UnmarshalJSON(data []byte) error {
 	var t float64

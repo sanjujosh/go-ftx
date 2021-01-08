@@ -23,10 +23,10 @@ const (
 func (c *Convert) RequestQuote(from, to string, size decimal.Decimal) (id int64, err error) {
 
 	params := struct {
-		FromCoin string          `json:"fromCoin"`
-		ToCoin   string          `json:"toCoin"`
-		Size     decimal.Decimal `json:"size"`
-	}{FromCoin: from, ToCoin: to, Size: size}
+		FromCoin *string          `json:"fromCoin"`
+		ToCoin   *string          `json:"toCoin"`
+		Size     *decimal.Decimal `json:"size"`
+	}{FromCoin: &from, ToCoin: &to, Size: &size}
 
 	url := fmt.Sprintf("%s%s", apiUrl, apiRequestQuote)
 
