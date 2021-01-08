@@ -67,7 +67,7 @@ func (s *SpotMargin) GetBorrowSummary() ([]*models.BorrowedAmount, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	var result []* models.BorrowedAmount{}
+	var result []*models.BorrowedAmount
 
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
