@@ -168,7 +168,9 @@ func (s *SpotMargin) GetLendingInfo() (*models.LendingInfo, error) {
 	return &result, nil
 }
 
-func (s *SpotMargin) SubmitLendingOffer(coin string, size decimal.Decimal, rate float64) (*models.Succeeded, error) {
+func (s *SpotMargin) SubmitLendingOffer(
+	coin string, size decimal.Decimal, rate float64,
+) (*models.Succeeded, error) {
 
 	url := FormURL(apiSubmitLendingOffer)
 	params := &models.LendingOfferParams{

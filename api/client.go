@@ -54,6 +54,7 @@ type Client struct {
 	Fills
 	Funding
 	Futures
+	LeveragedTokens
 	Markets
 	Orders
 	SpotMargin
@@ -76,6 +77,7 @@ func New(opts ...Option) *Client {
 	client.Fills = Fills{client: client}
 	client.Funding = Funding{client: client}
 	client.Futures = Futures{client: client}
+	client.LeveragedTokens = LeveragedTokens{client: client}
 	client.Markets = Markets{client: client}
 	client.Orders = Orders{client: client}
 	client.SpotMargin = SpotMargin{client: client}
