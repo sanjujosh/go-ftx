@@ -277,7 +277,7 @@ func (o *Options) Get24hOptionVolume() (*models.OptionsVolume, error) {
 
 func (o *Options) GetOptionsHistoricalVolume(
 	params *models.NumberTimeLimit,
-) (*models.OptionsHistoricalVolume, error) {
+) ([]*models.OptionsHistoricalVolume, error) {
 
 	url := FormURL(apiGetOptionsHistoricalVolume)
 	response, err := o.client.Get(params, url, false)
@@ -285,11 +285,11 @@ func (o *Options) GetOptionsHistoricalVolume(
 		return nil, errors.WithStack(err)
 	}
 
-	result := models.OptionsHistoricalVolume{}
+	var result []*models.OptionsHistoricalVolume
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return &result, nil
+	return result, nil
 }
 
 func (o *Options) GetOptionsOpenInterest() (openInterest decimal.Decimal, err error) {
