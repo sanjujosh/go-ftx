@@ -179,10 +179,14 @@ func TestOptions_GetHistoricalOpenInterest(t *testing.T) {
 		StartTime: api.PtrInt64(now.Add(-24 * time.Hour).Unix()),
 		EndTime:   api.PtrInt64(now.Unix()),
 	}
-	nc, tm, err := ftx.Options.GetHistoricalOpenInterest(params)
+	openInterest, err := ftx.Options.GetHistoricalOpenInterest(params)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Open Interest: %+v\n", nc)
-	t.Logf("Time: %s\n", tm.Format(time.RFC3339Nano))
+	for i, oi := range openInterest {
+		if i > 9 {
+			return
+		}
+		t.Logf("Open Interest: %+v\n", *oi)
+	}
 }

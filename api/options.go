@@ -26,7 +26,7 @@ const (
 	apiGetPublicOptionsTrades             = "/options/trades"
 	apiGetOptionsFills                    = "/options/fills"
 	apiGet24hOptionsVolume                = "/stats/24h_options_volume"
-	apiGetOptionsHistoricalVolume         = "/options/historical_volume/BTC"
+	apiGetOptionsHistoricalVolume         = "/options/historical_volumes/BTC"
 	apiGetOptionsOpenInterest             = "/options/open_interest/BTC"
 	apiGetOptionsHistoricalOpenInterest   = "/options/historical_open_interest/BTC"
 )
@@ -53,7 +53,7 @@ func (o *Options) ListQuoteRequests() ([]*models.OptionQuoteRequest, error) {
 func (o *Options) ListUserQuoteRequests() ([]*models.OptionQuoteRequest, error) {
 
 	url := FormURL(apiListUserOptionQuoteRequests)
-	response, err := o.client.Get(&struct{}{}, url, false)
+	response, err := o.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -312,7 +312,7 @@ func (o *Options) GetOptionsOpenInterest() (openInterest decimal.Decimal, err er
 
 func (o *Options) GetHistoricalOpenInterest(
 	params *models.NumberTimeLimit,
-) (numContracts decimal.Decimal, t time.Time, err error) {
+) ([]*models.OptionsHistoricalOpenInterest, error) {
 
 	url := FormURL(apiGetOptionsHistoricalOpenInterest)
 	response, err := o.client.Get(params, url, false)
@@ -320,13 +320,9 @@ func (o *Options) GetHistoricalOpenInterest(
 		return decimal.Decimal{}, time.Time{}, errors.WithStack(err)
 	}
 
-	result := struct {
-		NumContracts decimal.Decimal `json:"numContracts"`
-		Time         time.Time       `json:"time"`
-	}{}
+	var result []*models.OptionsHistoricalOpenInterest
 	if err = json.Unmarshal(response, &result); err != nil {
 		return decimal.Decimal{}, time.Time{}, errors.WithStack(err)
 	}
-	numContracts, t, err = result.NumContracts, result.Time, nil
-	return
+	return result, nil
 }

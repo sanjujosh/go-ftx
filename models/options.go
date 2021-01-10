@@ -129,3 +129,8 @@ type OptionsHistoricalVolume struct {
 	EndTime      time.Time       `json:"endTime"`
 	StartTime    time.Time       `json:"startTime"`
 }
+
+type OptionsHistoricalOpenInterest struct {
+	NumContracts decimal.Decimal `json:"numContracts"`
+	Time         time.Time       `json:"time"`
+}
