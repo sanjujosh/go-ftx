@@ -121,7 +121,9 @@ func (s *Stream) serve(
 
 			for {
 				message := &models.WsResponse{}
+				s.mu.Lock()
 				err = s.conn.ReadJSON(&message)
+				s.mu.Unlock()
 				if err != nil {
 					s.printf("read msg: %v", err)
 					if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
@@ -163,9 +165,11 @@ func (s *Stream) serve(
 		for {
 			select {
 			case <-ctx.Done():
+				s.mu.Lock()
 				err = s.conn.WriteMessage(
 					websocket.CloseMessage,
 					websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+				s.mu.Unlock()
 				if err != nil {
 					s.printf("write close msg: %v", err)
 					return
@@ -180,10 +184,12 @@ func (s *Stream) serve(
 				return
 			case <-time.After(pingPeriod):
 				s.printf("PING")
+				s.mu.Lock()
 				err = s.conn.WriteControl(
 					websocket.PingMessage,
 					[]byte(`{"op": "pong"}`),
 					time.Now().UTC().Add(10*time.Second))
+				s.mu.Unlock()
 				if err != nil && err != websocket.ErrCloseSent {
 					s.printf("write ping: %v", err)
 				}
