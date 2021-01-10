@@ -20,11 +20,11 @@ const (
 	apiRequestStake         = "/srm_stakes/stakes"
 )
 
-type SrmStaking struct {
+type Staking struct {
 	client *Client
 }
 
-func (s *SrmStaking) GetStakes() ([]*models.Stake, error) {
+func (s *Staking) GetStakes() ([]*models.Stake, error) {
 
 	url := FormURL(apiGetStakes)
 	response, err := s.client.Get(&struct{}{}, url, false)
@@ -39,7 +39,7 @@ func (s *SrmStaking) GetStakes() ([]*models.Stake, error) {
 	return result, nil
 }
 
-func (s *SrmStaking) GetUnstakeRequests() ([]*models.UnstakeRequest, error) {
+func (s *Staking) GetUnstakeRequests() ([]*models.UnstakeRequest, error) {
 
 	url := FormURL(apiGetUnstakeRequests)
 	response, err := s.client.Get(&struct{}{}, url, false)
@@ -54,7 +54,7 @@ func (s *SrmStaking) GetUnstakeRequests() ([]*models.UnstakeRequest, error) {
 	return result, nil
 }
 
-func (s *SrmStaking) GetStakeBalances() ([]*models.StakeBalance, error) {
+func (s *Staking) GetStakeBalances() ([]*models.StakeBalance, error) {
 
 	url := FormURL(apiGetStakeBalances)
 	response, err := s.client.Get(&struct{}{}, url, true)
@@ -69,7 +69,7 @@ func (s *SrmStaking) GetStakeBalances() ([]*models.StakeBalance, error) {
 	return result, nil
 }
 
-func (s *SrmStaking) RequestUnstake(
+func (s *Staking) RequestUnstake(
 	coin string, size decimal.Decimal,
 ) (*models.UnstakeRequest, error) {
 
@@ -91,7 +91,7 @@ func (s *SrmStaking) RequestUnstake(
 	return &result, nil
 }
 
-func (s *SrmStaking) CancelUnstakeRequest(id int64) (*models.Succeeded, error) {
+func (s *Staking) CancelUnstakeRequest(id int64) (*models.Succeeded, error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelUnstakeRequest, id))
 	request, err := s.client.prepareRequest(Request{
@@ -115,7 +115,7 @@ func (s *SrmStaking) CancelUnstakeRequest(id int64) (*models.Succeeded, error) {
 	return &result, nil
 }
 
-func (s *SrmStaking) GetStakingRewards() ([]*models.StakingReward, error) {
+func (s *Staking) GetStakingRewards() ([]*models.StakingReward, error) {
 
 	url := FormURL(apiGetStakingRewards)
 	response, err := s.client.Get(&struct{}{}, url, false)
@@ -130,7 +130,7 @@ func (s *SrmStaking) GetStakingRewards() ([]*models.StakingReward, error) {
 	return result, nil
 }
 
-func (s *SrmStaking) RequestStake(coin string, size decimal.Decimal) (*models.Stake, error) {
+func (s *Staking) RequestStake(coin string, size decimal.Decimal) (*models.Stake, error) {
 
 	url := FormURL(apiRequestStake)
 	params := &struct {
