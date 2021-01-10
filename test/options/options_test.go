@@ -143,7 +143,7 @@ func TestOptions_Get24hOptionsVolume(t *testing.T) {
 	t.Logf("24h Volume: %+v\n", *volume)
 }
 
-func TestOptions_GetOptionsHistoricalVolume(t *testing.T) {
+func TestOptions_GetOptionsHistoricalVolumes(t *testing.T) {
 
 	ftx := prepForTest(t)
 	now := time.Now().UTC()
@@ -152,11 +152,16 @@ func TestOptions_GetOptionsHistoricalVolume(t *testing.T) {
 		StartTime: api.PtrInt64(now.Add(-24 * time.Hour).Unix()),
 		EndTime:   api.PtrInt64(now.Unix()),
 	}
-	volume, err := ftx.Options.GetOptionsHistoricalVolume(params)
+	volumes, err := ftx.Options.GetOptionsHistoricalVolumes(params)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Volume: %+v\n", *volume)
+	for i, v := range volumes {
+		if i > 9 {
+			return
+		}
+		t.Logf("Volume: %+v\n", *v)
+	}
 }
 
 func TestOptions_GetOptionsOpenInterest(t *testing.T) {

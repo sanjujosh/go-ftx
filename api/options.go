@@ -25,7 +25,7 @@ const (
 	apiGetPublicOptionsTrades             = "/options/trades"
 	apiGetOptionsFills                    = "/options/fills"
 	apiGet24hOptionsVolume                = "/stats/24h_options_volume"
-	apiGetOptionsHistoricalVolume         = "/options/historical_volumes/BTC"
+	apiGetOptionsHistoricalVolumes        = "/options/historical_volumes/BTC"
 	apiGetOptionsOpenInterest             = "/options/open_interest/BTC"
 	apiGetOptionsHistoricalOpenInterest   = "/options/historical_open_interest/BTC"
 )
@@ -275,17 +275,17 @@ func (o *Options) Get24hOptionVolume() (*models.OptionsVolume, error) {
 	return &result, nil
 }
 
-func (o *Options) GetOptionsHistoricalVolume(
+func (o *Options) GetOptionsHistoricalVolumes(
 	params *models.NumberTimeLimit,
-) ([]*models.OptionsHistoricalVolume, error) {
+) ([]*models.OptionsHistoricalVolumes, error) {
 
-	url := FormURL(apiGetOptionsHistoricalVolume)
+	url := FormURL(apiGetOptionsHistoricalVolumes)
 	response, err := o.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	var result []*models.OptionsHistoricalVolume
+	var result []*models.OptionsHistoricalVolumes
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}

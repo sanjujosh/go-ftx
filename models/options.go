@@ -124,7 +124,7 @@ type OptionsVolume struct {
 	UnderlyingTotal decimal.Decimal `json:"underlying_total"`
 }
 
-type OptionsHistoricalVolume struct {
+type OptionsHistoricalVolumes struct {
 	NumContracts decimal.Decimal `json:"numContracts"`
 	EndTime      time.Time       `json:"endTime"`
 	StartTime    time.Time       `json:"startTime"`
