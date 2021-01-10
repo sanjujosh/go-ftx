@@ -59,6 +59,7 @@ type Client struct {
 	Options
 	Orders
 	SpotMargin
+	SrmStaking
 	SubAccounts
 	Wallet
 	Stream
@@ -83,6 +84,7 @@ func New(opts ...Option) *Client {
 	client.Options = Options{client: client}
 	client.Orders = Orders{client: client}
 	client.SpotMargin = SpotMargin{client: client}
+	client.SrmStaking = SrmStaking{client: client}
 	client.SubAccounts = SubAccounts{client: client}
 	client.Wallet = Wallet{client: client}
 	client.Stream = Stream{
