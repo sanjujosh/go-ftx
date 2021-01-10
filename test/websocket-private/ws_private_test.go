@@ -117,23 +117,13 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 		select {
 		case <-done:
 			return
-		case msg := <-filldata:
-			if msg == nil {
-				t.Log("wat ....")
-				time.Sleep(time.Second / 2)
-			} else {
-				t.Logf("Fill Data: %+v\n", *msg)
-			}
-		case msg := <-orderdata:
-			if msg == nil {
-				t.Log("huh ?...")
-				time.Sleep(time.Second / 2)
-			} else {
-				t.Logf("Orders Data: %+v\n", *msg)
-			}
+		case fill := <-filldata:
+			t.Logf("Fill: %+v\n", fill.Fill)
+		case order := <-orderdata:
+			t.Logf("Order: %+v\n", order.Order)
 		default:
 			t.Log("waiting ...")
-			time.Sleep(time.Second)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }
