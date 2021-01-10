@@ -13,6 +13,17 @@ import (
 	"github.com/uscott/go-ftx/models"
 )
 
+func client(t *testing.T) *api.Client {
+
+	ftx := api.New(
+		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
+	)
+	if err := ftx.SetServerTimeDiff(); err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	return ftx
+}
+
 func TestOrders_GetOpenOrders(t *testing.T) {
 	godotenv.Load()
 
@@ -70,7 +81,7 @@ func TestOrders_GetOpenTriggerOrders(t *testing.T) {
 	assert.NotNil(t, orders)
 }
 
-func TestOrders_GetOrderTriggers(t *testing.T) {
+func TestOrders_GetTriggerOrderTriggers(t *testing.T) {
 	godotenv.Load()
 
 	ftx := api.New(
@@ -81,11 +92,25 @@ func TestOrders_GetOrderTriggers(t *testing.T) {
 
 	orderID := int64(1111)
 
-	triggers, err := ftx.Orders.GetOrderTriggers(orderID)
+	triggers, err := ftx.Orders.GetTriggerOrderTriggers(orderID)
 
 	// 400 - Bad Request, orderID doesn't exist
 	assert.Error(t, err)
 	assert.Nil(t, triggers)
+}
+
+func TestOrders_GetTriggerOrdersHistory(t *testing.T) {
+
+	hist, err := client(t).GetTriggerOrdersHistory()
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+	for i, h := range hist {
+		if i > 9 {
+			return
+		}
+		t.Logf("Trigger Order: %+v\n", *h)
+	}
 }
 
 func TestOrders_PlaceOrderModifyAndCancel(t *testing.T) {
