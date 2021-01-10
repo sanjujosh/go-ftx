@@ -119,10 +119,12 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 			return
 		case fill, ok := <-filldata:
 			if ok {
+				t.Log("yes")
 				t.Logf("Fill: %+v\n", *fill)
 			}
 		case order, ok := <-orderdata:
 			if ok {
+				t.Log("yay")
 				t.Logf("Order: %+v\n", *order)
 			}
 		default:
