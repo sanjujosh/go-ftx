@@ -118,7 +118,7 @@ func (wr *WsResponse) MapToFillResponse() (*FillResponse, error) {
 	return &FillResponse{
 		Fill: fill,
 		BaseResponse: BaseResponse{
-			Type: wr.Type,
+			ResponseType: wr.Type,
 		},
 	}, nil
 }
