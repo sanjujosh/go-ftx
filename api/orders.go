@@ -10,19 +10,22 @@ import (
 )
 
 const (
-	apiGetOpenOrders           = "/orders"
-	apiGetOrdersHistory        = "/orders/history"
-	apiGetTriggerOrders        = "/conditional_orders"
-	apiGetOrderTriggers        = "/conditional_orders/%d/triggers"
-	apiGetTriggerOrdersHistory = "/conditional_orders/history"
-	apiPlaceOrder              = apiGetOpenOrders
-	apiPlaceTriggerOrder       = apiGetTriggerOrders
-	apiModifyOrder             = "/orders/%d/modify"
-	apiModifyTriggerOrder      = "/conditional_orders/%d/modify"
-	apiGetOrderStatus          = apiGetOpenOrders
-	apiCancelOrder             = apiGetOpenOrders
-	apiCancelTriggerOrder      = apiGetTriggerOrders
-	apiCancelAll               = apiGetOpenOrders
+	apiGetOpenOrders            = "/orders"
+	apiGetOrdersHistory         = "/orders/history"
+	apiGetTriggerOrders         = "/conditional_orders"
+	apiGetOrderTriggers         = "/conditional_orders/%d/triggers"
+	apiGetTriggerOrdersHistory  = "/conditional_orders/history"
+	apiPlaceOrder               = apiGetOpenOrders
+	apiPlaceTriggerOrder        = apiGetTriggerOrders
+	apiModifyOrder              = "/orders/%d/modify"
+	apiModifyOrderByClientID    = "/orders/by_client_id/%d/modify"
+	apiModifyTriggerOrder       = "/conditional_orders/%d/modify"
+	apiGetOrderStatus           = apiGetOpenOrders
+	apiGetOrderStatusByClientID = "/orders/by_client_id/%d"
+	apiCancelOrder              = apiGetOpenOrders
+	apiCancelOrderByClientID=apiGetOrderStatusByClientID
+	apiCancelTriggerOrder       = apiGetTriggerOrders
+	apiCancelAll                = apiGetOpenOrders
 )
 
 type Orders struct {
@@ -55,40 +58,6 @@ func (o *Orders) GetOpenOrders(market string) ([]*models.Order, error) {
 
 	return result, nil
 }
-
-/*
-func (o *Orders) GetOrdersHistory(
-	params *models.OrdersHistoryParams) ([]*models.Order, error) {
-
-	queryParams, err := PrepareQueryParams(params)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	request, err := o.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetOrdersHistory),
-		Params: queryParams,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	response, err := o.client.do(request)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	var result []*models.Order
-	err = json.Unmarshal(response, &result)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return result, nil
-}
-*/
 
 func (o *Orders) GetOrdersHistory(
 	params *models.OrdersHistoryParams) ([]*models.Order, error) {
@@ -139,7 +108,7 @@ func (o *Orders) GetOpenTriggerOrders(
 	return result, nil
 }
 
-func (o *Orders) GetOrderTriggers(orderID int64) ([]*models.Trigger, error) {
+func (o *Orders) GetTriggerOrderTriggers(orderID int64) ([]*models.Trigger, error) {
 
 	request, err := o.client.prepareRequest(Request{
 		Auth:   true,
@@ -273,6 +242,23 @@ func (o *Orders) ModifyOrder(
 	return &result, nil
 }
 
+func (o *Orders) ModifyOrderByClientID(
+	clientID int64, params *models.ModifyOrderParams,
+) (*models.Order, error) {
+
+	url := FormURL(fmt.Sprintf(apiModifyOrderByClientID, clientID))
+	params.ClientID = nil
+	response, err := o.client.Post(params, url)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	var result models.Order
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &result, nil
+}
+
 func (o *Orders) ModifyTriggerOrder(
 	orderID int64,
 	params *models.ModifyTriggerOrderParams) (*models.TriggerOrder, error) {
@@ -326,6 +312,20 @@ func (o *Orders) GetOrderStatus(orderID int64) (*models.Order, error) {
 	return &result, nil
 }
 
+func (o *Orders) GetOrderStatusByClientID(clientID int64) (*models.Order, error) {
+
+	url := FormURL(fmt.Sprintf(apiGetOrderStatusByClientID, clientID))
+	response, err := o.client.Get(&struct{}{}, url, true)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	var result models.Order
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &result, nil
+}
+
 func (o *Orders) CancelOrder(orderID int64) error {
 
 	request, err := o.client.prepareRequest(Request{
@@ -341,6 +341,29 @@ func (o *Orders) CancelOrder(orderID int64) error {
 		return errors.WithStack(err)
 	}
 	return nil
+}
+
+func(o*Orders)CancelOrderByClientID(clientID int64)(*models.Succeeded,error){
+
+	url:=FormURL(fmt.Sprintf(apiCancelOrderByClientID,clientID))
+	request, err := o.client.prepareRequest(Request{
+		Auth:   true,
+		Method: http.MethodDelete,
+		URL:    url,
+	})
+	if err != nil {
+		return nil,return errors.WithStack(err)
+	}
+	response, err = o.client.do(request)
+	if err != nil {
+		return nil,errors.WithStack(err)
+	}
+
+	result := models.Succeeded{}
+	if err=json.Unmarshal(response,&result);err!=nil{
+		return nil,errors.WithStack(err)
+	}
+	return &result,nil
 }
 
 func (o *Orders) CancelTriggerOrder(orderID int64) error {
