@@ -137,7 +137,7 @@ func TestStream_SubscribeToOrderBooks(t *testing.T) {
 
 	ftx, ctx, done := prepForTest()
 
-	symbol := "ETH/BTC"
+	symbol := "BTC-PERP"
 	data, err := ftx.Stream.SubscribeToOrderBooks(*ctx, symbol)
 	require.NoError(t, err)
 
