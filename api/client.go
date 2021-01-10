@@ -56,6 +56,7 @@ type Client struct {
 	Futures
 	LeveragedTokens
 	Markets
+	Options
 	Orders
 	SpotMargin
 	SubAccounts
@@ -79,6 +80,7 @@ func New(opts ...Option) *Client {
 	client.Futures = Futures{client: client}
 	client.LeveragedTokens = LeveragedTokens{client: client}
 	client.Markets = Markets{client: client}
+	client.Options = Options{client: client}
 	client.Orders = Orders{client: client}
 	client.SpotMargin = SpotMargin{client: client}
 	client.SubAccounts = SubAccounts{client: client}

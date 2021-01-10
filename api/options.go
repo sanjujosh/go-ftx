@@ -310,7 +310,7 @@ func (o *Options) GetOptionsOpenInterest() (openInterest decimal.Decimal, err er
 	return result.OpenInterest, nil
 }
 
-func (o *Options) GetOptionsHistoricalOpenInterest(
+func (o *Options) GetHistoricalOpenInterest(
 	params *models.NumberTimeLimit,
 ) (numContracts decimal.Decimal, t time.Time, err error) {
 
