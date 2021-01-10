@@ -26,6 +26,8 @@ func prepForTest() (*api.Client, *context.Context, chan struct{}) {
 	return ftx, &ctx, done
 }
 
+func sleep() { time.Sleep(100 * time.Millisecond) }
+
 func TestStream_SubscribeToTickers(t *testing.T) {
 
 	ftx, ctx, done := prepForTest()
@@ -52,6 +54,7 @@ func TestStream_SubscribeToTickers(t *testing.T) {
 			t.Log("so far so good")
 			count++
 		default:
+			sleep()
 		}
 	}
 }
@@ -129,6 +132,7 @@ func TestStream_SubscribeToTrades(t *testing.T) {
 			lastID = msg.ID
 			t.Log("so far so good")
 		default:
+			sleep()
 		}
 	}
 }
@@ -154,6 +158,7 @@ func TestStream_SubscribeToOrderBooks(t *testing.T) {
 			t.Log("so far so good")
 			count++
 		default:
+			sleep()
 		}
 	}
 }

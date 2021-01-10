@@ -133,7 +133,7 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 			}
 		default:
 			t.Log("waiting ...")
-			time.Sleep(time.Second / 2)
+			time.Sleep(time.Second)
 		}
 	}
 }
