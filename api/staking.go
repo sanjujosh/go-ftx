@@ -27,7 +27,7 @@ type Staking struct {
 func (s *Staking) GetStakes() ([]*models.Stake, error) {
 
 	url := FormURL(apiGetStakes)
-	response, err := s.client.Get(&struct{}{}, url, false)
+	response, err := s.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -42,7 +42,7 @@ func (s *Staking) GetStakes() ([]*models.Stake, error) {
 func (s *Staking) GetUnstakeRequests() ([]*models.UnstakeRequest, error) {
 
 	url := FormURL(apiGetUnstakeRequests)
-	response, err := s.client.Get(&struct{}{}, url, false)
+	response, err := s.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -118,7 +118,7 @@ func (s *Staking) CancelUnstakeRequest(id int64) (*models.Succeeded, error) {
 func (s *Staking) GetStakingRewards() ([]*models.StakingReward, error) {
 
 	url := FormURL(apiGetStakingRewards)
-	response, err := s.client.Get(&struct{}{}, url, false)
+	response, err := s.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
