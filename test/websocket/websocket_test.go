@@ -44,7 +44,7 @@ func TestStream_SubscribeToTickers(t *testing.T) {
 			return
 		case msg := <-data:
 			require.Equal(t, symbol, msg.Symbol)
-			require.Equal(t, models.Update, msg.Type)
+			require.Equal(t, models.Update, msg.ResponseType)
 			require.True(t, msg.Last.IsPositive())
 			require.True(t, msg.Ask.IsPositive())
 			require.True(t, msg.Bid.IsPositive())
@@ -103,7 +103,7 @@ func TestStream_ListMarkets(t *testing.T) {
 			return
 		case msg := <-data:
 			t.Logf("Name: %s\n", msg.Name)
-			t.Logf("Type: %s\n", msg.Type)
+			t.Logf("Type: %s\n", msg.ResponseType)
 			t.Logf("Base Currency:  %s\n", msg.BaseCurrency)
 			t.Logf("Quote Currency: %s\n", msg.QuoteCurrency)
 			t.Logf("Underlying:     %s\n", msg.Underlying)
@@ -153,7 +153,8 @@ func TestStream_SubscribeToOrderBooks(t *testing.T) {
 			return
 		case msg := <-data:
 			require.Equal(t, symbol, msg.Symbol)
-			require.True(t, msg.Type == models.Update || msg.Type == models.Partial)
+			require.True(t,
+				msg.ResponseType == models.Update || msg.ResponseType == models.Partial)
 			require.True(t, len(msg.Bids) > 0 || len(msg.Asks) > 0)
 			t.Log("so far so good")
 			count++
