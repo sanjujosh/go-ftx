@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -317,12 +316,12 @@ func (o *Options) GetHistoricalOpenInterest(
 	url := FormURL(apiGetOptionsHistoricalOpenInterest)
 	response, err := o.client.Get(params, url, false)
 	if err != nil {
-		return decimal.Decimal{}, time.Time{}, errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	var result []*models.OptionsHistoricalOpenInterest
 	if err = json.Unmarshal(response, &result); err != nil {
-		return decimal.Decimal{}, time.Time{}, errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 	return result, nil
 }
