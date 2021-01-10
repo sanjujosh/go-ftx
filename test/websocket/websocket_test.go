@@ -103,7 +103,7 @@ func TestStream_ListMarkets(t *testing.T) {
 			return
 		case msg := <-data:
 			t.Logf("Name: %s\n", msg.Name)
-			t.Logf("Type: %s\n", msg.ResponseType)
+			t.Logf("Type: %s\n", msg.Type)
 			t.Logf("Base Currency:  %s\n", msg.BaseCurrency)
 			t.Logf("Quote Currency: %s\n", msg.QuoteCurrency)
 			t.Logf("Underlying:     %s\n", msg.Underlying)
