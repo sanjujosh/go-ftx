@@ -163,7 +163,7 @@ func (s *Stream) serve(
 		for {
 			select {
 			case <-ctx.Done():
-				err := s.conn.WriteMessage(
+				err = s.conn.WriteMessage(
 					websocket.CloseMessage,
 					websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 				if err != nil {
@@ -180,7 +180,7 @@ func (s *Stream) serve(
 				return
 			case <-time.After(pingPeriod):
 				s.printf("PING")
-				err := s.conn.WriteControl(
+				err = s.conn.WriteControl(
 					websocket.PingMessage,
 					[]byte(`{"op": "pong"}`),
 					time.Now().UTC().Add(10*time.Second))
@@ -191,7 +191,7 @@ func (s *Stream) serve(
 		}
 	}()
 
-	return eventsC, nil
+	return eventsC, err
 }
 
 func (s *Stream) reconnect(
