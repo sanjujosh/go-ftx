@@ -117,10 +117,14 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 		select {
 		case <-done:
 			return
-		case fill := <-filldata:
-			t.Logf("Fill: %+v\n", fill.Fill)
-		case order := <-orderdata:
-			t.Logf("Order: %+v\n", order.Order)
+		case fill, ok := <-filldata:
+			if ok {
+				t.Logf("Fill: %+v\n", *fill)
+			}
+		case order, ok := <-orderdata:
+			if ok {
+				t.Logf("Order: %+v\n", *order)
+			}
 		default:
 			t.Log("waiting ...")
 			time.Sleep(100 * time.Millisecond)

@@ -7,8 +7,8 @@ import (
 )
 
 type BaseResponse struct {
-	Type   ResponseType
-	Symbol string
+	ResponseType ResponseType
+	Symbol       string
 }
 
 type TickerResponse struct {
@@ -71,8 +71,8 @@ func (wr *WsResponse) MapToTradesResponse() (*TradesResponse, error) {
 	return &TradesResponse{
 		Trades: trades,
 		BaseResponse: BaseResponse{
-			Type:   wr.Type,
-			Symbol: wr.Market,
+			ResponseType: wr.Type,
+			Symbol:       wr.Market,
 		},
 	}, nil
 }
@@ -87,8 +87,8 @@ func (wr *WsResponse) MapToTickerResponse() (*TickerResponse, error) {
 	return &TickerResponse{
 		Ticker: ticker,
 		BaseResponse: BaseResponse{
-			Type:   wr.Type,
-			Symbol: wr.Market,
+			ResponseType: wr.Type,
+			Symbol:       wr.Market,
 		},
 	}, nil
 }
@@ -103,8 +103,8 @@ func (wr *WsResponse) MapToOrderBookResponse() (*OrderBookResponse, error) {
 	return &OrderBookResponse{
 		OrderBook: book,
 		BaseResponse: BaseResponse{
-			Type:   wr.Type,
-			Symbol: wr.Market,
+			ResponseType: wr.Type,
+			Symbol:       wr.Market,
 		},
 	}, nil
 }
@@ -132,7 +132,7 @@ func (wr *WsResponse) MapToOrdersResponse() (*OrdersResponse, error) {
 	return &OrdersResponse{
 		Order: order,
 		BaseResponse: BaseResponse{
-			Type: wr.Type,
+			ResponseType: wr.Type,
 		},
 	}, nil
 }
