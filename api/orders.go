@@ -23,7 +23,7 @@ const (
 	apiGetOrderStatus           = apiGetOpenOrders
 	apiGetOrderStatusByClientID = "/orders/by_client_id/%d"
 	apiCancelOrder              = apiGetOpenOrders
-	apiCancelOrderByClientID=apiGetOrderStatusByClientID
+	apiCancelOrderByClientID    = apiGetOrderStatusByClientID
 	apiCancelTriggerOrder       = apiGetTriggerOrders
 	apiCancelAll                = apiGetOpenOrders
 )
@@ -343,27 +343,27 @@ func (o *Orders) CancelOrder(orderID int64) error {
 	return nil
 }
 
-func(o*Orders)CancelOrderByClientID(clientID int64)(*models.Succeeded,error){
+func (o *Orders) CancelOrderByClientID(clientID int64) (*models.Succeeded, error) {
 
-	url:=FormURL(fmt.Sprintf(apiCancelOrderByClientID,clientID))
+	url := FormURL(fmt.Sprintf(apiCancelOrderByClientID, clientID))
 	request, err := o.client.prepareRequest(Request{
 		Auth:   true,
 		Method: http.MethodDelete,
 		URL:    url,
 	})
 	if err != nil {
-		return nil,return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
-	response, err = o.client.do(request)
+	response, err := o.client.do(request)
 	if err != nil {
-		return nil,errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	result := models.Succeeded{}
-	if err=json.Unmarshal(response,&result);err!=nil{
-		return nil,errors.WithStack(err)
+	if err = json.Unmarshal(response, &result); err != nil {
+		return nil, errors.WithStack(err)
 	}
-	return &result,nil
+	return &result, nil
 }
 
 func (o *Orders) CancelTriggerOrder(orderID int64) error {

@@ -101,7 +101,11 @@ func TestOrders_GetTriggerOrderTriggers(t *testing.T) {
 
 func TestOrders_GetTriggerOrdersHistory(t *testing.T) {
 
-	hist, err := client(t).GetTriggerOrdersHistory()
+	params := &models.TriggerOrdersHistoryParams{
+		Market: api.PtrString("BTC-PERP"),
+		Limit:  api.PtrInt(10),
+	}
+	hist, err := client(t).GetTriggerOrdersHistory(params)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
