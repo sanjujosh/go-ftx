@@ -100,7 +100,7 @@ func (s *Stream) serve(
 	for _, req := range requests {
 		switch req.Channel {
 		case models.FillsChannel, models.OrdersChannel:
-			if err = s.Login(conn); err != nil {
+			if err = s.Authorize(conn); err != nil {
 				return nil, errors.WithStack(err)
 			}
 			break
@@ -224,7 +224,7 @@ func (s *Stream) subscribe(conn *websocket.Conn, requests []models.WSRequest) er
 	return nil
 }
 
-func (s *Stream) Login(conn *websocket.Conn, subaccounts ...string) (err error) {
+func (s *Stream) Authorize(conn *websocket.Conn, subaccounts ...string) (err error) {
 
 	if s.isLoggedIn {
 		return
@@ -244,7 +244,7 @@ func (s *Stream) Login(conn *websocket.Conn, subaccounts ...string) (err error) 
 	if len(subaccounts) > 0 {
 		args["subaccount"] = subaccounts[0]
 	}
-	err = conn.WriteJSON(&models.WSRequestLogin{
+	err = conn.WriteJSON(&models.WSRequestAuthorize{
 		Op:   "login",
 		Args: args,
 	})

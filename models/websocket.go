@@ -47,7 +47,7 @@ type WSRequest struct {
 	Op      Operation `json:"op"`
 }
 
-type WSRequestLogin struct {
+type WSRequestAuthorize struct {
 	Args map[string]interface{} `json:"args"`
 	Op   Operation              `json:"op"`
 }
