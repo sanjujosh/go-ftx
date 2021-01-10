@@ -105,8 +105,7 @@ func (s *Stream) serve(
 		return nil, errors.WithStack(err)
 	}
 	for _, req := range requests {
-		switch req.Channel {
-		case models.FillsChannel, models.OrdersChannel:
+		if req.Channel == models.FillsChannel || req.Channel == models.OrdersChannel {
 			if err = s.Authorize(); err != nil {
 				return nil, errors.WithStack(err)
 			}
