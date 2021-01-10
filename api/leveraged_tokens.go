@@ -138,7 +138,6 @@ func (l *LeveragedTokens) RequestLeveragedTokenRedemption(
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-
 	result := models.LeveragedTokenRedemption{}
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)

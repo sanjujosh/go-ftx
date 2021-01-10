@@ -16,10 +16,10 @@ type Option struct {
 type OptionOutput Option
 
 type OptionInput struct {
-	Underlying string          `json:"underlying"`
-	Type       OptionType      `json:"type"`
-	Strike     decimal.Decimal `json:"strike"`
-	Expiry     int64           `json:"expiry"`
+	Underlying *string          `json:"underlying"`
+	Type       *OptionType      `json:"type"`
+	Strike     *decimal.Decimal `json:"strike"`
+	Expiry     *int64           `json:"expiry"`
 }
 
 type OptionQuoteRequest struct {
@@ -28,10 +28,11 @@ type OptionQuoteRequest struct {
 	Side           Side            `json:"side"`
 	Size           decimal.Decimal `json:"size"`
 	Time           time.Time       `json:"time"`
-	RequestExpiry  time.Time       `json:"time"`
+	RequestExpiry  time.Time       `json:"requestExpiry"`
 	Status         Status          `json:"status"`
 	HideLimitPrice bool            `json:"hideLimitPrice"`
 	LimitPrice     decimal.Decimal `json:"limitPrice"`
+	Quotes         []OptionQuote   `json:"quotes"`
 }
 
 type OptionQuote struct {
@@ -44,13 +45,13 @@ type OptionQuote struct {
 }
 
 type OptionQuoteRequestParams struct {
-	OptionInput
-	Side           Side            `json:"side"`
-	Size           decimal.Decimal `json:"size"`
-	LimitPrice     decimal.Decimal `json:"limitPrice"`
-	HideLimitPrice bool            `json:"hideLimitPrice"`
-	RequestExpiry  int64           `json:"requestExpiry"`
-	CounterpartyID int64           `json:"counterpartyId"`
+	*OptionInput
+	Side           *Side            `json:"side"`
+	Size           *decimal.Decimal `json:"size"`
+	LimitPrice     *decimal.Decimal `json:"limitPrice,omitempty"`
+	HideLimitPrice *bool            `json:"hideLimitPrice,omitempty"`
+	RequestExpiry  *int64           `json:"requestExpiry,omitempty"`
+	CounterpartyID *int64           `json:"counterpartyId,omitempty"`
 }
 
 type CreateQuoteRequest struct {
@@ -72,7 +73,7 @@ type QuotesForOptionQuoteRequest struct {
 	Size        decimal.Decimal `json:"size"`
 }
 
-type MyQuote struct {
+type UserOptionQuote struct {
 	QuotesForOptionQuoteRequest
 	Status Status    `json:"status"`
 	Time   time.Time `json:"time"`
@@ -118,12 +119,12 @@ type OptionFill struct {
 	Time      time.Time       `json:"time"`
 }
 
-type OptionVolume struct {
+type OptionsVolume struct {
 	Contracts       decimal.Decimal `json:"contracts"`
 	UnderlyingTotal decimal.Decimal `json:"underlying_total"`
 }
 
-type OptionOpenInterest struct {
+type OptionsHistoricalVolume struct {
 	NumContracts decimal.Decimal `json:"numContracts"`
 	EndTime      time.Time       `json:"endTime"`
 	StartTime    time.Time       `json:"startTime"`
