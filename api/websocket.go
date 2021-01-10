@@ -183,7 +183,7 @@ func (s *Stream) serve(
 				err := s.conn.WriteControl(
 					websocket.PingMessage,
 					[]byte(`{"op": "pong"}`),
-					time.Now().UTC().Add(10*time.Second)
+					time.Now().UTC().Add(10*time.Second))
 				if err != nil && err != websocket.ErrCloseSent {
 					s.printf("write ping: %v", err)
 				}
