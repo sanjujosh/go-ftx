@@ -34,6 +34,13 @@ type Stream struct {
 	wsReconnectionInterval time.Duration
 	isDebugMode            bool
 	isLoggedIn             bool
+	conn                   *websocket.Conn
+	tickersC               chan *models.TickerResponse
+	marketsC               chan *models.Market
+	tradesC                chan *models.TradeResponse
+	booksC                 chan *models.OrderBookResponse
+	fillsC                 chan *models.FillResponse
+	ordersC                chan *models.OrdersResponse
 }
 
 func (s *Stream) SetReconnectionCount(count int) {
@@ -61,20 +68,20 @@ func (s *Stream) printf(format string, v ...interface{}) {
 	log.Printf(format+"\n", v)
 }
 
-func (s *Stream) connect(requests ...models.WSRequest) (*websocket.Conn, error) {
+func (s *Stream) connect(requests ...models.WSRequest) (err error) {
 
-	conn, _, err := s.dialer.Dial(s.url, nil)
+	s.conn, _, err = s.dialer.Dial(s.url, nil)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	s.printf("connected to %v", s.url)
 
-	if err = s.subscribe(conn, requests); err != nil {
-		return nil, errors.WithStack(err)
+	if err = s.subscribe(requests); err != nil {
+		return errors.WithStack(err)
 	}
 	lastPong := time.Now()
-	conn.SetPongHandler(
+	s.conn.SetPongHandler(
 		func(msg string) error {
 			lastPong = time.Now()
 			if time.Now().Sub(lastPong) > websocketTimeout {
@@ -87,42 +94,40 @@ func (s *Stream) connect(requests ...models.WSRequest) (*websocket.Conn, error) 
 			}
 			return nil
 		})
-	return conn, nil
+	return nil
 }
 
 func (s *Stream) serve(
 	ctx context.Context, requests ...models.WSRequest) (chan interface{}, error) {
 
-	conn, err := s.connect(requests...)
+	err := s.connect(requests...)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 	for _, req := range requests {
 		switch req.Channel {
 		case models.FillsChannel, models.OrdersChannel:
-			if err = s.Authorize(conn); err != nil {
+			if err = s.Authorize(); err != nil {
 				return nil, errors.WithStack(err)
 			}
 			break
 		}
 	}
 	doneC := make(chan struct{})
-	eventsC := make(chan interface{}, 1)
+	eventsC := make(chan interface{})
 
 	go func() {
 		go func() {
 
-			defer close(doneC)
-
 			for {
 				message := &models.WsResponse{}
-				err = conn.ReadJSON(&message)
+				err = s.conn.ReadJSON(&message)
 				if err != nil {
 					s.printf("read msg: %v", err)
 					if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 						return
 					}
-					conn, err = s.reconnect(ctx, requests)
+					err = s.reconnect(ctx, requests)
 					if err != nil {
 						s.printf("reconnect: %+v", err)
 						return
@@ -158,7 +163,7 @@ func (s *Stream) serve(
 		for {
 			select {
 			case <-ctx.Done():
-				err := conn.WriteMessage(
+				err := s.conn.WriteMessage(
 					websocket.CloseMessage,
 					websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 				if err != nil {
@@ -175,10 +180,10 @@ func (s *Stream) serve(
 				return
 			case <-time.After(pingPeriod):
 				s.printf("PING")
-				err := conn.WriteControl(
+				err := s.conn.WriteControl(
 					websocket.PingMessage,
 					[]byte(`{"op": "pong"}`),
-					time.Now().Add(10*time.Second))
+					time.Now().UTC().Add(10*time.Second)
 				if err != nil && err != websocket.ErrCloseSent {
 					s.printf("write ping: %v", err)
 				}
@@ -190,33 +195,29 @@ func (s *Stream) serve(
 }
 
 func (s *Stream) reconnect(
-	ctx context.Context, requests []models.WSRequest) (*websocket.Conn, error) {
+	ctx context.Context, requests []models.WSRequest) (err error) {
 
-	for i := 1; i < s.wsReconnectionCount; i++ {
-		conn, err := s.connect(requests...)
-		if err == nil {
-			return conn, nil
+	for i := 0; i < s.wsReconnectionCount; i++ {
+		if err = s.connect(requests...); err == nil {
+			return nil
 		}
-
 		select {
 		case <-time.After(s.wsReconnectionInterval):
-			conn, err := s.connect(requests...)
-			if err != nil {
+			if err = s.connect(requests...); err != nil {
 				continue
 			}
-
-			return conn, nil
+			return nil
 		case <-ctx.Done():
-			return nil, ctx.Err()
+			return ctx.Err()
 		}
 	}
 
-	return nil, errors.New("reconnection failed")
+	return errors.New("reconnection failed")
 }
 
-func (s *Stream) subscribe(conn *websocket.Conn, requests []models.WSRequest) error {
+func (s *Stream) subscribe(requests []models.WSRequest) (err error) {
 	for _, req := range requests {
-		err := conn.WriteJSON(req)
+		err = s.conn.WriteJSON(req)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -224,7 +225,7 @@ func (s *Stream) subscribe(conn *websocket.Conn, requests []models.WSRequest) er
 	return nil
 }
 
-func (s *Stream) Authorize(conn *websocket.Conn, subaccounts ...string) (err error) {
+func (s *Stream) Authorize(subaccounts ...string) (err error) {
 
 	if s.isLoggedIn {
 		return
@@ -244,7 +245,7 @@ func (s *Stream) Authorize(conn *websocket.Conn, subaccounts ...string) (err err
 	if len(subaccounts) > 0 {
 		args["subaccount"] = subaccounts[0]
 	}
-	err = conn.WriteJSON(&models.WSRequestAuthorize{
+	err = s.conn.WriteJSON(&models.WSRequestAuthorize{
 		Op:   "login",
 		Args: args,
 	})
@@ -259,7 +260,7 @@ func (s *Stream) SubscribeToTickers(
 	ctx context.Context, symbols ...string) (chan *models.TickerResponse, error) {
 
 	if len(symbols) == 0 {
-		return nil, errors.New("symbols missing")
+		errors.New("symbols missing")
 	}
 
 	requests := make([]models.WSRequest, 0, len(symbols))
@@ -276,9 +277,8 @@ func (s *Stream) SubscribeToTickers(
 		return nil, errors.WithStack(err)
 	}
 
-	tickersC := make(chan *models.TickerResponse, 1)
+	s.tickersC = make(chan *models.TickerResponse)
 	go func() {
-		defer close(tickersC)
 		for {
 			select {
 			case <-ctx.Done():
@@ -291,15 +291,16 @@ func (s *Stream) SubscribeToTickers(
 				if !ok {
 					return
 				}
-				tickersC <- ticker
+				s.tickersC <- ticker
 			}
 		}
 	}()
 
-	return tickersC, nil
+	return s.tickersC, nil
 }
 
-func (s *Stream) SubscribeToMarkets(ctx context.Context) (chan *models.Market, error) {
+func (s *Stream) SubscribeToMarkets(
+	ctx context.Context) (chan *models.Market, error) {
 
 	eventsC, err := s.serve(ctx, models.WSRequest{
 		Channel: models.MarketsChannel,
@@ -309,9 +310,8 @@ func (s *Stream) SubscribeToMarkets(ctx context.Context) (chan *models.Market, e
 		return nil, errors.WithStack(err)
 	}
 
-	marketsC := make(chan *models.Market, 1)
+	s.marketsC = make(chan *models.Market)
 	go func() {
-		defer close(marketsC)
 		for {
 			select {
 			case <-ctx.Done():
@@ -333,18 +333,17 @@ func (s *Stream) SubscribeToMarkets(ctx context.Context) (chan *models.Market, e
 					return
 				}
 				for _, market := range markets.Data {
-					marketsC <- market
+					s.marketsC <- market
 				}
 			}
 		}
 	}()
 
-	return marketsC, nil
+	return s.marketsC, nil
 }
 
 func (s *Stream) SubscribeToTrades(
-	ctx context.Context, symbols ...string,
-) (chan *models.TradeResponse, error) {
+	ctx context.Context, symbols ...string) (chan *models.TradeResponse, error) {
 
 	if len(symbols) == 0 {
 		return nil, errors.New("symbols missing")
@@ -364,9 +363,8 @@ func (s *Stream) SubscribeToTrades(
 		return nil, errors.WithStack(err)
 	}
 
-	tradesC := make(chan *models.TradeResponse, 1)
+	s.tradesC = make(chan *models.TradeResponse)
 	go func() {
-		defer close(tradesC)
 		for {
 			select {
 			case <-ctx.Done():
@@ -380,7 +378,7 @@ func (s *Stream) SubscribeToTrades(
 					return
 				}
 				for _, trade := range trades.Trades {
-					tradesC <- &models.TradeResponse{
+					s.tradesC <- &models.TradeResponse{
 						Trade:        trade,
 						BaseResponse: trades.BaseResponse,
 					}
@@ -389,7 +387,7 @@ func (s *Stream) SubscribeToTrades(
 		}
 	}()
 
-	return tradesC, nil
+	return s.tradesC, nil
 }
 
 func (s *Stream) SubscribeToOrderBooks(
@@ -414,9 +412,8 @@ func (s *Stream) SubscribeToOrderBooks(
 		return nil, errors.WithStack(err)
 	}
 
-	booksC := make(chan *models.OrderBookResponse, 1)
+	s.booksC = make(chan *models.OrderBookResponse)
 	go func() {
-		defer close(booksC)
 		for {
 			select {
 			case <-ctx.Done():
@@ -426,12 +423,12 @@ func (s *Stream) SubscribeToOrderBooks(
 				if !ok {
 					return
 				}
-				booksC <- book
+				s.booksC <- book
 			}
 		}
 	}()
 
-	return booksC, nil
+	return s.booksC, nil
 }
 
 // TODO: Get fill and order streams to actually work right
@@ -445,10 +442,9 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	fillsC := make(chan *models.FillResponse, 1)
+	s.fillsC = make(chan *models.FillResponse)
 
 	go func() {
-		defer close(fillsC)
 		for {
 			select {
 			case <-ctx.Done():
@@ -458,12 +454,12 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 				if !ok {
 					return
 				}
-				fillsC <- fill
+				s.fillsC <- fill
 			}
 		}
 	}()
 
-	return fillsC, nil
+	return s.fillsC, nil
 }
 
 func (s *Stream) SubscribeToOrders(ctx context.Context) (chan *models.OrdersResponse, error) {
@@ -475,10 +471,9 @@ func (s *Stream) SubscribeToOrders(ctx context.Context) (chan *models.OrdersResp
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	ordersC := make(chan *models.OrdersResponse, 1)
+	s.ordersC = make(chan *models.OrdersResponse)
 
 	go func() {
-		defer close(ordersC)
 		for {
 			select {
 			case <-ctx.Done():
@@ -488,10 +483,10 @@ func (s *Stream) SubscribeToOrders(ctx context.Context) (chan *models.OrdersResp
 				if !ok {
 					return
 				}
-				ordersC <- order
+				s.ordersC <- order
 			}
 		}
 	}()
 
-	return ordersC, nil
+	return s.ordersC, nil
 }
