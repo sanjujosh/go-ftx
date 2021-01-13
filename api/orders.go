@@ -142,8 +142,7 @@ func (o *Orders) PlaceOrder(params *models.OrderParams, order *models.Order) (er
 		return err
 	}
 
-	var result models.Order
-	if err = json.Unmarshal(response, &result); err != nil {
+	if err = json.Unmarshal(response, &order); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
@@ -161,8 +160,7 @@ func (o *Orders) PlaceTriggerOrder(
 		return errors.WithStack(err)
 	}
 
-	var result models.TriggerOrder
-	if err = json.Unmarshal(response, &result); err != nil {
+	if err = json.Unmarshal(response, order); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil

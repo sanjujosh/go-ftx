@@ -266,11 +266,19 @@ func TestOrders_CancelAll(t *testing.T) {
 	}
 	t.Logf("Place Trigger Order Result: %+v\n", triggerOrder)
 
-	cancelParams := &models.CancelAllParams{
+	err = ftx.Orders.CancelAllOrders(&models.CancelAllParams{
 		Market: api.PtrString(swap),
 		Side:   api.PtrString("buy"),
+	})
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
 	}
-	if err = ftx.Orders.CancelAllOrders(cancelParams); err != nil {
+
+	err = ftx.Orders.CancelAllOrders(&models.CancelAllParams{
+		Market: api.PtrString(swap),
+		Side:   api.PtrString("sell"),
+	})
+	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
 }
