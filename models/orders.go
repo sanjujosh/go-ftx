@@ -116,7 +116,8 @@ type ModifyTriggerOrderParams struct {
 }
 
 type CancelAllParams struct {
-	Market                *string `json:"market,omitempty"`
+	Market                *string `json:"market"`
+	Side                  *string `json:"side"`
 	ConditionalOrdersOnly *bool   `json:"conditionalOrdersOnly,omitempty"`
 	LimitOrdersOnly       *bool   `json:"limitOrdersOnly"`
 }
