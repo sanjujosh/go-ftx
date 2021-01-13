@@ -49,6 +49,11 @@ type Market struct {
 // The string would be '5005.5:10:5001.0:6:4995.0:5'
 //
 // The final checksum is the crc32 value of this string.
+
+type GetOrderBookParams struct {
+	Depth *int `json:"depth,omitempty"`
+}
+
 type OrderBook struct {
 	Asks     [][]decimal.Decimal `json:"asks"`
 	Bids     [][]decimal.Decimal `json:"bids"`
