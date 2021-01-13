@@ -149,7 +149,7 @@ func (c *Client) GetResponse(
 		}
 		request, err = c.prepareRequest(Request{
 			Auth:   true,
-			Method: http.MethodPost,
+			Method: method,
 			URL:    url,
 			Body:   body,
 		})

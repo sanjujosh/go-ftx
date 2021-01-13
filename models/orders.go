@@ -115,6 +115,10 @@ type ModifyTriggerOrderParams struct {
 	TrailValue   *decimal.Decimal `json:"trailValue,omitempty"`
 }
 
+type CancelOrderParams struct {
+	OrderID *int64 `json:"orderId"`
+}
+
 type CancelAllParams struct {
 	Market                *string `json:"market"`
 	Side                  *string `json:"side"`
