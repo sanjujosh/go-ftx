@@ -81,7 +81,7 @@ func TestMarkets_GetOrderBook(t *testing.T) {
 	})
 
 	t.Run("success_with_depth", func(t *testing.T) {
-		depth := 30
+		depth := 10
 		err := ftx.Markets.GetOrderBook("ETH/BTC", &depth, &ob)
 		req.NoError(err)
 		req.NotNil(&ob)
