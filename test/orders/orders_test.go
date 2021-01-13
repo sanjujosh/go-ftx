@@ -131,7 +131,7 @@ func TestOrders_PlaceOrderModifyAndCancel(t *testing.T) {
 		Side:     api.PtrString("buy"),
 		Price:    api.PtrDecimal(30e3),
 		Type:     api.PtrString("limit"),
-		Size:     api.PtrDecimal(0.001),
+		Size:     api.PtrDecimal(0.01),
 		PostOnly: api.PtrBool(true),
 	}, &order)
 	if err != nil {
@@ -168,7 +168,7 @@ func TestOrders_PlaceTriggerOrderModifyAndCancel(t *testing.T) {
 	err = ftx.Orders.PlaceTriggerOrder(&models.TriggerOrderParams{
 		Market:       api.PtrString("BTC-PERP"),
 		Side:         api.PtrString("sell"),
-		Size:         api.PtrDecimal(0.001),
+		Size:         api.PtrDecimal(0.01),
 		Type:         api.PtrString("stop"),
 		TriggerPrice: api.PtrDecimal(20e3),
 		OrderPrice:   api.PtrDecimal(19.5e3),
@@ -210,7 +210,7 @@ func TestOrders_CancelAll(t *testing.T) {
 		Side:     api.PtrString("buy"),
 		Price:    api.PtrDecimal(30e3),
 		Type:     api.PtrString("limit"),
-		Size:     api.PtrDecimal(0.001),
+		Size:     api.PtrDecimal(0.01),
 		PostOnly: api.PtrBool(true),
 	}, &order)
 	if err != nil {
@@ -222,7 +222,7 @@ func TestOrders_CancelAll(t *testing.T) {
 	err = ftx.Orders.PlaceTriggerOrder(&models.TriggerOrderParams{
 		Market:       api.PtrString("BTC-PERP"),
 		Side:         api.PtrString("sell"),
-		Size:         api.PtrDecimal(0.001),
+		Size:         api.PtrDecimal(0.01),
 		Type:         api.PtrString("stop"),
 		TriggerPrice: api.PtrDecimal(20e3),
 		OrderPrice:   api.PtrDecimal(19.5e3),
