@@ -99,43 +99,64 @@ func New(opts ...Option) *Client {
 }
 
 func (c *Client) Get(params interface{}, url string, auth bool) ([]byte, error) {
-
-	queryParams, err := PrepareQueryParams(params)
-	if err != nil {
-		return nil, errors.WithStack(err)
+	if params == nil {
+		return c.GetResponse(&struct{}{}, url, http.MethodGet, auth)
 	}
-
-	request, err := c.prepareRequest(Request{
-		Auth:   auth,
-		Method: http.MethodGet,
-		URL:    url,
-		Params: queryParams,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	response, err := c.do(request)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return response, nil
+	return c.GetResponse(params, url, http.MethodGet, auth)
 }
 
 func (c *Client) Post(params interface{}, url string) ([]byte, error) {
+	if params == nil {
+		return c.GetResponse(&struct{}{}, url, http.MethodPost)
+	}
+	return c.GetResponse(params, url, http.MethodPost)
+}
 
-	body, err := json.Marshal(params)
-	if err != nil {
-		return nil, errors.WithStack(err)
+func (c *Client) Delete(params interface{}, url string) ([]byte, error) {
+	if params == nil {
+		return c.GetResponse(&struct{}{}, url, http.MethodDelete)
+	}
+	return c.GetResponse(params, url, http.MethodDelete)
+}
+
+func (c *Client) GetResponse(
+	params interface{}, url string, method string, auth ...bool) ([]byte, error) {
+
+	var (
+		err     error
+		request *http.Request
+	)
+
+	switch method {
+	case http.MethodGet:
+		if len(auth) == 0 {
+			return nil, fmt.Errorf("Auth not specified")
+		}
+		queryParams, err := PrepareQueryParams(params)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		request, err = c.prepareRequest(Request{
+			Auth:   auth[0],
+			Method: method,
+			URL:    url,
+			Params: queryParams,
+		})
+	case http.MethodPost, http.MethodDelete:
+		body, err := json.Marshal(params)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		request, err = c.prepareRequest(Request{
+			Auth:   true,
+			Method: http.MethodPost,
+			URL:    url,
+			Body:   body,
+		})
+	default:
+		return nil, fmt.Errorf("Invalid http method")
 	}
 
-	request, err := c.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodPost,
-		URL:    url,
-		Body:   body,
-	})
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

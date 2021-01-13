@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/uscott/go-ftx/api"
+	"github.com/uscott/go-ftx/models"
 )
 
 func main() {
@@ -17,7 +18,8 @@ func main() {
 		}),
 	)
 
-	info, err := client.Account.GetAccountInformation()
+	info := models.AccountInformation{}
+	err := client.Account.GetAccountInformation(&info)
 	if err != nil {
 		panic(err)
 	}

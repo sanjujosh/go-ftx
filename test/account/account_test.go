@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uscott/go-ftx/api"
+	"github.com/uscott/go-ftx/models"
 )
 
 func TestAccount_GetAccountInformation(t *testing.T) {
@@ -20,10 +21,11 @@ func TestAccount_GetAccountInformation(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	account, err := ftx.Account.GetAccountInformation()
+	account := models.AccountInformation{}
+	err = ftx.Account.GetAccountInformation(&account)
 	assert.NoError(t, err)
-	assert.NotNil(t, account)
-	t.Logf("Account: %+v\n", *account)
+	assert.NotNil(t, &account)
+	t.Logf("Account: %+v\n", account)
 }
 
 func TestAccount_GetPositions(t *testing.T) {
@@ -57,8 +59,9 @@ func TestAccount_ChangeAccountLeverage(t *testing.T) {
 	err = ftx.Account.ChangeAccountLeverage(leverage)
 	assert.NoError(t, err)
 
-	account, err := ftx.Account.GetAccountInformation()
+	account := models.AccountInformation{}
+	err = ftx.Account.GetAccountInformation(&account)
 	assert.NoError(t, err)
-	assert.NotNil(t, account)
+	assert.NotNil(t, &account)
 	assert.True(t, leverage.Equal(account.Leverage))
 }

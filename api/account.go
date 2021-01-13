@@ -9,6 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 
 	"github.com/uscott/go-ftx/models"
+	"github.com/uscott/go-tools/errs"
 )
 
 const (
@@ -21,28 +22,23 @@ type Account struct {
 	client *Client
 }
 
-func (a *Account) GetAccountInformation() (*models.AccountInformation, error) {
-	request, err := a.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetAccountInformation),
-	})
+func (a *Account) GetAccountInformation(result *models.AccountInformation) (err error) {
+
+	if result == nil {
+		return errs.NilPtr
+	}
+	url := FormURL(apiGetAccountInformation)
+	response, err := a.client.Get(nil, url, true)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
-	response, err := a.client.do(request)
+	err = json.Unmarshal(response, result)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
-	var result *models.AccountInformation
-	err = json.Unmarshal(response, &result)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return result, nil
+	return nil
 }
 
 func (a *Account) GetPositions() ([]*models.Position, error) {
