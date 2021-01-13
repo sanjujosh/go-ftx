@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strconv"
 
 	"github.com/pkg/errors"
 
@@ -61,7 +63,22 @@ func (m *Markets) GetOrderBook(market string, depth *int, ob *models.OrderBook) 
 	}
 
 	url := FormURL(fmt.Sprintf(apiGetOrderBook, market))
-	response, err := m.client.Get(&models.GetOrderBookParams{Depth: depth}, url, false)
+	var response []byte
+
+	if depth == nil {
+		response, err = m.client.Get(nil, url, false)
+	} else {
+		request, err := m.client.prepareRequest(Request{
+			Auth:   false,
+			Method: http.MethodGet,
+			URL:    url,
+			Params: map[string]string{"depth": strconv.FormatInt(int64(*depth), 10)},
+		})
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		response, err = m.client.do(request)
+	}
 	if err != nil {
 		return errors.WithStack(err)
 	}

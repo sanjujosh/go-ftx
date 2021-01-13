@@ -50,9 +50,7 @@ type Market struct {
 //
 // The final checksum is the crc32 value of this string.
 
-type GetOrderBookParams struct {
-	Depth *int `json:"depth,omitempty"`
-}
+type GetOrderBookParams map[string]int
 
 type OrderBook struct {
 	Asks     [][]decimal.Decimal `json:"asks"`
