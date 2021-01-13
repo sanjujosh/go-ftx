@@ -1,9 +1,11 @@
 package test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/pkg/errors"
+	"github.com/uscott/go-ftx/api"
 )
 
 func prepForTest(t *testing.T) *api.Client {
@@ -25,7 +27,7 @@ func TestFunding_GetFundingPayments(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	if i, p := range payments {
+	for i, p := range payments {
 		if i > 9 {
 			return
 		}

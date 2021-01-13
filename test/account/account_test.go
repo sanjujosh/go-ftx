@@ -23,6 +23,7 @@ func TestAccount_GetAccountInformation(t *testing.T) {
 	account, err := ftx.Account.GetAccountInformation()
 	assert.NoError(t, err)
 	assert.NotNil(t, account)
+	t.Logf("Account: %+v\n", *account)
 }
 
 func TestAccount_GetPositions(t *testing.T) {
@@ -37,6 +38,9 @@ func TestAccount_GetPositions(t *testing.T) {
 	positions, err := ftx.Account.GetPositions()
 	assert.NoError(t, err)
 	assert.NotNil(t, positions)
+	for _, p := range positions {
+		t.Logf("Position: %+v\n", *p)
+	}
 }
 
 func TestAccount_ChangeAccountLeverage(t *testing.T) {
