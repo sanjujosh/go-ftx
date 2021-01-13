@@ -3,11 +3,11 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/pkg/errors"
 
 	"github.com/uscott/go-ftx/models"
+	"github.com/uscott/go-tools/errs"
 )
 
 const (
@@ -22,15 +22,9 @@ type Markets struct {
 }
 
 func (m *Markets) GetMarkets() ([]*models.Market, error) {
-	request, err := m.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetMarkets),
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 
-	response, err := m.client.do(request)
+	url := FormURL(apiGetMarkets)
+	response, err := m.client.Get(nil, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -44,79 +38,51 @@ func (m *Markets) GetMarkets() ([]*models.Market, error) {
 	return result, nil
 }
 
-func (m *Markets) GetMarketByName(name string) (*models.Market, error) {
-	request, err := m.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s/%s", apiUrl, apiGetMarkets, name),
-	})
+func (m *Markets) GetMarketByName(name string, market *models.Market) (err error) {
+
+	url := FormURL(fmt.Sprintf("%s/%s", apiGetMarkets, name))
+	response, err := m.client.Get(nil, url, false)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
-	response, err := m.client.do(request)
+	err = json.Unmarshal(response, market)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
-	var result models.Market
-	err = json.Unmarshal(response, &result)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &result, nil
+	return nil
 }
 
-func (m *Markets) GetOrderBook(marketName string, depth *int) (*models.OrderBook, error) {
+func (m *Markets) GetOrderBook(market string, depth *int, ob *models.OrderBook) (err error) {
+
+	if ob == nil {
+		return errs.NilPtr
+	}
 	params := map[string]string{}
 	if depth != nil {
 		params["depth"] = fmt.Sprintf("%d", *depth)
 	}
 
-	path := fmt.Sprintf(apiGetOrderBook, marketName)
-
-	request, err := m.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, path),
-		Params: params,
-	})
+	url := FormURL(fmt.Sprintf(apiGetOrderBook, market))
+	response, err := m.client.Get(params, url, false)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
-	response, err := m.client.do(request)
+	err = json.Unmarshal(response, ob)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
-	var result models.OrderBook
-	err = json.Unmarshal(response, &result)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &result, nil
+	return nil
 }
 
 func (m *Markets) GetTrades(
-	marketName string, params *models.GetTradesParams) ([]*models.Trade, error) {
+	market string, params *models.GetTradesParams) ([]*models.Trade, error) {
 
-	queryParams, err := PrepareQueryParams(params)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	path := fmt.Sprintf(apiGetTrades, marketName)
-	request, err := m.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, path),
-		Params: queryParams,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	response, err := m.client.do(request)
+	url := FormURL(fmt.Sprintf(apiGetTrades, market))
+	response, err := m.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -131,25 +97,11 @@ func (m *Markets) GetTrades(
 }
 
 func (m *Markets) GetHistoricalPrices(
-	marketName string, params *models.GetHistoricalPricesParams,
+	market string, params *models.GetHistoricalPricesParams,
 ) ([]*models.HistoricalPrice, error) {
 
-	queryParams, err := PrepareQueryParams(params)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	path := fmt.Sprintf(apiGetHistoricalPrices, marketName)
-	request, err := m.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, path),
-		Params: queryParams,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	response, err := m.client.do(request)
+	url := FormURL(fmt.Sprintf(apiGetHistoricalPrices, market))
+	response, err := m.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
