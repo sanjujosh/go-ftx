@@ -59,12 +59,12 @@ func (m *Markets) GetOrderBook(market string, depth *int, ob *models.OrderBook) 
 	if ob == nil {
 		return errs.NilPtr
 	}
-	params := map[string]string{}
-	if depth != nil {
-		params["depth"] = fmt.Sprintf("%d", *depth)
-	}
 
 	url := FormURL(fmt.Sprintf(apiGetOrderBook, market))
+	params := struct {
+		Depth *int `json:"depth,omitempty"`
+	}{Depth: depth}
+
 	response, err := m.client.Get(params, url, false)
 	if err != nil {
 		return errors.WithStack(err)
