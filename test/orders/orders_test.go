@@ -125,28 +125,31 @@ func TestOrders_PlaceOrderModifyAndCancel(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	order, err := ftx.Orders.PlaceOrder(&models.OrderParams{
+	order := models.Order{}
+	err = ftx.Orders.PlaceOrder(&models.OrderParams{
 		Market:   api.PtrString("BTC-PERP"),
 		Side:     api.PtrString("buy"),
 		Price:    api.PtrDecimal(30e3),
 		Type:     api.PtrString("limit"),
 		Size:     api.PtrDecimal(0.001),
 		PostOnly: api.PtrBool(true),
-	})
+	}, &order)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Place Order Result: %+v\n", *order)
+	t.Logf("Place Order Result: %+v\n", order)
 	orderID := order.ID
-	order, err = ftx.Orders.ModifyOrder(
+	err = ftx.Orders.ModifyOrder(
 		orderID,
 		&models.ModifyOrderParams{
 			Price: api.PtrDecimal(29.5e3),
-		})
+		},
+		&order,
+	)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Modify Order Result: %+v\n", *order)
+	t.Logf("Modify Order Result: %+v\n", order)
 	orderID = order.ID
 	if err = ftx.Orders.CancelOrder(orderID); err != nil {
 		t.Fatal(errors.WithStack(err))
@@ -161,30 +164,32 @@ func TestOrders_PlaceTriggerOrderModifyAndCancel(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	order, err := ftx.Orders.PlaceTriggerOrder(&models.TriggerOrderParams{
+	order := models.TriggerOrder{}
+	err = ftx.Orders.PlaceTriggerOrder(&models.TriggerOrderParams{
 		Market:       api.PtrString("BTC-PERP"),
 		Side:         api.PtrString("sell"),
 		Size:         api.PtrDecimal(0.001),
 		Type:         api.PtrString("stop"),
 		TriggerPrice: api.PtrDecimal(20e3),
 		OrderPrice:   api.PtrDecimal(19.5e3),
-	})
+	}, &order)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Place Trigger Order Result: %+v\n", *order)
+	t.Logf("Place Trigger Order Result: %+v\n", order)
 	orderID := order.ID
-	order, err = ftx.Orders.ModifyTriggerOrder(
+	err = ftx.Orders.ModifyTriggerOrder(
 		orderID,
 		&models.ModifyTriggerOrderParams{
 			TriggerPrice: api.PtrDecimal(19e3),
 			OrderPrice:   api.PtrDecimal(18e3),
 		},
+		&order,
 	)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Modify Trigger Order Result: %+v\n", *order)
+	t.Logf("Modify Trigger Order Result: %+v\n", order)
 	orderID = order.ID
 	if err = ftx.Orders.CancelTriggerOrder(orderID); err != nil {
 		t.Fatal(errors.WithStack(err))
@@ -199,31 +204,33 @@ func TestOrders_CancelAll(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	order, err := ftx.Orders.PlaceOrder(&models.OrderParams{
+	order := models.Order{}
+	err = ftx.Orders.PlaceOrder(&models.OrderParams{
 		Market:   api.PtrString("BTC-PERP"),
 		Side:     api.PtrString("buy"),
 		Price:    api.PtrDecimal(30e3),
 		Type:     api.PtrString("limit"),
 		Size:     api.PtrDecimal(0.001),
 		PostOnly: api.PtrBool(true),
-	})
+	}, &order)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Place Order Result: %+v\n", *order)
+	t.Logf("Place Order Result: %+v\n", order)
 
-	triggerOrder, err := ftx.Orders.PlaceTriggerOrder(&models.TriggerOrderParams{
+	triggerOrder := models.TriggerOrder{}
+	err = ftx.Orders.PlaceTriggerOrder(&models.TriggerOrderParams{
 		Market:       api.PtrString("BTC-PERP"),
 		Side:         api.PtrString("sell"),
 		Size:         api.PtrDecimal(0.001),
 		Type:         api.PtrString("stop"),
 		TriggerPrice: api.PtrDecimal(20e3),
 		OrderPrice:   api.PtrDecimal(19.5e3),
-	})
+	}, &triggerOrder)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Place Trigger Order Result: %+v\n", *triggerOrder)
+	t.Logf("Place Trigger Order Result: %+v\n", triggerOrder)
 
 	if err = ftx.Orders.CancelAllOrders(&models.CancelAllParams{Market: nil}); err != nil {
 		t.Fatal(errors.WithStack(err))
