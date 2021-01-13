@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/uscott/go-ftx/models"
+	"github.com/uscott/go-tools/errs"
 )
 
 const (
@@ -46,71 +47,50 @@ func (f *Futures) GetFutures() ([]*models.Future, error) {
 	return result, nil
 }
 
-func (f *Futures) GetFutureByName(name string) (*models.Future, error) {
+func (f *Futures) GetFutureByName(name string, future *models.Future) (err error) {
 
-	request, err := f.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s/%s", apiUrl, apiGetFutures, name),
-	})
+	if future == nil {
+		return errs.NilPtr
+	}
+	url := FormURL(fmt.Sprintf("%s/%s", apiGetFutures, name))
+	response, err := f.client.Get(nil, url, false)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
-	response, err := f.client.do(request)
+	err = json.Unmarshal(response, future)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
-	var result models.Future
-	err = json.Unmarshal(response, &result)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &result, nil
+	return nil
 }
 
-func (f *Futures) GetFutureStats(name string) (*models.FutureStats, error) {
+func (f *Futures) GetFutureStats(name string, stats *models.FutureStats) (err error) {
 
-	path := fmt.Sprintf(apiGetFutureStats, name)
-	request, err := f.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, path),
-	})
+	if stats == nil {
+		return errs.NilPtr
+	}
+	url := FormURL(fmt.Sprintf(apiGetFutureStats, name))
+	response, err := f.client.Get(nil, url, false)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
-	response, err := f.client.do(request)
-	if err != nil {
-		return nil, errors.WithStack(err)
+	if err = json.Unmarshal(response, stats); err != nil {
+		return errors.WithStack(err)
 	}
-	var result models.FutureStats
-	if err = json.Unmarshal(response, &result); err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return &result, nil
+	return nil
 }
 
 func (f *Futures) GetFundingRates(
 	params *models.FundingRatesParams) ([]*models.FundingRates, error) {
 
-	queryParams, err := PrepareQueryParams(params)
+	url := FormURL(apiGetFundingRates)
+	response, err := f.client.Get(nil, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	request, err := f.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetFundingRates),
-		Params: queryParams,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	response, err := f.client.do(request)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 	var result []*models.FundingRates
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
@@ -120,18 +100,12 @@ func (f *Futures) GetFundingRates(
 
 func (f *Futures) GetIndexWeights(index string) (*map[string]float64, error) {
 
-	path := fmt.Sprintf(apiGetIndexWeights, index)
-	request, err := f.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, path),
-	})
+	url := FormURL(fmt.Sprintf(apiGetIndexWeights, index))
+	response, err := f.client.Get(nil, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	response, err := f.client.do(request)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
+
 	var result map[string]float64
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
@@ -141,17 +115,12 @@ func (f *Futures) GetIndexWeights(index string) (*map[string]float64, error) {
 
 func (f *Futures) GetExpiredFutures() ([]*models.FutureExpired, error) {
 
-	request, err := f.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetExpiredFutures),
-	})
+	url := FormURL(apiGetExpiredFutures)
+	response, err := f.client.Get(nil, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	response, err := f.client.do(request)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
+
 	var result []*models.FutureExpired
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
@@ -163,23 +132,12 @@ func (f *Futures) GetHistoricalIndex(
 	indexName string,
 	params *models.HistoricalIndexParams) ([]*models.HistoricalIndex, error) {
 
-	path := fmt.Sprintf(apiGetHistoricalIndex, indexName)
-	queryParams, err := PrepareQueryParams(params)
+	url := FormURL(fmt.Sprintf(apiGetHistoricalIndex, indexName))
+	response, err := f.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	request, err := f.client.prepareRequest(Request{
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, path),
-		Params: queryParams,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	response, err := f.client.do(request)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
+
 	var result []*models.HistoricalIndex
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)

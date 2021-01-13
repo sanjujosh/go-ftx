@@ -37,7 +37,8 @@ func TestFutures_GetFutureByName(t *testing.T) {
 
 	ftx := api.New()
 
-	future, err := ftx.Futures.GetFutureByName(futName)
+	future := models.Future{}
+	err := ftx.Futures.GetFutureByName(futName, &future)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
@@ -47,7 +48,8 @@ func TestFutures_GetFutureByName(t *testing.T) {
 func TestFutures_GetFutureStats(t *testing.T) {
 
 	ftx := api.New()
-	stats, err := ftx.Futures.GetFutureStats(futName)
+	stats := models.FutureStats{}
+	err := ftx.Futures.GetFutureStats(futName, &stats)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
@@ -116,11 +118,11 @@ func TestFutures_GetHistoricalIndex(t *testing.T) {
 	histIndex, err := ftx.Futures.GetHistoricalIndex(
 		index,
 		&models.HistoricalIndexParams{
-		Resolution: api.PtrInt(resolution),
-		Limit:      api.PtrInt(limit),
-		StartTime:  api.PtrInt(int(now.Add(-5 * time.Hour).Unix())),
-		EndTime:    api.PtrInt(int(now.Unix())),
-	})
+			Resolution: api.PtrInt(resolution),
+			Limit:      api.PtrInt(limit),
+			StartTime:  api.PtrInt(int(now.Add(-5 * time.Hour).Unix())),
+			EndTime:    api.PtrInt(int(now.Unix())),
+		})
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
