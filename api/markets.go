@@ -61,20 +61,16 @@ func (m *Markets) GetOrderBook(market string, depth *int, ob *models.OrderBook) 
 	}
 
 	url := FormURL(fmt.Sprintf(apiGetOrderBook, market))
-	var params struct {
+	params := &struct {
 		Depth *int `json:"depth,omitempty"`
-	}
-	if depth != nil {
-		params.Depth = depth
-	}
+	}{Depth: depth}
 
-	response, err := m.client.Get(&params, url, false)
+	response, err := m.client.Get(params, url, false)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	err = json.Unmarshal(response, ob)
-	if err != nil {
+	if err = json.Unmarshal(response, ob); err != nil {
 		return errors.WithStack(err)
 	}
 
