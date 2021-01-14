@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -91,28 +90,19 @@ func (s *Staking) RequestUnstake(
 	return &result, nil
 }
 
-func (s *Staking) CancelUnstakeRequest(id int64) (*models.Succeeded, error) {
+func (s *Staking) CancelUnstakeRequest(id int64) (result *models.Result, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelUnstakeRequest, id))
-	request, err := s.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodDelete,
-		URL:    url,
-	})
+	response, err := s.client.Delete(nil, url)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	response, err := s.client.do(request)
-	if err != nil {
+	result = new(models.Result)
+	if err = json.Unmarshal(response, result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-
-	result := models.Succeeded{}
-	if err = json.Unmarshal(response, &result); err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return &result, nil
+	return
 }
 
 func (s *Staking) GetStakingRewards() ([]*models.StakingReward, error) {

@@ -120,9 +120,8 @@ const (
 	Processed = UnstakeRequestStatus("processed")
 )
 
-type Succeeded struct {
-	Success bool        `json:"success"`
-	Result  interface{} `json:"result"`
+type Result struct {
+	Result interface{} `json:"result"`
 }
 
 type FTXTime struct {
