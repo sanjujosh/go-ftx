@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/uscott/go-ftx/models"
@@ -20,15 +19,10 @@ func (f *Funding) GetFundingPayments(
 	future *string, start, end *int64,
 ) ([]*models.FundingPayment, error) {
 
-	params := struct {
-		Future    *string `json:"future,omitempty"`
-		StartTime *int64  `json:"start_time,omitempty"`
-		EndTime   *int64  `json:"end_time,omitempty"`
-	}{Future: future, StartTime: start, EndTime: end}
+	url := FormURL(apiGetFundingPayments)
+	params := &models.FundingPaymentParams{Future: future, StartTime: start, EndTime: end}
 
-	url := fmt.Sprintf("%s%s", apiUrl, apiGetFundingPayments)
-
-	response, err := f.client.Get(&params, url, true)
+	response, err := f.client.Get(params, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
