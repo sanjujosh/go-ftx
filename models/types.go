@@ -121,7 +121,7 @@ const (
 )
 
 type Result struct {
-	Result interface{} `json:"result"`
+	Result string `json:"result"`
 }
 
 type FTXTime struct {

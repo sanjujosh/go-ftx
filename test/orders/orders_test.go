@@ -169,7 +169,7 @@ func TestOrders_PlaceOrderModifyAndCancel(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Cancel Result: %+v\n", *success)
+	t.Logf("Cancel Result: %+v\n", success)
 }
 
 func TestOrders_PlaceTriggerOrderModifyAndCancel(t *testing.T) {
@@ -223,7 +223,7 @@ func TestOrders_PlaceTriggerOrderModifyAndCancel(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Cancel Result: %+v\n", *success)
+	t.Logf("Cancel Result: %+v\n", success)
 }
 
 func TestOrders_CancelAll(t *testing.T) {
@@ -276,5 +276,5 @@ func TestOrders_CancelAll(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Cancel Result: %+v\n", *success)
+	t.Logf("Cancel Result: %+v\n", success)
 }

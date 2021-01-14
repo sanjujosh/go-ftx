@@ -260,63 +260,67 @@ func (o *Orders) GetOrderStatusByClientID(clientID int64, order *models.Order) (
 	return nil
 }
 
-func (o *Orders) CancelOrder(orderID int64) (result *models.Result, err error) {
+func (o *Orders) CancelOrder(orderID int64) (result string, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelOrder, orderID))
 	response, err := o.client.Delete(nil, url)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	result = new(models.Result)
-	if err = json.Unmarshal(response, result); err != nil {
-		return nil, errors.WithStack(err)
+	r := new(models.Result)
+	if err = json.Unmarshal(response, r); err != nil {
+		return result, errors.WithStack(err)
 	}
+	result = r.Result
 	return
 }
 
-func (o *Orders) CancelOrderByClientID(clientID int64) (result *models.Result, err error) {
+func (o *Orders) CancelOrderByClientID(clientID int64) (result string, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelOrderByClientID, clientID))
 	response, err := o.client.Delete(nil, url)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	result = new(models.Result)
-	if err = json.Unmarshal(response, result); err != nil {
-		return nil, errors.WithStack(err)
+	r := new(models.Result)
+	if err = json.Unmarshal(response, r); err != nil {
+		return result, errors.WithStack(err)
 	}
+	result = r.Result
 	return
 }
 
-func (o *Orders) CancelTriggerOrder(orderID int64) (result *models.Result, err error) {
+func (o *Orders) CancelTriggerOrder(orderID int64) (result string, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelTriggerOrder, orderID))
 	response, err := o.client.Delete(nil, url)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	result = new(models.Result)
-	if err = json.Unmarshal(response, result); err != nil {
-		return nil, errors.WithStack(err)
+	r := new(models.Result)
+	if err = json.Unmarshal(response, r); err != nil {
+		return result, errors.WithStack(err)
 	}
+	result = r.Result
 	return
 }
 
 func (o *Orders) CancelAllOrders(
-	params *models.CancelAllParams) (result *models.Result, err error) {
+	params *models.CancelAllParams) (result string, err error) {
 
 	url := FormURL(apiCancelAll)
 	response, err := o.client.Delete(params, url)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	result = new(models.Result)
-	if err = json.Unmarshal(response, result); err != nil {
-		return nil, errors.WithStack(err)
+	r := new(models.Result)
+	if err = json.Unmarshal(response, r); err != nil {
+		return result, errors.WithStack(err)
 	}
+	result = r.Result
 	return
 }
