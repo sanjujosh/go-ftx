@@ -165,9 +165,11 @@ func TestOrders_PlaceOrderModifyAndCancel(t *testing.T) {
 	}
 	t.Logf("Modify Order Result: %+v\n", order)
 	orderID = order.ID
-	if err = ftx.Orders.CancelOrder(orderID); err != nil {
+	success, err := ftx.Orders.CancelOrder(orderID)
+	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
+	t.Logf("Cancel Result: %+v\n", *success)
 }
 
 func TestOrders_PlaceTriggerOrderModifyAndCancel(t *testing.T) {
@@ -217,9 +219,11 @@ func TestOrders_PlaceTriggerOrderModifyAndCancel(t *testing.T) {
 	}
 	t.Logf("Modify Trigger Order Result: %+v\n", order)
 	orderID = order.ID
-	if err = ftx.Orders.CancelTriggerOrder(orderID); err != nil {
+	success, err := ftx.Orders.CancelTriggerOrder(orderID)
+	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
+	t.Logf("Cancel Result: %+v\n", *success)
 }
 
 func TestOrders_CancelAll(t *testing.T) {
@@ -266,19 +270,11 @@ func TestOrders_CancelAll(t *testing.T) {
 	}
 	t.Logf("Place Trigger Order Result: %+v\n", triggerOrder)
 
-	err = ftx.Orders.CancelAllOrders(&models.CancelAllParams{
+	success, err := ftx.Orders.CancelAllOrders(&models.CancelAllParams{
 		Market: api.PtrString(swap),
-		Side:   api.PtrString("buy"),
 	})
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-
-	err = ftx.Orders.CancelAllOrders(&models.CancelAllParams{
-		Market: api.PtrString(swap),
-		Side:   api.PtrString("sell"),
-	})
-	if err != nil {
-		t.Fatal(errors.WithStack(err))
-	}
+	t.Logf("Cancel Result: %+v\n", *success)
 }

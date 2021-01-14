@@ -260,49 +260,64 @@ func (o *Orders) GetOrderStatusByClientID(clientID int64, order *models.Order) (
 	return nil
 }
 
-func (o *Orders) CancelOrder(orderID int64) (err error) {
+func (o *Orders) CancelOrder(orderID int64) (success *models.Succeeded, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelOrder, orderID))
-	_, err = o.client.Delete(nil, url)
+	response, err := o.client.Delete(nil, url)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
+	}
+
+	success = new(models.Succeeded)
+	if err = json.Unmarshal(response, success); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return
+}
+
+func (o *Orders) CancelOrderByClientID(clientID int64) (success *models.Succeeded, err error) {
+
+	url := FormURL(fmt.Sprintf(apiCancelOrderByClientID, clientID))
+	response, err := o.client.Delete(nil, url)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	success = new(models.Succeeded)
+	if err = json.Unmarshal(response, success); err != nil {
+		return nil, errors.WithStack(err)
 	}
 	return
 }
 
-func (o *Orders) CancelOrderByClientID(clientID int64, success *models.Succeeded) (err error) {
-
-	if success == nil {
-		return errs.NilPtr
-	}
-	url := FormURL(fmt.Sprintf(apiCancelOrderByClientID, clientID))
-	response, err := o.client.Delete(success, url)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	if err = json.Unmarshal(response, success); err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
-}
-
-func (o *Orders) CancelTriggerOrder(orderID int64) (err error) {
+func (o *Orders) CancelTriggerOrder(orderID int64) (success *models.Succeeded, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelTriggerOrder, orderID))
-	_, err = o.client.Delete(nil, url)
+	response, err := o.client.Delete(nil, url)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
-	return nil
+
+	success = new(models.Succeeded)
+	if err = json.Unmarshal(response, success); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return
 }
 
-func (o *Orders) CancelAllOrders(params *models.CancelAllParams) (err error) {
+func (o *Orders) CancelAllOrders(
+	params *models.CancelAllParams) (success *models.Succeeded, err error) {
 
 	url := FormURL(apiCancelAll)
-	_, err = o.client.Delete(params, url)
+	response, err := o.client.Delete(params, url)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
-	return nil
+
+	success = new(models.Succeeded)
+	if err = json.Unmarshal(response, success); err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return
 }
