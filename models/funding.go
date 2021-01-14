@@ -6,11 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type FundingPaymentParams struct {
-	Future    *string `json:"future,omitempty"`
-	StartTime *int64  `json:"start_time,omitempty"`
-	EndTime   *int64  `json:"end_time,omitempty"`
-}
+type FundingPaymentParams FundingRatesParams
 
 type FundingPayment struct {
 	Future  string          `json:"future"`

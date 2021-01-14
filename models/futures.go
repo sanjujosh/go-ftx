@@ -45,9 +45,9 @@ type FutureStats struct {
 }
 
 type FundingRatesParams struct {
-	StartTime *int    `json:"start_time,omitempty"`
-	EndTime   *int    `json:"end_time,omitempty"`
 	Future    *string `json:"future,omitempty"`
+	StartTime *int64  `json:"start_time,omitempty"`
+	EndTime   *int64  `json:"end_time,omitempty"`
 }
 
 type FundingRates struct {
