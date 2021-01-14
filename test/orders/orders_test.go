@@ -14,7 +14,10 @@ import (
 	"github.com/uscott/go-ftx/models"
 )
 
-const swap = "BTC-PERP"
+const (
+	swap = "BTC-PERP"
+	N    = 5
+)
 
 func client(t *testing.T) *api.Client {
 
@@ -41,7 +44,7 @@ func TestOrders_GetOpenOrders(t *testing.T) {
 	assert.NotNil(t, orders)
 
 	for i, o := range orders {
-		if i > 9 {
+		if i > N {
 			return
 		}
 		t.Logf("Order: %+v\n", *o)
@@ -57,16 +60,23 @@ func TestOrders_GetOrdersHistory(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	market, limit := swap, 10
+	limit := 10
 
 	orders, err := ftx.Orders.GetOrdersHistory(&models.OrdersHistoryParams{
-		Market:    &market,
+		Market:    nil,
 		Limit:     &limit,
 		StartTime: nil,
 		EndTime:   nil,
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, orders)
+
+	for i, o := range orders {
+		if i > N {
+			return
+		}
+		t.Logf("Order: %+v\n", *o)
+	}
 }
 
 func TestOrders_GetOpenTriggerOrders(t *testing.T) {
@@ -83,7 +93,7 @@ func TestOrders_GetOpenTriggerOrders(t *testing.T) {
 	assert.NotNil(t, orders)
 
 	for i, o := range orders {
-		if i > 9 {
+		if i > N {
 			return
 		}
 		t.Logf("Order: %+v\n", *o)
@@ -119,7 +129,7 @@ func TestOrders_GetTriggerOrdersHistory(t *testing.T) {
 		t.Fatal(errors.WithStack(err))
 	}
 	for i, h := range hist {
-		if i > 9 {
+		if i > N {
 			return
 		}
 		t.Logf("Trigger Order: %+v\n", *h)
