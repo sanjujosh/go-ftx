@@ -17,7 +17,7 @@ const (
 	apiGetDepositHistory    = "/wallet/deposits"
 	apiGetWithdrawalHistory = "/wallet/withdrawals"
 	apiRequestWithdrawal    = apiGetWithdrawalHistory
-	apiGetAirdrops          = "wallet/airdrops"
+	apiGetAirdrops          = "/wallet/airdrops"
 	apiGetSavedAddresses    = "/wallet/saved_addresses"
 	apiCreateSavedAddresses = apiGetSavedAddresses
 	apiDeleteSavedAddresses = apiGetSavedAddresses
