@@ -56,14 +56,11 @@ func TestWallet_GetDepositAddress(t *testing.T) {
 
 	ftx := prepForTest(t)
 
-	address, err := ftx.Wallet.GetDepositAddress("BTC", nil)
+	address, tag, err := ftx.Wallet.GetDepositAddress("BTC", nil)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	if address == nil {
-		t.Fatal("nil pointer")
-	}
-	t.Logf("Address: %+v\n", *address)
+	t.Logf("Address, Tag: %s, %s\n", address, tag)
 }
 
 func TestWallet_GetDepositHistory(t *testing.T) {

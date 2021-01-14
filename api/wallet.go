@@ -3,10 +3,10 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/pkg/errors"
 	"github.com/uscott/go-ftx/models"
+	"github.com/uscott/go-tools/errs"
 )
 
 const (
@@ -29,16 +29,8 @@ type Wallet struct {
 
 func (w *Wallet) GetCoins() ([]*models.Coin, error) {
 
-	request, err := w.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetCoins),
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	response, err := w.client.do(request)
+	url := FormURL(apiGetCoins)
+	response, err := w.client.Get(nil, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -47,22 +39,13 @@ func (w *Wallet) GetCoins() ([]*models.Coin, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-
 	return result, nil
 }
 
 func (w *Wallet) GetBalances() ([]*models.Balance, error) {
 
-	request, err := w.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetBalances),
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	response, err := w.client.do(request)
+	url := FormURL(apiGetBalances)
+	response, err := w.client.Get(nil, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -71,22 +54,13 @@ func (w *Wallet) GetBalances() ([]*models.Balance, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-
 	return result, nil
 }
 
 func (w *Wallet) GetBalancesAllAccts() (map[string][]*models.Balance, error) {
 
-	request, err := w.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetBalancesAll),
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	response, err := w.client.do(request)
+	url := FormURL(apiGetBalancesAll)
+	response, err := w.client.Get(nil, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -101,53 +75,32 @@ func (w *Wallet) GetBalancesAllAccts() (map[string][]*models.Balance, error) {
 
 func (w *Wallet) GetDepositAddress(
 	coin string, method *models.DepositMethod,
-) (*models.DepositAddress, error) {
+) (address, tag string, err error) {
 
-	path := fmt.Sprintf(apiGetDepositAddress, coin)
-	queryParams, err := PrepareQueryParams(&struct {
-		Method *models.DepositMethod `json:"method"`
-	}{Method: method})
+	url := FormURL(fmt.Sprintf(apiGetDepositAddress, coin))
+	params := &struct {
+		Method *models.DepositMethod `json:"method,omitempty"`
+	}{Method: method}
+	response, err := w.client.Get(params, url, true)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return address, tag, errors.WithStack(err)
 	}
 
-	request, err := w.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, path),
-		Params: queryParams,
-	})
-
-	response, err := w.client.do(request)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	var result models.DepositAddress
+	result := models.DepositAddress{}
 	if err = json.Unmarshal(response, &result); err != nil {
-		return nil, errors.WithStack(err)
+		return address, tag, errors.WithStack(err)
 	}
 
-	return &result, nil
+	address, tag = result.Address, result.Tag
+	return
 }
 
 func (w *Wallet) GetDepositHistory(
 	params *models.DepositHistoryParams,
 ) ([]*models.Deposit, error) {
 
-	queryParams, err := PrepareQueryParams(params)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	request, err := w.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetDepositHistory),
-		Params: queryParams,
-	})
-
-	response, err := w.client.do(request)
+	url := FormURL(apiGetDepositHistory)
+	response, err := w.client.Get(params, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -164,19 +117,8 @@ func (w *Wallet) GetWithdrawalHistory(
 	params *models.WithdrawalHistoryParams,
 ) ([]*models.Withdrawal, error) {
 
-	queryParams, err := PrepareQueryParams(params)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	request, err := w.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetWithdrawalHistory),
-		Params: queryParams,
-	})
-
-	response, err := w.client.do(request)
+	url := FormURL(apiGetWithdrawalHistory)
+	response, err := w.client.Get(params, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -185,30 +127,32 @@ func (w *Wallet) GetWithdrawalHistory(
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-
 	return result, nil
 }
 
 func (w *Wallet) RequestWithdrawal(
 	params *models.RequestWithdrawalParams,
-) (*models.Withdrawal, error) {
+	withdrawal *models.Withdrawal,
+) (err error) {
 
-	url := fmt.Sprintf("%s%s", apiUrl, apiRequestWithdrawal)
+	if withdrawal == nil {
+		return errs.NilPtr
+	}
+	url := FormURL(apiRequestWithdrawal)
 	response, err := w.client.Post(params, url)
 	if err != nil {
-		return nil, err
+		return errors.WithStack(err)
 	}
 
-	var result models.Withdrawal
-	if err = json.Unmarshal(response, &result); err != nil {
-		return nil, errors.WithStack(err)
+	if err = json.Unmarshal(response, withdrawal); err != nil {
+		return errors.WithStack(err)
 	}
-	return &result, nil
+	return
 }
 
 func (w *Wallet) GetAirdrops(params *models.AirDropParams) ([]*models.AirDrop, error) {
 
-	url := fmt.Sprintf("%s%s", apiUrl, apiGetAirdrops)
+	url := FormURL(apiGetAirdrops)
 	response, err := w.client.Get(params, url, true)
 	if err != nil {
 		return nil, err
@@ -223,13 +167,13 @@ func (w *Wallet) GetAirdrops(params *models.AirDropParams) ([]*models.AirDrop, e
 
 func (w *Wallet) GetSavedAddresses(coin *string) ([]*models.SavedAddress, error) {
 
-	url := fmt.Sprintf("%s%s", apiUrl, apiGetSavedAddresses)
-	params := struct {
+	url := FormURL(apiGetSavedAddresses)
+	params := &struct {
 		Coin *string `json:"coin,omitempty"`
 	}{Coin: coin}
-	response, err := w.client.Get(&params, url, true)
+	response, err := w.client.Get(params, url, true)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	var result []*models.SavedAddress
@@ -243,10 +187,10 @@ func (w *Wallet) CreateSavedAddresses(
 	params *models.SavedAddressParams,
 ) ([]*models.SavedAddress, error) {
 
-	url := fmt.Sprintf("%s%s", apiUrl, apiCreateSavedAddresses)
+	url := FormURL(apiCreateSavedAddresses)
 	response, err := w.client.Post(params, url)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	var result []*models.SavedAddress
@@ -256,30 +200,20 @@ func (w *Wallet) CreateSavedAddresses(
 	return result, nil
 }
 
-func (w *Wallet) DeleteSavedAddress(address int64) error {
+func (w *Wallet) DeleteSavedAddress(address int64) (result string, err error) {
 
-	params := struct {
+	url := FormURL(apiDeleteSavedAddresses)
+	params := &struct {
 		SavedAddressID *int64 `json:"saved_address_id"`
 	}{SavedAddressID: &address}
 
-	body, err := json.Marshal(&params)
+	response, err := w.client.Delete(params, url)
 	if err != nil {
-		return errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	request, err := w.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodDelete,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiDeleteSavedAddresses),
-		Body:   body,
-	})
-	if err != nil {
-		return errors.WithStack(err)
+	if err = json.Unmarshal(response, &result); err != nil {
+		return result, errors.WithStack(err)
 	}
-
-	_, err = w.client.do(request)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
+	return
 }

@@ -40,3 +40,4 @@ type StakeRequestParams struct {
 }
 
 type StakeRequest Stake
+type UnstakeRequestParams StakeRequestParams

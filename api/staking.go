@@ -73,10 +73,7 @@ func (s *Staking) RequestUnstake(
 ) (*models.UnstakeRequest, error) {
 
 	url := FormURL(apiRequestUnstake)
-	params := &struct {
-		Coin *string          `json:"coin"`
-		Size *decimal.Decimal `json:"size"`
-	}{Coin: &coin, Size: &size}
+	params := &models.UnstakeRequestParams{Coin: &coin, Size: &size}
 
 	response, err := s.client.Post(params, url)
 	if err != nil {
@@ -122,10 +119,7 @@ func (s *Staking) GetStakingRewards() ([]*models.StakingReward, error) {
 func (s *Staking) RequestStake(coin string, size decimal.Decimal) (*models.Stake, error) {
 
 	url := FormURL(apiRequestStake)
-	params := &struct {
-		Coin *string          `json:"coin"`
-		Size *decimal.Decimal `json:"size"`
-	}{Coin: &coin, Size: &size}
+	params := &models.StakeRequestParams{Coin: &coin, Size: &size}
 	response, err := s.client.Post(params, url)
 	if err != nil {
 		return nil, errors.WithStack(err)
