@@ -36,11 +36,7 @@ type DepositAddress struct {
 	Tag     string `json:"tag"`
 }
 
-type DepositHistoryParams struct {
-	Limit     *int   `json:"limit,omitempty"`
-	StartTime *int64 `json:"start_time,omitempty"`
-	EndTime   *int64 `json:"end_time,omitempty"`
-}
+type DepositHistoryParams NumberTimeLimit
 
 type Deposit struct {
 	Coin          string          `json:"coin"`
@@ -80,7 +76,7 @@ type RequestWithdrawalParams struct {
 	Tag      *string          `json:"tag,omitempty"`
 }
 
-type AirDropParams DepositHistoryParams
+type AirDropParams NumberTimeLimit
 
 type AirDrop struct {
 	Coin   string          `json:"coin"`
