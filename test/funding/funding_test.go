@@ -23,7 +23,7 @@ func TestFunding_GetFundingPayments(t *testing.T) {
 
 	ftx := prepForTest(t)
 
-	payments, err := ftx.Funding.GetFundingPayments(nil,nil,nil)
+	payments, err := ftx.Funding.GetFundingPayments(nil, nil)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
