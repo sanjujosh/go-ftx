@@ -7,10 +7,12 @@ import (
 )
 
 type FillParams struct {
-	NumberTimeLimit
-	OrderID *int64  `json:"orderId,omitempty"`
-	Market  *string `json:"market,omitempty"`
-	Order   *string `json:"order,omitempty"`
+	Market    *string `json:"market,omitempty"`
+	Limit     *int    `json:"limit,omitempty"`
+	StartTime *int64  `json:"start_time,omitempty"`
+	EndTime   *int64  `json:"end_time,omitempty"`
+	Order     *string `json:"order,omitempty"`
+	OrderID   *int64  `json:"orderId,omitempty"`
 }
 
 type Fill struct {

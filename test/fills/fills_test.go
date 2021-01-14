@@ -34,13 +34,13 @@ func TestFills_GetFills(t *testing.T) {
 			}
 		}
 	*/
-	fills, err := ftx.Fills.GetFills(&models.FillParams{})
+	fills, err := ftx.Fills.GetFills(&models.FillParams{Limit: api.PtrInt(10)})
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	for _, f := range fills {
-		if f == nil {
-			t.Fatal("nil pointer")
+	for i, f := range fills {
+		if i > 9 {
+			return
 		}
 		t.Logf("Fill: %+v\n", *f)
 	}
