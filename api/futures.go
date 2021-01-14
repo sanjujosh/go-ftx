@@ -66,12 +66,12 @@ func (f *Futures) GetFutureByName(name string, future *models.Future) (err error
 	return nil
 }
 
-func (f *Futures) GetFutureStats(name string, stats *models.FutureStats) (err error) {
+func (f *Futures) GetFutureStats(future string, stats *models.FutureStats) (err error) {
 
 	if stats == nil {
 		return errs.NilPtr
 	}
-	url := FormURL(fmt.Sprintf(apiGetFutureStats, name))
+	url := FormURL(fmt.Sprintf(apiGetFutureStats, future))
 	response, err := f.client.Get(nil, url, false)
 	if err != nil {
 		return errors.WithStack(err)

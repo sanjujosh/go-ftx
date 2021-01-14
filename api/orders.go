@@ -33,31 +33,38 @@ type Orders struct {
 	client *Client
 }
 
-func (o *Orders) GetOpenOrders(market string) ([]*models.Order, error) {
+func (o *Orders) GetOpenOrders(market *string) ([]*models.Order, error) {
 
-	request, err := o.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetOpenOrders),
-		Params: map[string]string{
-			"market": market,
-		},
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
+	var (
+		err      error
+		response []byte
+	)
+	url := FormURL(apiGetOpenOrders)
+
+	if market == nil {
+		response, err = o.client.Get(nil, url, true)
+	} else {
+		request, err := o.client.prepareRequest(Request{
+			Auth:   true,
+			Method: http.MethodGet,
+			URL:    url,
+			Params: map[string]string{
+				"market": *market,
+			},
+		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		response, err = o.client.do(request)
 	}
-
-	response, err := o.client.do(request)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	var result []*models.Order
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-
 	return result, nil
 }
 
@@ -79,9 +86,10 @@ func (o *Orders) GetOrdersHistory(
 }
 
 func (o *Orders) GetOpenTriggerOrders(
-	params *models.OpenTriggerOrdersParams) ([]*models.TriggerOrder, error) {
+	market, triggerType *string) ([]*models.TriggerOrder, error) {
 
 	url := FormURL(apiGetTriggerOrders)
+	params := &models.TriggerOrderParams{Market: market, Type: triggerType}
 	response, err := o.client.Get(params, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)

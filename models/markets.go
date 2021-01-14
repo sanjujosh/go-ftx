@@ -84,11 +84,7 @@ type Ticker struct {
 	Time    FTXTime         `json:"time"`
 }
 
-type GetTradesParams struct {
-	Limit     *int `json:"limit"`
-	StartTime *int `json:"start_time"`
-	EndTime   *int `json:"end_time"`
-}
+type GetTradesParams NumberTimeLimit
 
 type GetHistoricalPricesParams struct {
 	Resolution Resolution `json:"resolution"`
