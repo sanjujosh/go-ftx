@@ -19,15 +19,12 @@ func TestFutures_GetFutures(t *testing.T) {
 		t.Fatal(err)
 	}
 	for i, p := range futures {
-		if p == nil {
-			t.Fatal("nil pointer")
+		if i > 9 {
+			return
 		}
 		fmt.Printf("Description: %s\n", p.Description)
 		fmt.Printf("Expiration:  %+v\n", p.Expiry.Format(time.RFC3339))
 		fmt.Printf("Name:        %s\n", p.Name)
-		if i > 10 {
-			break
-		}
 	}
 }
 
@@ -60,11 +57,12 @@ func TestFutures_GetFundingRates(t *testing.T) {
 
 	ftx := api.New()
 	now := time.Now()
-	rates, err := ftx.Futures.GetFundingRates(&models.FundingRatesParams{
-		StartTime: api.PtrInt(int(now.Add(-5 * time.Hour).Unix())),
-		EndTime:   api.PtrInt(int(now.Unix())),
-		Future:    api.PtrString(futName),
-	})
+
+	rates, err := ftx.Futures.GetFundingRates(
+		api.PtrString(futName),
+		api.PtrInt64(now.Add(-5*time.Hour).Unix()),
+		api.PtrInt64(now.Unix()),
+	)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
