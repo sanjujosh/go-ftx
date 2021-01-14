@@ -59,7 +59,6 @@ func TestFutures_GetFundingRates(t *testing.T) {
 	now := time.Now()
 
 	rates, err := ftx.Futures.GetFundingRates(
-		api.PtrString(futName),
 		api.PtrInt64(now.Add(-5*time.Hour).Unix()),
 		api.PtrInt64(now.Unix()),
 	)
