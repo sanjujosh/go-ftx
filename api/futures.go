@@ -82,11 +82,10 @@ func (f *Futures) GetFutureStats(name string, stats *models.FutureStats) (err er
 	return nil
 }
 
-func (f *Futures) GetFundingRates(start, end *int64) ([]*models.FundingRates, error) {
+func (f *Futures) GetFundingRates() ([]*models.FundingRates, error) {
 
 	url := FormURL(apiGetFundingRates)
-	params := &models.FundingRatesParams{StartTime: start, EndTime: end}
-	response, err := f.client.Get(params, url, false)
+	response, err := f.client.Get(nil, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

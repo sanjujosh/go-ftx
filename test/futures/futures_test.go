@@ -56,23 +56,16 @@ func TestFutures_GetFutureStats(t *testing.T) {
 func TestFutures_GetFundingRates(t *testing.T) {
 
 	ftx := api.New()
-	now := time.Now()
 
-	rates, err := ftx.Futures.GetFundingRates(
-		api.PtrInt64(now.Add(-5*time.Hour).Unix()),
-		api.PtrInt64(now.Unix()),
-	)
+	rates, err := ftx.Futures.GetFundingRates()
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
 	for i, p := range rates {
-		if p == nil {
-			t.Fatal("nil pointer")
+		if i > 9 {
+			return
 		}
 		t.Logf("Rates: %+v\n", *p)
-		if i > 10 {
-			break
-		}
 	}
 
 }
