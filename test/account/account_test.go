@@ -54,14 +54,16 @@ func TestAccount_ChangeAccountLeverage(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	leverage := decimal.New(10, 0)
+	leverage := 10.0
 
-	err = ftx.Account.ChangeAccountLeverage(leverage)
+	result, err := ftx.Account.ChangeAccountLeverage(leverage)
 	assert.NoError(t, err)
+	t.Logf("Result: %s\n", result)
 
 	account := models.AccountInformation{}
 	err = ftx.Account.GetAccountInformation(&account)
+
 	assert.NoError(t, err)
 	assert.NotNil(t, &account)
-	assert.True(t, leverage.Equal(account.Leverage))
+	assert.True(t, decimal.NewFromFloat(leverage).Equal(account.Leverage))
 }

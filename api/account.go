@@ -2,8 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -42,51 +40,35 @@ func (a *Account) GetAccountInformation(result *models.AccountInformation) (err 
 }
 
 func (a *Account) GetPositions() ([]*models.Position, error) {
-	request, err := a.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiGetPositions),
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 
-	response, err := a.client.do(request)
+	url := FormURL(apiGetPositions)
+	response, err := a.client.Get(nil, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	var result []*models.Position
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
-
 	return result, nil
 }
 
-func (a *Account) ChangeAccountLeverage(leverage decimal.Decimal) error {
-	body, err := json.Marshal(struct {
-		Leverage decimal.Decimal `json:"leverage"`
-	}{Leverage: leverage})
+func (a *Account) ChangeAccountLeverage(leverage float64) (result string, err error) {
+
+	url := FormURL(apiPostLeverage)
+	l := decimal.NewFromFloat(leverage)
+	params := &struct {
+		Leverage *decimal.Decimal `json:"leverage"`
+	}{Leverage: &l}
+
+	response, err := a.client.Post(params, url)
 	if err != nil {
-		return errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	request, err := a.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodPost,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiPostLeverage),
-		Body:   body,
-	})
-	if err != nil {
-		return errors.WithStack(err)
+	if err = json.Unmarshal(response, &result); err != nil {
+		return result, errors.WithStack(err)
 	}
-
-	_, err = a.client.do(request)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	return nil
+	return
 }
