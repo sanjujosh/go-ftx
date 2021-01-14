@@ -90,17 +90,16 @@ func (s *Staking) RequestUnstake(
 	return &result, nil
 }
 
-func (s *Staking) CancelUnstakeRequest(id int64) (result *models.Result, err error) {
+func (s *Staking) CancelUnstakeRequest(id int64) (result string, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelUnstakeRequest, id))
 	response, err := s.client.Delete(nil, url)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	result = new(models.Result)
-	if err = json.Unmarshal(response, result); err != nil {
-		return nil, errors.WithStack(err)
+	if err = json.Unmarshal(response, &result); err != nil {
+		return result, errors.WithStack(err)
 	}
 	return
 }

@@ -170,7 +170,7 @@ func (s *SpotMargin) GetLendingInfo() ([]*models.LendingInfo, error) {
 
 func (s *SpotMargin) SubmitLendingOffer(
 	coin string, size decimal.Decimal, rate float64,
-) (result *models.Result, err error) {
+) (result string, err error) {
 
 	url := FormURL(apiSubmitLendingOffer)
 	params := &models.LendingOfferParams{
@@ -180,12 +180,11 @@ func (s *SpotMargin) SubmitLendingOffer(
 	}
 	response, err := s.client.Get(params, url, true)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	result = new(models.Result)
-	if err = json.Unmarshal(response, result); err != nil {
-		return nil, errors.WithStack(err)
+	if err = json.Unmarshal(response, &result); err != nil {
+		return result, errors.WithStack(err)
 	}
 	return
 }
