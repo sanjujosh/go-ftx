@@ -268,11 +268,9 @@ func (o *Orders) CancelOrder(orderID int64) (result string, err error) {
 		return result, errors.WithStack(err)
 	}
 
-	r := new(models.Result)
-	if err = json.Unmarshal(response, r); err != nil {
+	if err = json.Unmarshal(response, &result); err != nil {
 		return result, errors.WithStack(err)
 	}
-	result = r.Result
 	return
 }
 
@@ -284,11 +282,9 @@ func (o *Orders) CancelOrderByClientID(clientID int64) (result string, err error
 		return result, errors.WithStack(err)
 	}
 
-	r := new(models.Result)
-	if err = json.Unmarshal(response, r); err != nil {
+	if err = json.Unmarshal(response, &result); err != nil {
 		return result, errors.WithStack(err)
 	}
-	result = r.Result
 	return
 }
 
@@ -300,11 +296,9 @@ func (o *Orders) CancelTriggerOrder(orderID int64) (result string, err error) {
 		return result, errors.WithStack(err)
 	}
 
-	r := new(models.Result)
-	if err = json.Unmarshal(response, r); err != nil {
+	if err = json.Unmarshal(response, &result); err != nil {
 		return result, errors.WithStack(err)
 	}
-	result = r.Result
 	return
 }
 
@@ -317,10 +311,8 @@ func (o *Orders) CancelAllOrders(
 		return result, errors.WithStack(err)
 	}
 
-	r := new(models.Result)
-	if err = json.Unmarshal(response, r); err != nil {
+	if err = json.Unmarshal(response, &result); err != nil {
 		return result, errors.WithStack(err)
 	}
-	result = r.Result
 	return
 }
