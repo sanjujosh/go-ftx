@@ -36,11 +36,16 @@ func TestOrders_GetOpenOrders(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	market := "ETH/BTC"
-
-	orders, err := ftx.Orders.GetOpenOrders(market)
+	orders, err := ftx.Orders.GetOpenOrders(nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, orders)
+
+	for i, o := range orders {
+		if i > 9 {
+			return
+		}
+		t.Logf("Order: %+v\n", *o)
+	}
 }
 
 func TestOrders_GetOrdersHistory(t *testing.T) {
@@ -73,15 +78,16 @@ func TestOrders_GetOpenTriggerOrders(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	market := "ETH/BTC"
-	orderType := models.Stop
-
-	orders, err := ftx.Orders.GetOpenTriggerOrders(&models.OpenTriggerOrdersParams{
-		Market: &market,
-		Type:   &orderType,
-	})
+	orders, err := ftx.Orders.GetOpenTriggerOrders(nil, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, orders)
+
+	for i, o := range orders {
+		if i > 9 {
+			return
+		}
+		t.Logf("Order: %+v\n", *o)
+	}
 }
 
 func TestOrders_GetTriggerOrderTriggers(t *testing.T) {
