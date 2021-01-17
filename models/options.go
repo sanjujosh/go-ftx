@@ -25,7 +25,7 @@ type OptionInput struct {
 type OptionQuoteRequest struct {
 	ID             int64           `json:"id"`
 	Option         Option          `json:"option"`
-	Side           Side            `json:"side"`
+	Side           OrderSide       `json:"side"`
 	Size           decimal.Decimal `json:"size"`
 	Time           time.Time       `json:"time"`
 	RequestExpiry  time.Time       `json:"requestExpiry"`
@@ -46,7 +46,7 @@ type OptionQuote struct {
 
 type OptionQuoteRequestParams struct {
 	*OptionInput
-	Side           *Side            `json:"side"`
+	Side           *OrderSide       `json:"side"`
 	Size           *decimal.Decimal `json:"size"`
 	LimitPrice     *decimal.Decimal `json:"limitPrice,omitempty"`
 	HideLimitPrice *bool            `json:"hideLimitPrice,omitempty"`
@@ -56,7 +56,7 @@ type OptionQuoteRequestParams struct {
 
 type CreateQuoteRequest struct {
 	OptionInput
-	Side Side            `json:"side"`
+	Side OrderSide       `json:"side"`
 	Size decimal.Decimal `json:"size"`
 }
 
@@ -68,8 +68,8 @@ type QuotesForOptionQuoteRequest struct {
 	Option      Option          `json:"option"`
 	Price       decimal.Decimal `json:"price"`
 	QuoteExpiry time.Time       `json:"quoteExpiry"`
-	QuoterSide  Side            `json:"quoterSide"`
-	RequestSide Side            `json:"requestSide"`
+	QuoterSide  OrderSide       `json:"quoterSide"`
+	RequestSide OrderSide       `json:"requestSide"`
 	Size        decimal.Decimal `json:"size"`
 }
 
@@ -91,7 +91,7 @@ type OptionPosition struct {
 	EntryPrice            decimal.Decimal `json:"entryPrice"`
 	NetSize               decimal.Decimal `json:"netSize"`
 	Option                Option          `json:"option"`
-	Side                  Side            `json:"side"`
+	Side                  OrderSide       `json:"side"`
 	Size                  decimal.Decimal `json:"size"`
 	PessimisticValuation  decimal.Decimal `json:"pessimisticValuation"`
 	PessimisticIndexPrice decimal.Decimal `json:"pessimisticIndexPrice"`
@@ -114,7 +114,7 @@ type OptionFill struct {
 	Option    Option          `json:"option"`
 	Price     decimal.Decimal `json:"price"`
 	QuoteID   int             `json:"quoteId"`
-	Side      Side            `json:"side"`
+	Side      OrderSide       `json:"side"`
 	Size      decimal.Decimal `json:"size"`
 	Time      time.Time       `json:"time"`
 }

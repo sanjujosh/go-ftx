@@ -10,7 +10,7 @@ type Order struct {
 	ID            int64           `json:"id"`
 	Market        string          `json:"market"`
 	Type          OrderType       `json:"type"`
-	Side          Side            `json:"side"`
+	Side          OrderSide       `json:"side"`
 	Price         decimal.Decimal `json:"price"`
 	Size          decimal.Decimal `json:"size"`
 	FilledSize    decimal.Decimal `json:"filledSize"`
@@ -41,7 +41,7 @@ type TriggerOrder struct {
 	Future           string           `json:"future"`
 	OrderPrice       decimal.Decimal  `json:"orderPrice"`
 	ReduceOnly       bool             `json:"reduceOnly"`
-	Side             Side             `json:"side"`
+	Side             OrderSide        `json:"side"`
 	Size             decimal.Decimal  `json:"size"`
 	Status           OrderStatus      `json:"status"`
 	TrailStart       decimal.Decimal  `json:"trailStart"`

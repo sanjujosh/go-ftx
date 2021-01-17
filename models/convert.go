@@ -14,6 +14,6 @@ type ConvertQuoteStatus struct {
 	Price     decimal.Decimal `json:"price"`
 	Proceeds  decimal.Decimal `json:"proceeds"`
 	QuoteCoin string          `json:"quoteCoin"`
-	Side      Side            `json:"side"`
+	Side      OrderSide       `json:"side"`
 	ToCoin    string          `json:"toCoin"`
 }

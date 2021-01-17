@@ -65,11 +65,11 @@ const (
 	MarketOrder = OrderType("market")
 )
 
-type Side string
+type OrderSide string
 
 const (
-	Sell = Side("sell")
-	Buy  = Side("buy")
+	Sell = OrderSide("sell")
+	Buy  = OrderSide("buy")
 )
 
 type OrderStatus string
