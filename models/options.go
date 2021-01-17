@@ -29,7 +29,7 @@ type OptionQuoteRequest struct {
 	Size           decimal.Decimal `json:"size"`
 	Time           time.Time       `json:"time"`
 	RequestExpiry  time.Time       `json:"requestExpiry"`
-	Status         Status          `json:"status"`
+	Status         OrderStatus     `json:"status"`
 	HideLimitPrice bool            `json:"hideLimitPrice"`
 	LimitPrice     decimal.Decimal `json:"limitPrice"`
 	Quotes         []OptionQuote   `json:"quotes"`
@@ -40,7 +40,7 @@ type OptionQuote struct {
 	ID          int64           `json:"id"`
 	Price       decimal.Decimal `json:"price"`
 	QuoteExpiry time.Time       `json:"quoteExpiry"`
-	Status      Status          `json:"status"`
+	Status      OrderStatus     `json:"status"`
 	Time        time.Time       `json:"time"`
 }
 
@@ -75,8 +75,8 @@ type QuotesForOptionQuoteRequest struct {
 
 type UserOptionQuote struct {
 	QuotesForOptionQuoteRequest
-	Status Status    `json:"status"`
-	Time   time.Time `json:"time"`
+	Status OrderStatus `json:"status"`
+	Time   time.Time   `json:"time"`
 }
 
 type AccountOptionsInfo struct {

@@ -72,12 +72,12 @@ const (
 	Buy  = Side("buy")
 )
 
-type Status string
+type OrderStatus string
 
 const (
-	New    = Status("new")
-	Open   = Status("open")
-	Closed = Status("closed")
+	New    = OrderStatus("new")
+	Open   = OrderStatus("open")
+	Closed = OrderStatus("closed")
 )
 
 type TriggerOrderType string

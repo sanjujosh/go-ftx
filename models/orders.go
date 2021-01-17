@@ -16,7 +16,7 @@ type Order struct {
 	FilledSize    decimal.Decimal `json:"filledSize"`
 	RemainingSize decimal.Decimal `json:"remainingSize"`
 	AvgFillPrice  decimal.Decimal `json:"avgFillPrice"`
-	Status        Status          `json:"status"`
+	Status        OrderStatus     `json:"status"`
 	CreatedAt     time.Time       `json:"createdAt"`
 	ReduceOnly    bool            `json:"reduceOnly"`
 	IOC           bool            `json:"ioc"`
@@ -43,7 +43,7 @@ type TriggerOrder struct {
 	ReduceOnly       bool             `json:"reduceOnly"`
 	Side             Side             `json:"side"`
 	Size             decimal.Decimal  `json:"size"`
-	Status           Status           `json:"status"`
+	Status           OrderStatus      `json:"status"`
 	TrailStart       decimal.Decimal  `json:"trailStart"`
 	TrailValue       decimal.Decimal  `json:"trailValue"`
 	TriggerPrice     decimal.Decimal  `json:"triggerPrice"`
