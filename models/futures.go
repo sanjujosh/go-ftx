@@ -28,7 +28,7 @@ type Future struct {
 	PositionLimitWeight float64         `json:"positionLimitWeight"`
 	PostOnly            bool            `json:"postOnly"`
 	PriceIncrement      decimal.Decimal `json:"priceIncrement"`
-	SizeIncrement       float64         `json:"sizeIncrement"`
+	SizeIncrement       decimal.Decimal `json:"sizeIncrement"`
 	Underlying          string          `json:"underlying"`
 	UpperBound          decimal.Decimal `json:"upperBound"`
 	Type                string          `json:"type"`
@@ -69,14 +69,14 @@ type FutureExpired struct {
 	Last                  decimal.Decimal `json:"last"`
 	LowerBound            decimal.Decimal `json:"lowerBound"`
 	MarginPrice           float64         `json:"marginPrice"`
-	Mark                  float64         `json:"mark"`
+	Mark                  decimal.Decimal `json:"mark"`
 	MoveStart             string          `json:"moveStart"`
 	Name                  string          `json:"name"`
 	Perpetual             bool            `json:"perpetual"`
 	PositionLimitWeight   float64         `json:"positionLimitWeight"`
 	PostOnly              bool            `json:"postOnly"`
 	PriceIncrement        decimal.Decimal `json:"priceIncrement"`
-	SizeIncrement         float64         `json:"sizeIncrement"`
+	SizeIncrement         decimal.Decimal `json:"sizeIncrement"`
 	Type                  string          `json:"type"`
 	Underlying            string          `json:"underlying"`
 	UnderlyingDescription string          `json:"underlyingDescription"`
@@ -87,7 +87,7 @@ type HistoricalIndexParams struct {
 	Resolution *int `json:"resolution"`
 	Limit      *int `json:"limit,omitempty"`
 	StartTime  *int `json:"start_time,omitempty"`
-	EndTime    *int `json:end_time,omitempty"`
+	EndTime    *int `json:"end_time,omitempty"`
 }
 
 type HistoricalIndex struct {
