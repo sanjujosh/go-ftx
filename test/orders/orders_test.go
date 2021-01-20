@@ -250,47 +250,62 @@ func TestOrders_CancelAll(t *testing.T) {
 	err := ftx.SetServerTimeDiff()
 	require.NoError(t, err)
 
-	future := models.Future{}
-	err = ftx.Futures.GetFutureByName(swap, &future)
-	if err != nil {
-		t.Fatal(errors.WithStack(err))
-	}
+	future, order1, order2 := models.Future{}, models.Order{}, models.Order{}
+	contract := "BTC-0924"
 
-	bid, _ := future.Bid.Float64()
+	for c, o := range map[string]*models.Order{swap: &order1, contract: &order2} {
 
-	order := models.Order{}
-	err = ftx.Orders.PlaceOrder(&models.OrderParams{
-		Market:   api.PtrString(swap),
-		Side:     api.PtrString(string(models.Buy)),
-		Price:    api.PtrDecimal(bid - 100),
-		Type:     api.PtrString(string(models.LimitOrder)),
-		Size:     api.PtrDecimal(0.01),
-		PostOnly: api.PtrBool(true),
-	}, &order)
-	if err != nil {
-		t.Fatal(errors.WithStack(err))
-	}
-	t.Logf("Place Order Result: %+v\n", order)
+		if err = ftx.Futures.GetFutureByName(c, &future); err != nil {
+			t.Fatal(errors.WithStack(err))
+		}
 
-	triggerOrder := models.TriggerOrder{}
-	err = ftx.Orders.PlaceTriggerOrder(&models.TriggerOrderParams{
-		Market:       api.PtrString(swap),
-		Side:         api.PtrString(string(models.Sell)),
-		Size:         api.PtrDecimal(0.01),
-		Type:         api.PtrString(string(models.Stop)),
-		TriggerPrice: api.PtrDecimal(bid - 5e3),
-		OrderPrice:   api.PtrDecimal(bid - 6e3),
-	}, &triggerOrder)
-	if err != nil {
-		t.Fatal(errors.WithStack(err))
+		bid, _ := future.Bid.Float64()
+
+		err = ftx.Orders.PlaceOrder(&models.OrderParams{
+			Market:   api.PtrString(c),
+			Side:     api.PtrString(string(models.Buy)),
+			Price:    api.PtrDecimal(bid - 1000),
+			Type:     api.PtrString(string(models.LimitOrder)),
+			Size:     api.PtrDecimal(0.01),
+			PostOnly: api.PtrBool(true),
+		}, &order1)
+
+		if err != nil {
+			t.Fatal(errors.WithStack(err))
+		}
+		t.Logf("Place %s Order Result: %+v\n", c, *o)
 	}
-	t.Logf("Place Trigger Order Result: %+v\n", triggerOrder)
 
 	success, err := ftx.Orders.CancelAllOrders(&models.CancelAllParams{
 		Market: api.PtrString(swap),
 	})
+
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Cancel Result: %+v\n", success)
+
+	t.Logf("Cancel All Orders %s Result: %+v\n", swap, success)
+
+	for c, o := range map[string]*models.Order{swap: &order1, contract: &order2} {
+		if err = ftx.Orders.GetOrderStatus(o.ID, o); err != nil {
+			t.Fatal(err)
+		}
+		t.Logf("%s Order Status: %+v\n", c, *o)
+	}
+
+	success, err := ftx.Orders.CancelAllOrders(&models.CancelAllParams{
+		Market: api.PtrString(contract),
+	})
+
+	if err != nil {
+		t.Fatal(errors.WithStack(err))
+	}
+
+	t.Logf("Cancel All Orders %s Result: %+v\n", contract, success)
+
+	if err = ftx.Orders.GetOrderStatus(order2.ID, &order2); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("%s Order Status: %+v\n", contract, order2)
 }
