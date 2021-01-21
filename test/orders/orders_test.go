@@ -3,6 +3,7 @@ package test
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
@@ -268,12 +269,14 @@ func TestOrders_CancelAll(t *testing.T) {
 			Type:     api.PtrString(string(models.LimitOrder)),
 			Size:     api.PtrDecimal(0.01),
 			PostOnly: api.PtrBool(true),
-		}, &order1)
+		}, o)
 
 		if err != nil {
 			t.Fatal(errors.WithStack(err))
 		}
-		t.Logf("Place %s Order Result: %+v\n", c, *o)
+
+		t.Logf("\nPlace %s Order Result: %+v\n", c, *o)
+		time.Sleep(time.Second)
 	}
 
 	success, err := ftx.Orders.CancelAllOrders(&models.CancelAllParams{
@@ -284,16 +287,19 @@ func TestOrders_CancelAll(t *testing.T) {
 		t.Fatal(errors.WithStack(err))
 	}
 
-	t.Logf("Cancel All Orders %s Result: %+v\n", swap, success)
+	t.Logf("\nCancel All Orders %s Result: %+v\n", swap, success)
 
 	for c, o := range map[string]*models.Order{swap: &order1, contract: &order2} {
+
 		if err = ftx.Orders.GetOrderStatus(o.ID, o); err != nil {
 			t.Fatal(err)
 		}
-		t.Logf("%s Order Status: %+v\n", c, *o)
+
+		t.Logf("\n%s Order Status: %+v\n", c, *o)
+		time.Sleep(time.Second)
 	}
 
-	success, err := ftx.Orders.CancelAllOrders(&models.CancelAllParams{
+	success, err = ftx.Orders.CancelAllOrders(&models.CancelAllParams{
 		Market: api.PtrString(contract),
 	})
 
@@ -301,11 +307,12 @@ func TestOrders_CancelAll(t *testing.T) {
 		t.Fatal(errors.WithStack(err))
 	}
 
-	t.Logf("Cancel All Orders %s Result: %+v\n", contract, success)
+	t.Logf("\nCancel All Orders %s Result: %+v\n", contract, success)
+	time.Sleep(time.Second)
 
 	if err = ftx.Orders.GetOrderStatus(order2.ID, &order2); err != nil {
 		t.Fatal(err)
 	}
 
-	t.Logf("%s Order Status: %+v\n", contract, order2)
+	t.Logf("\n%s Order Status: %+v\n", contract, order2)
 }
