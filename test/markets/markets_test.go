@@ -121,8 +121,8 @@ func TestMarkets_GetTrades(t *testing.T) {
 		limit := 10
 		trades, err := ftx.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
 			Limit:     &limit,
-			StartTime: PtrInt(int(time.Now().Add(-5 * time.Hour).Unix())),
-			EndTime:   PtrInt(int(time.Now().Unix())),
+			StartTime: PtrInt64(time.Now().Add(-5 * time.Hour).Unix()),
+			EndTime:   PtrInt64(time.Now().Unix()),
 		})
 		req.NoError(err)
 		req.NotNil(trades)
