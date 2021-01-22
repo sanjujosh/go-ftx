@@ -96,8 +96,8 @@ func (o *Orders) GetOpenTriggerOrders(
 	}
 
 	var result []*models.TriggerOrder
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -113,8 +113,8 @@ func (o *Orders) GetTriggerOrderTriggers(orderID int64) ([]*models.Trigger, erro
 	}
 
 	var result []*models.Trigger
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -131,8 +131,8 @@ func (o *Orders) GetTriggerOrdersHistory(
 	}
 
 	var result []*models.TriggerOrder
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -180,9 +180,11 @@ func (o *Orders) ModifyOrder(
 	order *models.Order) (err error) {
 
 	if params == nil || order == nil {
-		return models.ErrNilPtr
+		panic(errs.NilPtrArg)
 	}
+
 	url := FormURL(fmt.Sprintf(apiModifyOrder, orderID))
+
 	response, err := o.client.Post(params, url)
 	if err != nil {
 		return errors.WithStack(err)
@@ -199,8 +201,9 @@ func (o *Orders) ModifyOrderByClientID(
 ) (err error) {
 
 	if order == nil {
-		return errs.NilPtr
+		panic(errs.NilPtrArg)
 	}
+
 	url := FormURL(fmt.Sprintf(apiModifyOrderByClientID, clientID))
 	params.ClientID = nil
 	response, err := o.client.Post(params, url)
@@ -220,7 +223,7 @@ func (o *Orders) ModifyTriggerOrder(
 	order *models.TriggerOrder) (err error) {
 
 	if params == nil || order == nil {
-		return models.ErrNilPtr
+		panic(errs.NilPtrArg)
 	}
 	url := FormURL(fmt.Sprintf(apiModifyTriggerOrder, orderID))
 	response, err := o.client.Post(params, url)
@@ -237,7 +240,7 @@ func (o *Orders) ModifyTriggerOrder(
 func (o *Orders) GetOrderStatus(orderID int64, order *models.Order) (err error) {
 
 	if order == nil {
-		return errs.NilPtr
+		panic(errs.NilPtrArg)
 	}
 	url := FormURL(fmt.Sprintf(apiGetOrderStatus, orderID))
 	response, err := o.client.Get(nil, url, true)
@@ -254,7 +257,7 @@ func (o *Orders) GetOrderStatus(orderID int64, order *models.Order) (err error) 
 func (o *Orders) GetOrderStatusByClientID(clientID int64, order *models.Order) (err error) {
 
 	if order == nil {
-		return errs.NilPtr
+		panic(errs.NilPtrArg)
 	}
 	url := FormURL(fmt.Sprintf(apiGetOrderStatusByClientID, clientID))
 	response, err := o.client.Get(nil, url, true)
@@ -271,6 +274,7 @@ func (o *Orders) GetOrderStatusByClientID(clientID int64, order *models.Order) (
 func (o *Orders) CancelOrder(orderID int64) (result string, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelOrder, orderID))
+
 	response, err := o.client.Delete(nil, url)
 	if err != nil {
 		return result, errors.WithStack(err)
@@ -285,6 +289,7 @@ func (o *Orders) CancelOrder(orderID int64) (result string, err error) {
 func (o *Orders) CancelOrderByClientID(clientID int64) (result string, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelOrderByClientID, clientID))
+
 	response, err := o.client.Delete(nil, url)
 	if err != nil {
 		return result, errors.WithStack(err)
@@ -299,6 +304,7 @@ func (o *Orders) CancelOrderByClientID(clientID int64) (result string, err error
 func (o *Orders) CancelTriggerOrder(orderID int64) (result string, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelTriggerOrder, orderID))
+
 	response, err := o.client.Delete(nil, url)
 	if err != nil {
 		return result, errors.WithStack(err)
@@ -314,6 +320,7 @@ func (o *Orders) CancelAllOrders(
 	params *models.CancelAllParams) (result string, err error) {
 
 	url := FormURL(apiCancelAll)
+
 	response, err := o.client.Delete(params, url)
 	if err != nil {
 		return result, errors.WithStack(err)

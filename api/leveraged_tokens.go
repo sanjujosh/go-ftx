@@ -94,9 +94,11 @@ func (l *LeveragedTokens) RequestLeveragedTokenCreation(
 ) (*models.LeveragedTokenCreation, error) {
 
 	url := FormURL(fmt.Sprintf(apiRequestLeveragedTokenCreation, token))
+
 	body := struct {
 		Size *decimal.Decimal `json:"size"`
 	}{Size: &size}
+
 	response, err := l.client.Post(&body, url)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -131,13 +133,16 @@ func (l *LeveragedTokens) RequestLeveragedTokenRedemption(
 ) (*models.LeveragedTokenRedemption, error) {
 
 	url := FormURL(fmt.Sprintf(apiRequestLeveragedTokenRedemption, token))
+
 	body := struct {
 		Size *decimal.Decimal `json:"size"`
 	}{Size: &size}
+
 	response, err := l.client.Post(&body, url)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	result := models.LeveragedTokenRedemption{}
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)

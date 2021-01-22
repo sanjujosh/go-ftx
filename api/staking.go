@@ -26,6 +26,7 @@ type Staking struct {
 func (s *Staking) GetStakes() ([]*models.Stake, error) {
 
 	url := FormURL(apiGetStakes)
+
 	response, err := s.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -41,6 +42,7 @@ func (s *Staking) GetStakes() ([]*models.Stake, error) {
 func (s *Staking) GetUnstakeRequests() ([]*models.UnstakeRequest, error) {
 
 	url := FormURL(apiGetUnstakeRequests)
+
 	response, err := s.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -56,6 +58,7 @@ func (s *Staking) GetUnstakeRequests() ([]*models.UnstakeRequest, error) {
 func (s *Staking) GetStakeBalances() ([]*models.StakeBalance, error) {
 
 	url := FormURL(apiGetStakeBalances)
+
 	response, err := s.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -90,6 +93,7 @@ func (s *Staking) RequestUnstake(
 func (s *Staking) CancelUnstakeRequest(id int64) (result string, err error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelUnstakeRequest, id))
+
 	response, err := s.client.Delete(nil, url)
 	if err != nil {
 		return result, errors.WithStack(err)
@@ -104,6 +108,7 @@ func (s *Staking) CancelUnstakeRequest(id int64) (result string, err error) {
 func (s *Staking) GetStakingRewards() ([]*models.StakingReward, error) {
 
 	url := FormURL(apiGetStakingRewards)
+
 	response, err := s.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -119,6 +124,7 @@ func (s *Staking) GetStakingRewards() ([]*models.StakingReward, error) {
 func (s *Staking) RequestStake(coin string, size decimal.Decimal) (*models.Stake, error) {
 
 	url := FormURL(apiRequestStake)
+
 	params := &models.StakeRequestParams{Coin: &coin, Size: &size}
 	response, err := s.client.Post(params, url)
 	if err != nil {

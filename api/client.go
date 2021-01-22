@@ -154,7 +154,7 @@ func (c *Client) GetResponse(
 			Body:   body,
 		})
 	default:
-		return nil, fmt.Errorf("Invalid http method")
+		return nil, fmt.Errorf("Invalid http method: %v", method)
 	}
 
 	if err != nil {
@@ -211,15 +211,12 @@ func (c *Client) prepareRequest(request Request) (*http.Request, error) {
 		c.sb.WriteString(nonce)
 		c.sb.WriteString(req.Method)
 		c.sb.WriteString(req.URL.Path)
-		// payload := nonce + req.Method + req.URL.Path
 		if req.URL.RawQuery != "" {
 			c.sb.WriteRune('?')
 			c.sb.WriteString(req.URL.RawQuery)
-			// payload += "?" + req.URL.RawQuery
 		}
 		if len(request.Body) > 0 {
 			c.sb.WriteString(string(request.Body))
-			// payload += string(request.Body)
 		}
 		payload := c.sb.String()
 		c.sb.Reset()
@@ -251,8 +248,8 @@ func (c *Client) do(req *http.Request) ([]byte, error) {
 	}
 
 	var response Response
-	err = json.Unmarshal(res, &response)
-	if err != nil {
+
+	if err = json.Unmarshal(res, &response); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -299,8 +296,8 @@ func (c *Client) GetServerTime() (*time.Time, error) {
 	}
 
 	var result time.Time
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 

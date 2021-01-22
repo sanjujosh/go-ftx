@@ -58,8 +58,7 @@ func (f *Futures) GetFutureByName(name string, future *models.Future) (err error
 		return errors.WithStack(err)
 	}
 
-	err = json.Unmarshal(response, future)
-	if err != nil {
+	if err = json.Unmarshal(response, future); err != nil {
 		return errors.WithStack(err)
 	}
 

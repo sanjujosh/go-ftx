@@ -32,8 +32,8 @@ func (m *Markets) GetMarkets() ([]*models.Market, error) {
 	}
 
 	var result []*models.Market
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -48,8 +48,7 @@ func (m *Markets) GetMarketByName(name string, market *models.Market) (err error
 		return errors.WithStack(err)
 	}
 
-	err = json.Unmarshal(response, market)
-	if err != nil {
+	if err = json.Unmarshal(response, market); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -100,8 +99,8 @@ func (m *Markets) GetTrades(
 	}
 
 	var result []*models.Trade
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -119,8 +118,8 @@ func (m *Markets) GetHistoricalPrices(
 	}
 
 	var result []*models.HistoricalPrice
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 

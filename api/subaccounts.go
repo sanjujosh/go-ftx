@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/pkg/errors"
 	"github.com/uscott/go-ftx/models"
@@ -21,23 +20,17 @@ type SubAccounts struct {
 }
 
 func (s *SubAccounts) GetSubaccounts() ([]*models.SubAccount, error) {
-	request, err := s.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiSubaccounts),
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 
-	response, err := s.client.do(request)
+	url := FormURL(apiSubaccounts)
+
+	response, err := s.client.Get(nil, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	var result []*models.SubAccount
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -45,107 +38,81 @@ func (s *SubAccounts) GetSubaccounts() ([]*models.SubAccount, error) {
 }
 
 func (s *SubAccounts) CreateSubaccount(nickname string) (*models.SubAccount, error) {
-	body, err := json.Marshal(struct {
-		Nickname string `json:"nickname"`
-	}{Nickname: nickname})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 
-	request, err := s.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodPost,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiSubaccounts),
-		Body:   body,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	response, err := s.client.do(request)
+	url := FormURL(apiSubaccounts)
+
+	pars := &struct {
+		Nickname string `json:"nickname"`
+	}{Nickname: nickname}
+
+	response, err := s.client.Post(pars, url)
+
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	var result models.SubAccount
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	return &result, nil
 }
 
-func (s *SubAccounts) ChangeSubaccount(nickname, newNickname string) error {
-	body, err := json.Marshal(struct {
+func (s *SubAccounts) ChangeSubaccount(nickname, newNickname string) (result string, err error) {
+
+	url := FormURL(apiChangeSubaccountName)
+
+	pars := &struct {
 		Nickname    string `json:"nickname"`
 		NewNickname string `json:"newNickname"`
-	}{Nickname: nickname, NewNickname: newNickname})
+	}{Nickname: nickname, NewNickname: newNickname}
+
+	response, err := s.client.Post(pars, url)
 	if err != nil {
-		return errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	request, err := s.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodPost,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiChangeSubaccountName),
-		Body:   body,
-	})
-	if err != nil {
-		return errors.WithStack(err)
+	if err = json.Unmarshal(response, &result); err != nil {
+		return result, errors.WithStack(err)
 	}
-
-	_, err = s.client.do(request)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	return nil
+	return
 }
 
-func (s *SubAccounts) DeleteSubaccount(nickname string) error {
-	body, err := json.Marshal(struct {
+func (s *SubAccounts) DeleteSubaccount(nickname string) (result string, err error) {
+
+	url := FormURL(apiSubaccounts)
+
+	pars := &struct {
 		Nickname string `json:"nickname"`
-	}{Nickname: nickname})
+	}{Nickname: nickname}
+
+	response, err := s.client.Delete(pars, url)
+
 	if err != nil {
-		return errors.WithStack(err)
+		return result, errors.WithStack(err)
 	}
 
-	request, err := s.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodDelete,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiSubaccounts),
-		Body:   body,
-	})
-	if err != nil {
-		return errors.WithStack(err)
+	if err = json.Unmarshal(response, &result); err != nil {
+		return result, errors.WithStack(err)
 	}
 
-	_, err = s.client.do(request)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	return nil
+	return
 }
 
 func (s *SubAccounts) GetSubaccountBalances(nickname string) ([]*models.Balance, error) {
-	request, err := s.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodGet,
-		URL:    fmt.Sprintf("%s%s", apiUrl, fmt.Sprintf(apiGetSubaccountBalances, nickname)),
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 
-	response, err := s.client.do(request)
+	url := FormURL(fmt.Sprintf(apiGetSubaccountBalances, nickname))
+
+	response, err := s.client.Get(nil, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
 	var result []*models.Balance
-	err = json.Unmarshal(response, &result)
-	if err != nil {
+
+	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -153,22 +120,11 @@ func (s *SubAccounts) GetSubaccountBalances(nickname string) ([]*models.Balance,
 }
 
 func (s *SubAccounts) Transfer(payload *models.TransferPayload) (*models.TransferResponse, error) {
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 
-	request, err := s.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodPost,
-		URL:    fmt.Sprintf("%s%s", apiUrl, apiTransfer),
-		Body:   body,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
+	url := FormURL(apiTransfer)
 
-	response, err := s.client.do(request)
+	response, err := s.client.Post(payload, url)
+
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

@@ -127,9 +127,11 @@ func (o *Options) CreateQuote(
 ) (*models.UserOptionQuote, error) {
 
 	url := FormURL(fmt.Sprintf(apiCreateOptionQuote, id))
+
 	body := &struct {
 		Price *decimal.Decimal `json:"price"`
 	}{Price: &price}
+
 	response, err := o.client.Post(body, url)
 	if err != nil {
 		return nil, errors.WithStack(err)

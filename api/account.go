@@ -31,8 +31,7 @@ func (a *Account) GetAccountInformation(result *models.AccountInformation) (err 
 		return errors.WithStack(err)
 	}
 
-	err = json.Unmarshal(response, result)
-	if err != nil {
+	if err = json.Unmarshal(response, result); err != nil {
 		return errors.WithStack(err)
 	}
 
