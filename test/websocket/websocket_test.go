@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	sleepDuration time.Duration = 5 * time.Second
-	N                           = 5
+	runtime time.Duration = 10 * time.Second
+	N                     = 5
 )
 
 func prepForTest() (*api.Client, *context.Context, chan struct{}) {
@@ -22,14 +22,14 @@ func prepForTest() (*api.Client, *context.Context, chan struct{}) {
 	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan struct{})
 	go func() {
-		time.Sleep(sleepDuration)
+		time.Sleep(runtime)
 		cancel()
 		done <- struct{}{}
 	}()
 	return ftx, &ctx, done
 }
 
-func sleep() { time.Sleep(100 * time.Millisecond) }
+func sleep() { time.Sleep(time.Millisecond) }
 
 func TestStream_SubscribeToTickers(t *testing.T) {
 
@@ -72,7 +72,7 @@ func TestStream_SubscribeToMarkets(t *testing.T) {
 	data, err := ftx.Stream.SubscribeToMarkets(*ctx)
 	require.NoError(t, err)
 
-	asset1, asset2 := "ETH", "BTC"
+	asset1, asset2 := "BTC", "USD"
 	symbol := fmt.Sprintf("%s/%s", asset1, asset2)
 
 	count := 0
@@ -94,6 +94,7 @@ func TestStream_SubscribeToMarkets(t *testing.T) {
 				count++
 			}
 		default:
+			sleep()
 		}
 	}
 }
