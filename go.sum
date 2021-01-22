@@ -23,6 +23,8 @@ github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5Cc
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/uscott/go-tools v1.2.6-0.20210112203115-7ce2360ee3e2 h1:Icbd27jHGqwQDpZhr6UETuTVJti/Sf/hAVnajASZLA0=
 github.com/uscott/go-tools v1.2.6-0.20210112203115-7ce2360ee3e2/go.mod h1:BhqbQ5B6Y3vjCN6LAp/wdV8vKDeYXMW8wk2458ZGabE=
+github.com/uscott/go-tools v1.2.6-0.20210122072830-d9692234d3ad h1:B3wTtDGChG+z8rGRBZF2NFlubUwt4rfxAQHs5IQoa5Y=
+github.com/uscott/go-tools v1.2.6-0.20210122072830-d9692234d3ad/go.mod h1:DW6zAcyYw7bc+8x58Cfpn52Bf/e/jvjqKnoA/ZqEvdE=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 h1:qIbj1fsPNlZgppZ+VLlY7N33q108Sa+fhmuc+sWQYwY=

@@ -10,7 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/shopspring/decimal v1.2.0
 	github.com/stretchr/testify v1.7.0
-	github.com/uscott/go-tools v1.2.6-0.20210112203115-7ce2360ee3e2
+	github.com/uscott/go-tools v1.2.6-0.20210122072830-d9692234d3ad
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
