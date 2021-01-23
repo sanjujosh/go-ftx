@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -58,11 +59,14 @@ func PtrFloat64(f float64) *float64 {
 	return &f
 }
 
-func PtrDecimal(f float64) *decimal.Decimal {
-	x := decimal.NewFromFloat(f)
-	return &x
+func PtrDecimal(d decimal.Decimal) *decimal.Decimal {
+	return &d
 }
 
 func PtrBool(b bool) *bool {
 	return &b
+}
+
+func PtrDuration(d time.Duration) *time.Duration {
+	return &d
 }
