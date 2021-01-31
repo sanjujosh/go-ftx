@@ -36,6 +36,7 @@ func (s *Staking) GetStakes() ([]*models.Stake, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -52,6 +53,7 @@ func (s *Staking) GetUnstakeRequests() ([]*models.UnstakeRequest, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -68,6 +70,7 @@ func (s *Staking) GetStakeBalances() ([]*models.StakeBalance, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -76,6 +79,7 @@ func (s *Staking) RequestUnstake(
 ) (*models.UnstakeRequest, error) {
 
 	url := FormURL(apiRequestUnstake)
+
 	params := &models.UnstakeRequestParams{Coin: &coin, Size: &size}
 
 	response, err := s.client.Post(params, url)
@@ -87,6 +91,7 @@ func (s *Staking) RequestUnstake(
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return &result, nil
 }
 
@@ -118,6 +123,7 @@ func (s *Staking) GetStakingRewards() ([]*models.StakingReward, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -135,5 +141,6 @@ func (s *Staking) RequestStake(coin string, size decimal.Decimal) (*models.Stake
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return &result, nil
 }

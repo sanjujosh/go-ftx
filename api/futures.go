@@ -68,22 +68,27 @@ func (f *Futures) GetFutureByName(name string, future *models.Future) (err error
 func (f *Futures) GetFutureStats(future string, stats *models.FutureStats) (err error) {
 
 	if stats == nil {
-		return errs.NilPtr
+		panic(errs.NilPtrArg)
 	}
+
 	url := FormURL(fmt.Sprintf(apiGetFutureStats, future))
+
 	response, err := f.client.Get(nil, url, false)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	if err = json.Unmarshal(response, stats); err != nil {
 		return errors.WithStack(err)
 	}
+
 	return nil
 }
 
 func (f *Futures) GetFundingRates() ([]*models.FundingRates, error) {
 
 	url := FormURL(apiGetFundingRates)
+
 	response, err := f.client.Get(nil, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -93,12 +98,14 @@ func (f *Futures) GetFundingRates() ([]*models.FundingRates, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
 func (f *Futures) GetIndexWeights(index string) (*map[string]float64, error) {
 
 	url := FormURL(fmt.Sprintf(apiGetIndexWeights, index))
+
 	response, err := f.client.Get(nil, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -108,12 +115,14 @@ func (f *Futures) GetIndexWeights(index string) (*map[string]float64, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return &result, nil
 }
 
 func (f *Futures) GetExpiredFutures() ([]*models.FutureExpired, error) {
 
 	url := FormURL(apiGetExpiredFutures)
+
 	response, err := f.client.Get(nil, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -123,6 +132,7 @@ func (f *Futures) GetExpiredFutures() ([]*models.FutureExpired, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -131,6 +141,7 @@ func (f *Futures) GetHistoricalIndex(
 	params *models.HistoricalIndexParams) ([]*models.HistoricalIndex, error) {
 
 	url := FormURL(fmt.Sprintf(apiGetHistoricalIndex, indexName))
+
 	response, err := f.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -140,5 +151,6 @@ func (f *Futures) GetHistoricalIndex(
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }

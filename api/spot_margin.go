@@ -55,6 +55,7 @@ func (s *SpotMargin) GetLendingRates() ([]*models.LendingRate, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -72,6 +73,7 @@ func (s *SpotMargin) GetBorrowSummary() ([]*models.BorrowedAmount, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -93,6 +95,7 @@ func (s *SpotMargin) GetMarketInfo(market string) (*models.SpotMarginMarketInfo,
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return &result, nil
 }
 
@@ -111,6 +114,7 @@ func (s *SpotMargin) GetBorrowHistory() ([]*models.BorrowHistory, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -129,6 +133,7 @@ func (s *SpotMargin) GetLendingHistory() ([]*models.LendingHistory, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -147,6 +152,7 @@ func (s *SpotMargin) GetLendingOffers() ([]*models.LendingOffer, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -165,6 +171,7 @@ func (s *SpotMargin) GetLendingInfo() ([]*models.LendingInfo, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -186,5 +193,6 @@ func (s *SpotMargin) SubmitLendingOffer(
 	if err = json.Unmarshal(response, &result); err != nil {
 		return result, errors.WithStack(err)
 	}
+
 	return
 }

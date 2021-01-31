@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strconv"
 	"sync"
@@ -22,9 +23,10 @@ const (
 	apiUrl    = "https://ftx.com/api"
 	apiOtcUrl = "https://otc.ftx.com/api"
 
-	keyHeader  = "FTX-KEY"
-	signHeader = "FTX-SIGN"
-	tsHeader   = "FTX-TS"
+	keyHeader     = "FTX-KEY"
+	signHeader    = "FTX-SIGN"
+	tsHeader      = "FTX-TS"
+	subacctHeader = "FTX-SUBACCOUNT"
 )
 
 type Option func(c *Client)
@@ -42,11 +44,18 @@ func WithAuth(key, secret string) Option {
 	}
 }
 
+func SetSubAccount(nickname string) Option {
+	return func(c *Client) {
+		c.SubAccount = &nickname
+	}
+}
+
 type Client struct {
 	client         *http.Client
 	apiKey         string
 	secret         string
 	serverTimeDiff time.Duration
+	SubAccount     *string
 	Buf            *bytes.Buffer
 	Account
 	Convert
@@ -128,42 +137,59 @@ func (c *Client) GetResponse(
 
 	switch method {
 	case http.MethodGet:
+
 		if len(auth) == 0 {
 			return nil, fmt.Errorf("Auth not specified")
 		}
+
 		queryParams, err := PrepareQueryParams(params)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
+
+		var subacct *string
+		if len(auth) > 0 && auth[0] {
+			subacct = c.SubAccount
+		}
+
 		request, err = c.prepareRequest(Request{
-			Auth:   auth[0],
-			Method: method,
-			URL:    url,
-			Params: queryParams,
+			Auth:       auth[0],
+			Method:     method,
+			URL:        url,
+			SubAccount: subacct,
+			Params:     queryParams,
 		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
 	case http.MethodPost, http.MethodDelete:
+
 		body, err := json.Marshal(params)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
+
 		request, err = c.prepareRequest(Request{
-			Auth:   true,
-			Method: method,
-			URL:    url,
-			Body:   body,
+			Auth:       true,
+			Method:     method,
+			URL:        url,
+			SubAccount: c.SubAccount,
+			Body:       body,
 		})
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
 	default:
 		return nil, fmt.Errorf("Invalid http method: %v", method)
-	}
-
-	if err != nil {
-		return nil, errors.WithStack(err)
 	}
 
 	response, err := c.do(request)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return response, nil
 }
 
@@ -183,12 +209,13 @@ type Response struct {
 }
 
 type Request struct {
-	Auth    bool
-	Method  string
-	URL     string
-	Headers map[string]string
-	Params  map[string]string
-	Body    []byte
+	Auth       bool
+	Method     string
+	URL        string
+	SubAccount *string
+	Headers    map[string]string
+	Params     map[string]string
+	Body       []byte
 }
 
 func (c *Client) prepareRequest(request Request) (*http.Request, error) {
@@ -223,6 +250,9 @@ func (c *Client) prepareRequest(request Request) (*http.Request, error) {
 		req.Header.Set(keyHeader, c.apiKey)
 		req.Header.Set(signHeader, c.signature(payload))
 		req.Header.Set(tsHeader, nonce)
+		if request.SubAccount != nil {
+			req.Header.Set(subacctHeader, url.QueryEscape(*request.SubAccount))
+		}
 	}
 
 	for k, v := range request.Headers {

@@ -30,6 +30,7 @@ type Wallet struct {
 func (w *Wallet) GetCoins() ([]*models.Coin, error) {
 
 	url := FormURL(apiGetCoins)
+
 	response, err := w.client.Get(nil, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -39,12 +40,14 @@ func (w *Wallet) GetCoins() ([]*models.Coin, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
 func (w *Wallet) GetBalances() ([]*models.Balance, error) {
 
 	url := FormURL(apiGetBalances)
+
 	response, err := w.client.Get(nil, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -54,12 +57,14 @@ func (w *Wallet) GetBalances() ([]*models.Balance, error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
 func (w *Wallet) GetBalancesAllAccts() (map[string][]*models.Balance, error) {
 
 	url := FormURL(apiGetBalancesAll)
+
 	response, err := w.client.Get(nil, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -78,9 +83,11 @@ func (w *Wallet) GetDepositAddress(
 ) (address, tag string, err error) {
 
 	url := FormURL(fmt.Sprintf(apiGetDepositAddress, coin))
+
 	params := &struct {
 		Method *models.DepositMethod `json:"method,omitempty"`
 	}{Method: method}
+
 	response, err := w.client.Get(params, url, true)
 	if err != nil {
 		return address, tag, errors.WithStack(err)
@@ -92,6 +99,7 @@ func (w *Wallet) GetDepositAddress(
 	}
 
 	address, tag = result.Address, result.Tag
+
 	return
 }
 
@@ -100,6 +108,7 @@ func (w *Wallet) GetDepositHistory(
 ) ([]*models.Deposit, error) {
 
 	url := FormURL(apiGetDepositHistory)
+
 	response, err := w.client.Get(params, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -118,6 +127,7 @@ func (w *Wallet) GetWithdrawalHistory(
 ) ([]*models.Withdrawal, error) {
 
 	url := FormURL(apiGetWithdrawalHistory)
+
 	response, err := w.client.Get(params, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -127,6 +137,7 @@ func (w *Wallet) GetWithdrawalHistory(
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -138,7 +149,9 @@ func (w *Wallet) RequestWithdrawal(
 	if withdrawal == nil {
 		return errs.NilPtr
 	}
+
 	url := FormURL(apiRequestWithdrawal)
+
 	response, err := w.client.Post(params, url)
 	if err != nil {
 		return errors.WithStack(err)
@@ -147,12 +160,14 @@ func (w *Wallet) RequestWithdrawal(
 	if err = json.Unmarshal(response, withdrawal); err != nil {
 		return errors.WithStack(err)
 	}
+
 	return
 }
 
 func (w *Wallet) GetAirdrops(params *models.AirDropParams) ([]*models.AirDrop, error) {
 
 	url := FormURL(apiGetAirdrops)
+
 	response, err := w.client.Get(params, url, true)
 	if err != nil {
 		return nil, err
@@ -162,12 +177,14 @@ func (w *Wallet) GetAirdrops(params *models.AirDropParams) ([]*models.AirDrop, e
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
 func (w *Wallet) GetSavedAddresses(coin *string) ([]*models.SavedAddress, error) {
 
 	url := FormURL(apiGetSavedAddresses)
+
 	params := &struct {
 		Coin *string `json:"coin,omitempty"`
 	}{Coin: coin}
@@ -180,6 +197,7 @@ func (w *Wallet) GetSavedAddresses(coin *string) ([]*models.SavedAddress, error)
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
@@ -188,6 +206,7 @@ func (w *Wallet) CreateSavedAddresses(
 ) ([]*models.SavedAddress, error) {
 
 	url := FormURL(apiCreateSavedAddresses)
+
 	response, err := w.client.Post(params, url)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -197,12 +216,14 @@ func (w *Wallet) CreateSavedAddresses(
 	if err = json.Unmarshal(response, &result); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return result, nil
 }
 
 func (w *Wallet) DeleteSavedAddress(address int64) (result string, err error) {
 
 	url := FormURL(apiDeleteSavedAddresses)
+
 	params := &struct {
 		SavedAddressID *int64 `json:"saved_address_id"`
 	}{SavedAddressID: &address}
@@ -215,5 +236,6 @@ func (w *Wallet) DeleteSavedAddress(address int64) (result string, err error) {
 	if err = json.Unmarshal(response, &result); err != nil {
 		return result, errors.WithStack(err)
 	}
+
 	return
 }

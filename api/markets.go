@@ -66,6 +66,9 @@ func (m *Markets) GetOrderBook(market string, depth *int, ob *models.OrderBook) 
 
 	if depth == nil {
 		response, err = m.client.Get(nil, url, false)
+		if err != nil {
+			return errors.WithStack(err)
+		}
 	} else {
 		request, err := m.client.prepareRequest(Request{
 			Auth:   false,
@@ -77,9 +80,9 @@ func (m *Markets) GetOrderBook(market string, depth *int, ob *models.OrderBook) 
 			return errors.WithStack(err)
 		}
 		response, err = m.client.do(request)
-	}
-	if err != nil {
-		return errors.WithStack(err)
+		if err != nil {
+			return errors.WithStack(err)
+		}
 	}
 
 	if err = json.Unmarshal(response, ob); err != nil {
@@ -93,6 +96,7 @@ func (m *Markets) GetTrades(
 	market string, params *models.GetTradesParams) ([]*models.Trade, error) {
 
 	url := FormURL(fmt.Sprintf(apiGetTrades, market))
+
 	response, err := m.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -112,6 +116,7 @@ func (m *Markets) GetHistoricalPrices(
 ) ([]*models.HistoricalPrice, error) {
 
 	url := FormURL(fmt.Sprintf(apiGetHistoricalPrices, market))
+
 	response, err := m.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)

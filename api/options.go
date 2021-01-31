@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -37,6 +36,7 @@ type Options struct {
 func (o *Options) ListQuoteRequests() ([]*models.OptionQuoteRequest, error) {
 
 	url := FormURL(apiListOptionQuoteRequests)
+
 	response, err := o.client.Get(&struct{}{}, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -52,6 +52,7 @@ func (o *Options) ListQuoteRequests() ([]*models.OptionQuoteRequest, error) {
 func (o *Options) ListUserQuoteRequests() ([]*models.OptionQuoteRequest, error) {
 
 	url := FormURL(apiListUserOptionQuoteRequests)
+
 	response, err := o.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -69,6 +70,7 @@ func (o *Options) CreateQuoteRequest(
 ) (*models.CreateQuoteRequest, error) {
 
 	url := FormURL(apiCreateOptionQuoteRequest)
+
 	response, err := o.client.Post(params, url)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -84,16 +86,8 @@ func (o *Options) CreateQuoteRequest(
 func (o *Options) CancelQuoteRequest(id int64) (*models.CancelQuoteRequest, error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelOptionQuoteRequest, id))
-	request, err := o.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodDelete,
-		URL:    url,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 
-	response, err := o.client.do(request)
+	response, err := o.client.Delete(nil, url)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -162,16 +156,8 @@ func (o *Options) GetUserQuotes() ([]*models.UserOptionQuote, error) {
 func (o *Options) CancelQuote(id int64) (*models.UserOptionQuote, error) {
 
 	url := FormURL(fmt.Sprintf(apiCancelUserOptionQuote, id))
-	request, err := o.client.prepareRequest(Request{
-		Auth:   true,
-		Method: http.MethodDelete,
-		URL:    url,
-	})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 
-	response, err := o.client.do(request)
+	response, err := o.client.Delete(nil, url)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -186,6 +172,7 @@ func (o *Options) CancelQuote(id int64) (*models.UserOptionQuote, error) {
 func (o *Options) AcceptQuote(id int64) (*models.UserOptionQuote, error) {
 
 	url := FormURL(fmt.Sprintf(apiAcceptOptionQuote, id))
+
 	response, err := o.client.Post(&struct{}{}, url)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -201,6 +188,7 @@ func (o *Options) AcceptQuote(id int64) (*models.UserOptionQuote, error) {
 func (o *Options) GetAccountOptionsInfo() (*models.AccountOptionsInfo, error) {
 
 	url := FormURL(apiGetOptionsAccountInfo)
+
 	response, err := o.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -216,6 +204,7 @@ func (o *Options) GetAccountOptionsInfo() (*models.AccountOptionsInfo, error) {
 func (o *Options) GetOptionsPositions() ([]*models.OptionPosition, error) {
 
 	url := FormURL(apiGetOptionsPositions)
+
 	response, err := o.client.Get(&struct{}{}, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -233,6 +222,7 @@ func (o *Options) GetPublicOptionsTrades(
 ) ([]*models.PublicOptionTrade, error) {
 
 	url := FormURL(apiGetPublicOptionsTrades)
+
 	response, err := o.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -250,6 +240,7 @@ func (o *Options) GetOptionsFills(
 ) ([]*models.OptionFill, error) {
 
 	url := FormURL(apiGetOptionsFills)
+
 	response, err := o.client.Get(params, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -265,6 +256,7 @@ func (o *Options) GetOptionsFills(
 func (o *Options) Get24hOptionVolume() (*models.OptionsVolume, error) {
 
 	url := FormURL(apiGet24hOptionsVolume)
+
 	response, err := o.client.Get(&struct{}{}, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -282,6 +274,7 @@ func (o *Options) GetOptionsHistoricalVolumes(
 ) ([]*models.OptionsHistoricalVolumes, error) {
 
 	url := FormURL(apiGetOptionsHistoricalVolumes)
+
 	response, err := o.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -297,6 +290,7 @@ func (o *Options) GetOptionsHistoricalVolumes(
 func (o *Options) GetOptionsOpenInterest() (openInterest decimal.Decimal, err error) {
 
 	url := FormURL(apiGetOptionsOpenInterest)
+
 	response, err := o.client.Get(&struct{}{}, url, false)
 	if err != nil {
 		return decimal.Decimal{}, errors.WithStack(err)
@@ -316,6 +310,7 @@ func (o *Options) GetHistoricalOpenInterest(
 ) ([]*models.OptionsHistoricalOpenInterest, error) {
 
 	url := FormURL(apiGetOptionsHistoricalOpenInterest)
+
 	response, err := o.client.Get(params, url, false)
 	if err != nil {
 		return nil, errors.WithStack(err)

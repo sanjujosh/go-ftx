@@ -62,10 +62,9 @@ func (s *Stream) SetReconnectionInterval(interval time.Duration) {
 }
 
 func (s *Stream) printf(format string, v ...interface{}) {
-	if !s.isDebugMode {
-		return
+	if s.isDebugMode {
+		log.Printf(format+"\n", v)
 	}
-	log.Printf(format+"\n", v)
 }
 
 func (s *Stream) connect(requests ...models.WSRequest) (err error) {
@@ -151,17 +150,18 @@ func (s *Stream) getEventResponse(
 func (s *Stream) serve(
 	ctx context.Context, requests ...models.WSRequest) (chan interface{}, error) {
 
-	err := s.connect(requests...)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
 	for _, req := range requests {
 		if req.Channel == models.FillsChannel || req.Channel == models.OrdersChannel {
-			if err = s.Authorize(); err != nil {
+			if err := s.Authorize(); err != nil {
 				return nil, errors.WithStack(err)
 			}
 			break
 		}
+	}
+
+	err := s.connect(requests...)
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
 	eventsC := make(chan interface{})
 	msg := models.WsResponse{}
@@ -245,7 +245,7 @@ func (s *Stream) subscribe(requests []models.WSRequest) (err error) {
 	return nil
 }
 
-func (s *Stream) Authorize(subaccounts ...string) (err error) {
+func (s *Stream) Authorize() (err error) {
 
 	if s.isLoggedIn {
 		return
@@ -265,8 +265,8 @@ func (s *Stream) Authorize(subaccounts ...string) (err error) {
 		"time": ms,
 	}
 
-	if len(subaccounts) > 0 {
-		args["subaccount"] = subaccounts[0]
+	if s.client.SubAccount != nil {
+		args["subaccount"] = *s.client.SubAccount
 	}
 
 	err = s.conn.WriteJSON(&models.WSRequestAuthorize{
