@@ -45,7 +45,7 @@ func TestSubAccounts_CRUD(t *testing.T) {
 	})
 
 	ftx.SubAccount = api.PtrString(nickname)
-	var account *models.AccountInformation
+	account := &models.AccountInformation{}
 	if err = ftx.Account.GetAccountInformation(account); err != nil {
 		t.Fatal(err)
 	}
