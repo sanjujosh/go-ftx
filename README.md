@@ -1,4 +1,4 @@
-# ftx
+# go-ftx
 FTX exchange golang library
 
 Forked from https://github.com/grishinsana/ftx
