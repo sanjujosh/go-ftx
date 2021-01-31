@@ -15,7 +15,7 @@ import (
 
 const (
 	sleepDuration time.Duration = 10 * time.Second
-	swap                        = "BTC-PERP"
+	swap                        = "USDT-PERP"
 )
 
 func prepForTest() (*api.Client, *context.Context, chan struct{}) {
@@ -56,31 +56,33 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 
 		bid := perp.Bid
 		ask := perp.Ask
-
+		incr := perp.PriceIncrement
+		size := decimal.NewFromInt(1)
 		o := &models.Order{}
+
 		err = ftx.Orders.PlaceOrder(&models.OrderParams{
 			Market:   api.PtrString(swap),
 			Side:     api.PtrString(string(models.Buy)),
-			Price:    api.PtrDecimal(bid.Sub(decimal.NewFromInt(2))),
+			Price:    api.PtrDecimal(bid.Sub(incr)),
 			Type:     api.PtrString(string(models.LimitOrder)),
-			Size:     api.PtrDecimal(decimal.NewFromFloat(0.001)),
+			Size:     &size,
 			PostOnly: api.PtrBool(false),
 		}, o)
 		if err != nil {
-			t.Fatal(errors.WithStack(err))
+			t.Log(err.Error())
 		}
 		oidbid := o.ID
 
 		err = ftx.Orders.PlaceOrder(&models.OrderParams{
 			Market:   api.PtrString(swap),
 			Side:     api.PtrString(string(models.Sell)),
-			Price:    api.PtrDecimal(ask.Add(decimal.NewFromInt(2))),
+			Price:    api.PtrDecimal(ask.Add(incr)),
 			Type:     api.PtrString(string(models.LimitOrder)),
-			Size:     api.PtrDecimal(decimal.NewFromFloat(0.001)),
+			Size:     &size,
 			PostOnly: api.PtrBool(false),
 		}, o)
 		if err != nil {
-			t.Fatal(errors.WithStack(err))
+			t.Log(err.Error())
 		}
 		oidask := o.ID
 
@@ -89,22 +91,24 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 		err = ftx.Orders.ModifyOrder(
 			oidbid,
 			&models.ModifyOrderParams{
-				Price: api.PtrDecimal(ask.Add(decimal.NewFromInt(1))),
+				Price: api.PtrDecimal(ask.Add(incr)),
+				Size:  &size,
 			},
 			o,
 		)
 		if err != nil {
-			t.Fatal(errors.WithStack(err))
+			t.Log(err.Error())
 		}
 		err = ftx.Orders.ModifyOrder(
 			oidask,
 			&models.ModifyOrderParams{
-				Price: api.PtrDecimal(bid.Sub(decimal.NewFromInt(1))),
+				Price: api.PtrDecimal(bid.Sub(incr)),
+				Size:  &size,
 			},
 			o,
 		)
 		if err != nil {
-			t.Fatal(errors.WithStack(err))
+			t.Log(err.Error())
 		}
 	}()
 
@@ -121,16 +125,12 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 		select {
 		case <-done:
 			return
-		case fill, ok := <-filldata:
-			if ok {
-				t.Log("yes!")
-				t.Logf("Fill: %+v\n", *fill)
-			}
-		case order, ok := <-orderdata:
-			if ok {
-				t.Log("yay!")
-				t.Logf("Order: %+v\n", *order)
-			}
+		case fill := <-filldata:
+			t.Log("yes!")
+			t.Logf("Fill: %+v\n", *fill)
+		case order := <-orderdata:
+			t.Log("yay!")
+			t.Logf("Order: %+v\n", *order)
 		default:
 			time.Sleep(time.Millisecond)
 		}
