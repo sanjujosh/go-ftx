@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -48,7 +47,7 @@ type Client struct {
 	apiKey         string
 	secret         string
 	serverTimeDiff time.Duration
-	sb             *strings.Builder
+	Buf            *bytes.Buffer
 	Account
 	Convert
 	Fills
@@ -69,7 +68,7 @@ func New(opts ...Option) *Client {
 
 	client := &Client{
 		client: http.DefaultClient,
-		sb:     new(strings.Builder),
+		Buf:    bytes.NewBuffer(make([]byte, 128)),
 	}
 	for _, opt := range opts {
 		opt(client)
@@ -206,20 +205,20 @@ func (c *Client) prepareRequest(request Request) (*http.Request, error) {
 	req.URL.RawQuery = query.Encode()
 
 	if request.Auth {
-		c.sb.Reset()
+		c.Buf.Reset()
 		nonce := strconv.FormatInt(time.Now().UTC().Add(c.serverTimeDiff).Unix()*1000, 10)
-		c.sb.WriteString(nonce)
-		c.sb.WriteString(req.Method)
-		c.sb.WriteString(req.URL.Path)
+		c.Buf.WriteString(nonce)
+		c.Buf.WriteString(req.Method)
+		c.Buf.WriteString(req.URL.Path)
 		if req.URL.RawQuery != "" {
-			c.sb.WriteRune('?')
-			c.sb.WriteString(req.URL.RawQuery)
+			c.Buf.WriteRune('?')
+			c.Buf.WriteString(req.URL.RawQuery)
 		}
 		if len(request.Body) > 0 {
-			c.sb.WriteString(string(request.Body))
+			c.Buf.WriteString(string(request.Body))
 		}
-		payload := c.sb.String()
-		c.sb.Reset()
+		payload := c.Buf.String()
+		c.Buf.Reset()
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set(keyHeader, c.apiKey)
 		req.Header.Set(signHeader, c.signature(payload))
@@ -261,10 +260,12 @@ func (c *Client) do(req *http.Request) ([]byte, error) {
 }
 
 func (c *Client) prepareQueryParams(params interface{}) map[string]string {
-	result := make(map[string]string)
 
+	result := make(map[string]string)
 	val := reflect.ValueOf(params).Elem()
+
 	for i := 0; i < val.NumField(); i++ {
+
 		valueField := val.Field(i)
 		typeField := val.Type().Field(i)
 		tag := typeField.Tag
