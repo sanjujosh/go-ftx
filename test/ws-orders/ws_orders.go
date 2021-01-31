@@ -1,4 +1,4 @@
-package testwsfills
+package testwsorders
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ import (
 	"github.com/uscott/go-ftx/test"
 )
 
-func Test_Fills(t *testing.T) {
+func Test_Orders(t *testing.T) {
 
 	ftx, ctx, done := test.PrepForTest()
 	defer ftx.CancelAllOrders(&models.CancelAllParams{Market: api.PtrString(test.USDTSWAP)})
@@ -29,22 +29,24 @@ func Test_Fills(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	filldata, err := ftx.Stream.SubscribeToFills(*ctx)
+	orderdata, err := ftx.Stream.SubscribeToOrders(*ctx)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
 
 	for {
+
 		select {
 
 		case <-done:
 			return
-		case fill := <-filldata:
-			t.Log("yes!")
-			t.Logf("Fill: %+v\n", *fill)
+		case order := <-orderdata:
+			t.Log("yay!")
+			t.Logf("Order: %+v\n", *order)
 		default:
 			time.Sleep(time.Millisecond)
 
 		}
+
 	}
 }

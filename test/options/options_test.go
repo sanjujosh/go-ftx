@@ -1,4 +1,4 @@
-package test
+package testoptions
 
 import (
 	"os"

@@ -1,5 +1,1 @@
-package test
-
-import (
-	"testing"
-)
+package testconvert

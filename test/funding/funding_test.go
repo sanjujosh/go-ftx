@@ -1,4 +1,4 @@
-package test
+package testfunding
 
 import (
 	"os"
