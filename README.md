@@ -3,6 +3,10 @@ FTX exchange golang library
 
 Forked from https://github.com/grishinsana/ftx
 
+This is a full implementation of the FTX REST and Websocket API.
+
+Use at your own risk.
+
 ### Install
 ```shell script
 go get github.com/uscott/go-ftx
@@ -11,9 +15,6 @@ go get github.com/uscott/go-ftx
 ### Usage
 
 > See examples directory and test cases for more examples
-
-### TODO
-- Private Streams (working on it)
 
 #### REST
 ```go
@@ -24,22 +25,24 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/uscott/go-ftx"
+	"github.com/uscott/go-ftx/api"
+	"github.com/uscott/go-ftx/models"
 )
 
 func main() {
-	client := ftx.New(
-		ftx.WithAuth("API-KEY", "API-SECRET"),
-		ftx.WithHTTPClient(&http.Client{
+	client := api.New(
+		api.WithAuth("API-KEY", "API-SECRET"),
+		api.WithHTTPClient(&http.Client{
 			Timeout: 5 * time.Second,
 		}),
 	)
 
-	info, err := client.Account.GetAccountInformation()
+	info := models.AccountInformation{}
+	err := client.Account.GetAccountInformation(&info)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(info)
+	fmt.Printf("Account info: %+v\n", info)
 }
 ```
 
@@ -55,19 +58,20 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/uscott/go-ftx"
+	"github.com/uscott/go-ftx/api"
 )
 
 func main() {
+
     sigs := make(chan os.Signal, 1)
     signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
     ctx, cancel := context.WithCancel(context.Background())
-
-    client := ftx.New()
+	defer cancel()
+    client := api.New()
     client.Stream.SetDebugMode(true)
 
-    data, err := client.Stream.SubscribeToTickers(ctx, "ETH/BTC")
+    data, err := client.Stream.SubscribeToTickers(ctx, "BTC-PERP")
     if err != nil {
         log.Fatalf("%+v", err)
     }
@@ -86,9 +90,8 @@ func main() {
         }
     }()
 
-    <-sigs
-    cancel()
-    time.Sleep(time.Second)
+	<-sigs
+
 }
 ```
 
