@@ -172,9 +172,12 @@ func (s *Stream) serve(
 
 		go func() {
 			for {
+				s.client.mu.Lock()
 				if err = s.getEventResponse(ctx, eventsC, &msg, requests...); err != nil {
+					s.client.mu.Unlock()
 					return
 				}
+				s.client.mu.Unlock()
 			}
 		}()
 
@@ -184,14 +187,17 @@ func (s *Stream) serve(
 
 			case <-ctx.Done():
 
+				s.client.mu.Lock()
 				err = s.conn.WriteMessage(
 					websocket.CloseMessage,
 					websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 
 				if err != nil {
 					s.printf("write close msg: %v", err)
+					s.client.mu.Unlock()
 					return
 				}
+				s.client.mu.Unlock()
 
 				time.Sleep(time.Second)
 
@@ -201,6 +207,7 @@ func (s *Stream) serve(
 
 				s.printf("PING")
 
+				s.client.mu.Lock()
 				err = s.conn.WriteControl(
 					websocket.PingMessage,
 					[]byte(`{"op": "pong"}`),
@@ -209,6 +216,7 @@ func (s *Stream) serve(
 				if err != nil && err != websocket.ErrCloseSent {
 					s.printf("write ping: %v", err)
 				}
+				s.client.mu.Unlock()
 
 			}
 		}
