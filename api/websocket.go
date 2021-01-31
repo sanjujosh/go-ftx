@@ -410,8 +410,14 @@ func (s *Stream) SubscribeToTrades(
 			select {
 			case <-ctx.Done():
 				return
-			case event := <-eventsC:
-				trades := event.(*models.TradesResponse)
+			case event, ok := <-eventsC:
+				if !ok {
+					return
+				}
+				trades, ok := event.(*models.TradesResponse)
+				if !ok {
+					return
+				}
 				for _, trade := range trades.Trades {
 					s.tradesC <- &models.TradeResponse{
 						Trade:        trade,
@@ -454,8 +460,14 @@ func (s *Stream) SubscribeToOrderBooks(
 			select {
 			case <-ctx.Done():
 				return
-			case event := <-eventsC:
-				book := event.(*models.OrderBookResponse)
+			case event, ok := <-eventsC:
+				if !ok {
+					return
+				}
+				book, ok := event.(*models.OrderBookResponse)
+				if !ok {
+					return
+				}
 				s.booksC <- book
 			}
 		}
@@ -482,8 +494,14 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 			select {
 			case <-ctx.Done():
 				return
-			case event := <-eventsC:
-				fill := event.(*models.FillResponse)
+			case event, ok := <-eventsC:
+				if !ok {
+					return
+				}
+				fill, ok := event.(*models.FillResponse)
+				if !ok {
+					return
+				}
 				s.fillsC <- fill
 			}
 		}
@@ -508,8 +526,14 @@ func (s *Stream) SubscribeToOrders(ctx context.Context) (chan *models.OrdersResp
 			select {
 			case <-ctx.Done():
 				return
-			case event := <-eventsC:
-				order := event.(*models.OrdersResponse)
+			case event, ok := <-eventsC:
+				if !ok {
+					return
+				}
+				order, ok := event.(*models.OrdersResponse)
+				if !ok {
+					return
+				}
 				s.ordersC <- order
 			}
 		}
