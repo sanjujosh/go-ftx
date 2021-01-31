@@ -63,34 +63,34 @@ import (
 
 func main() {
 
-    sigs := make(chan os.Signal, 1)
-    signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-    ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-    client := api.New()
-    client.Stream.SetDebugMode(true)
+	client := api.New()
+	client.Stream.SetDebugMode(true)
 
-    data, err := client.Stream.SubscribeToTickers(ctx, "BTC-PERP")
-    if err != nil {
-        log.Fatalf("%+v", err)
-    }
+	data, err := client.Stream.SubscribeToTickers(ctx, "BTC-PERP")
+	if err != nil {
+		log.Fatalf("%+v", err)
+	}
 
-    go func() {
-        for {
-            select {
-            case <-ctx.Done():
-                return
-            case msg, ok := <-data:
-                if !ok {
-                    return
-                }
-                log.Printf("%+v\n", msg)
-            }
-        }
-    }()
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case msg, ok := <-data:
+				if !ok {
+					return
+				}
+				log.Printf("%+v\n", msg)
+			}
+		}
+	}()
 
-    <-sigs
+	<-sigs
 }
 ```
 
