@@ -84,7 +84,7 @@ func (s *Stream) connect(requests ...models.WSRequest) (err error) {
 	s.conn.SetPongHandler(
 		func(msg string) error {
 			lastPong = time.Now()
-			if time.Now().Sub(lastPong) > websocketTimeout {
+			if time.Since(lastPong) > websocketTimeout {
 				// TODO handle this case
 				errmsg := "PONG response time has been exceeded"
 				s.printf(errmsg)
@@ -166,6 +166,7 @@ func (s *Stream) serve(
 	msg := models.WsResponse{}
 
 	go func() {
+
 		go func() {
 			for {
 				if err = s.getEventResponse(ctx, eventsC, &msg, requests...); err != nil {
@@ -175,32 +176,41 @@ func (s *Stream) serve(
 		}()
 
 		for {
+
 			select {
+
 			case <-ctx.Done():
+
 				s.mu.Lock()
 				err = s.conn.WriteMessage(
 					websocket.CloseMessage,
 					websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 				s.mu.Unlock()
+
 				if err != nil {
 					s.printf("write close msg: %v", err)
 					return
 				}
-				select {
-				case <-time.After(time.Second):
-					return
-				}
+
+				time.Sleep(time.Second)
+
+				return
+
 			case <-time.After(pingPeriod):
+
 				s.printf("PING")
+
 				s.mu.Lock()
 				err = s.conn.WriteControl(
 					websocket.PingMessage,
 					[]byte(`{"op": "pong"}`),
 					time.Now().UTC().Add(10*time.Second))
-				s.mu.Unlock()
+
 				if err != nil && err != websocket.ErrCloseSent {
 					s.printf("write ping: %v", err)
 				}
+				s.mu.Unlock()
+
 			}
 		}
 	}()
