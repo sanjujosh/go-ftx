@@ -260,14 +260,14 @@ func TestOrders_CancelAll(t *testing.T) {
 			t.Fatal(errors.WithStack(err))
 		}
 
-		bid, _ := future.Bid.Float64()
+		price := future.Bid.Sub(decimal.NewFromFloat(1000))
 
 		err = ftx.Orders.PlaceOrder(&models.OrderParams{
 			Market:   api.PtrString(c),
 			Side:     api.PtrString(string(models.Buy)),
-			Price:    api.PtrDecimal(bid - 1000),
+			Price:    &price,
 			Type:     api.PtrString(string(models.LimitOrder)),
-			Size:     api.PtrDecimal(0.01),
+			Size:     api.PtrDecimal(decimal.NewFromFloat(0.01)),
 			PostOnly: api.PtrBool(true),
 		}, o)
 

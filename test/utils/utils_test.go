@@ -27,8 +27,8 @@ func TestPrepareQueryParams(t *testing.T) {
 		{
 			params: &models.GetTradesParams{
 				Limit:     api.PtrInt(10),
-				StartTime: api.PtrInt(20),
-				EndTime:   api.PtrInt(30),
+				StartTime: api.PtrInt64(20),
+				EndTime:   api.PtrInt64(30),
 			},
 			expected: map[string]string{
 				"limit":      "10",
@@ -40,8 +40,8 @@ func TestPrepareQueryParams(t *testing.T) {
 		{
 			params: &models.GetTradesParams{
 				Limit:     api.PtrInt(10),
-				StartTime: api.PtrInt(20),
-				EndTime:   api.PtrInt(0),
+				StartTime: api.PtrInt64(20),
+				EndTime:   api.PtrInt64(0),
 			},
 			expected: map[string]string{
 				"limit":      "10",

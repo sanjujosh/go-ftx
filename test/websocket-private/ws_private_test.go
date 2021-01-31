@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
@@ -47,35 +48,37 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 
 		time.Sleep(sleepDuration / 2)
 
-		perp, err := ftx.Futures.GetFutureByName(swap)
+		perp := &models.Future{}
+		err := ftx.Futures.GetFutureByName(swap, perp)
 		if err != nil {
 			t.Fatal(errors.WithStack(err))
 		}
 
-		bid, _ := perp.Bid.Float64()
-		ask, _ := perp.Ask.Float64()
+		bid := perp.Bid
+		ask := perp.Ask
 
-		o, err := ftx.Orders.PlaceOrder(&models.OrderParams{
+		o := &models.Order{}
+		err = ftx.Orders.PlaceOrder(&models.OrderParams{
 			Market:   api.PtrString(swap),
 			Side:     api.PtrString(string(models.Buy)),
-			Price:    api.PtrDecimal(bid - 2),
+			Price:    api.PtrDecimal(bid.Sub(decimal.NewFromInt(2))),
 			Type:     api.PtrString(string(models.LimitOrder)),
-			Size:     api.PtrDecimal(0.001),
+			Size:     api.PtrDecimal(decimal.NewFromFloat(0.001)),
 			PostOnly: api.PtrBool(true),
-		})
+		}, o)
 		if err != nil {
 			t.Fatal(errors.WithStack(err))
 		}
 		oidbid := o.ID
 
-		o, err = ftx.Orders.PlaceOrder(&models.OrderParams{
+		err = ftx.Orders.PlaceOrder(&models.OrderParams{
 			Market:   api.PtrString(swap),
 			Side:     api.PtrString(string(models.Sell)),
-			Price:    api.PtrDecimal(ask + 2),
+			Price:    api.PtrDecimal(ask.Add(decimal.NewFromInt(2))),
 			Type:     api.PtrString(string(models.LimitOrder)),
-			Size:     api.PtrDecimal(0.001),
+			Size:     api.PtrDecimal(decimal.NewFromFloat(0.001)),
 			PostOnly: api.PtrBool(true),
-		})
+		}, o)
 		if err != nil {
 			t.Fatal(errors.WithStack(err))
 		}
@@ -83,20 +86,22 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 
 		time.Sleep(time.Second)
 
-		_, err = ftx.Orders.ModifyOrder(
+		err = ftx.Orders.ModifyOrder(
 			oidbid,
 			&models.ModifyOrderParams{
-				Price: api.PtrDecimal(bid - 1),
+				Price: api.PtrDecimal(bid.Sub(decimal.NewFromInt(1))),
 			},
+			o,
 		)
 		if err != nil {
 			t.Fatal(errors.WithStack(err))
 		}
-		_, err = ftx.Orders.ModifyOrder(
+		err = ftx.Orders.ModifyOrder(
 			oidask,
 			&models.ModifyOrderParams{
-				Price: api.PtrDecimal(ask + 1),
+				Price: api.PtrDecimal(ask.Add(decimal.NewFromInt(1))),
 			},
+			o,
 		)
 	}()
 
