@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uscott/go-ftx/api"
+	"github.com/uscott/go-ftx/models"
 )
 
 func TestSubAccounts_CRUD(t *testing.T) {
@@ -42,6 +43,22 @@ func TestSubAccounts_CRUD(t *testing.T) {
 		assert.True(t, sub.Editable)
 		t.Logf("Subaccount: %+v\n", *sub)
 	})
+
+	ftx.SubAccount = api.PtrString(nickname)
+	var account *models.AccountInformation
+	if err = ftx.Account.GetAccountInformation(account); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%s account: %+v", nickname, *account)
+
+	positions, err := ftx.Account.GetPositions()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%s positions:\n", nickname)
+	for _, p := range positions {
+		t.Logf("%+v\n", *p)
+	}
 
 	t.Run("get_balances", func(t *testing.T) {
 		balances, err := ftx.SubAccounts.GetSubaccountBalances(nickname)
