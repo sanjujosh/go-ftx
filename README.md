@@ -90,8 +90,7 @@ func main() {
         }
     }()
 
-	<-sigs
-
+    <-sigs
 }
 ```
 
