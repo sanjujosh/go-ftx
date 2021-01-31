@@ -69,9 +69,11 @@ func (s *Stream) printf(format string, v ...interface{}) {
 
 func (s *Stream) connect(requests ...models.WSRequest) (err error) {
 
-	s.conn, _, err = s.dialer.Dial(s.url, nil)
-	if err != nil {
-		return errors.WithStack(err)
+	if s.conn == nil {
+		s.conn, _, err = s.dialer.Dial(s.url, nil)
+		if err != nil {
+			return errors.WithStack(err)
+		}
 	}
 
 	s.printf("connected to %v", s.url)
@@ -249,6 +251,13 @@ func (s *Stream) Authorize() (err error) {
 
 	if s.isLoggedIn {
 		return
+	}
+
+	if s.conn == nil {
+		s.conn, _, err = s.dialer.Dial(s.url, nil)
+		if err != nil {
+			return errors.WithStack(err)
+		}
 	}
 
 	ms := time.Now().UTC().UnixNano() / int64(time.Millisecond)
