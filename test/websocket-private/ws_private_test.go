@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	sleepDuration time.Duration = 15 * time.Second
+	sleepDuration time.Duration = 10 * time.Second
 	swap                        = "BTC-PERP"
 )
 
@@ -64,7 +64,7 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 			Price:    api.PtrDecimal(bid.Sub(decimal.NewFromInt(2))),
 			Type:     api.PtrString(string(models.LimitOrder)),
 			Size:     api.PtrDecimal(decimal.NewFromFloat(0.001)),
-			PostOnly: api.PtrBool(true),
+			PostOnly: api.PtrBool(false),
 		}, o)
 		if err != nil {
 			t.Fatal(errors.WithStack(err))
@@ -77,7 +77,7 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 			Price:    api.PtrDecimal(ask.Add(decimal.NewFromInt(2))),
 			Type:     api.PtrString(string(models.LimitOrder)),
 			Size:     api.PtrDecimal(decimal.NewFromFloat(0.001)),
-			PostOnly: api.PtrBool(true),
+			PostOnly: api.PtrBool(false),
 		}, o)
 		if err != nil {
 			t.Fatal(errors.WithStack(err))
@@ -89,7 +89,7 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 		err = ftx.Orders.ModifyOrder(
 			oidbid,
 			&models.ModifyOrderParams{
-				Price: api.PtrDecimal(bid.Sub(decimal.NewFromInt(1))),
+				Price: api.PtrDecimal(ask.Add(decimal.NewFromInt(1))),
 			},
 			o,
 		)
@@ -99,15 +99,14 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 		err = ftx.Orders.ModifyOrder(
 			oidask,
 			&models.ModifyOrderParams{
-				Price: api.PtrDecimal(ask.Add(decimal.NewFromInt(1))),
+				Price: api.PtrDecimal(bid.Sub(decimal.NewFromInt(1))),
 			},
 			o,
 		)
+		if err != nil {
+			t.Fatal(errors.WithStack(err))
+		}
 	}()
-
-	if err != nil {
-		t.Fatal(errors.WithStack(err))
-	}
 
 	filldata, err := ftx.Stream.SubscribeToFills(*ctx)
 	if err != nil {
@@ -124,17 +123,16 @@ func TestStream_SubscribeToOrdersAndFills(t *testing.T) {
 			return
 		case fill, ok := <-filldata:
 			if ok {
-				t.Log("yes")
+				t.Log("yes!")
 				t.Logf("Fill: %+v\n", *fill)
 			}
 		case order, ok := <-orderdata:
 			if ok {
-				t.Log("yay")
+				t.Log("yay!")
 				t.Logf("Order: %+v\n", *order)
 			}
 		default:
-			t.Log("waiting ...")
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(time.Millisecond)
 		}
 	}
 }
