@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -9,6 +8,8 @@ import (
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
 )
+
+const N = 9
 
 func TestFutures_GetFutures(t *testing.T) {
 
@@ -18,13 +19,18 @@ func TestFutures_GetFutures(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for i, p := range futures {
-		if i > 9 {
+
+	cnt := 0
+
+	for _, p := range futures {
+		if cnt > N {
 			return
 		}
-		fmt.Printf("Description: %s\n", p.Description)
-		fmt.Printf("Expiration:  %+v\n", p.Expiry.Format(time.RFC3339))
-		fmt.Printf("Name:        %s\n", p.Name)
+		if p.Underlying != "BTC" {
+			continue
+		}
+		t.Logf("Future: %+v\n", *p)
+		cnt++
 	}
 }
 
@@ -50,7 +56,7 @@ func TestFutures_GetFutureStats(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("Stats: %+v\n", stats)
+	t.Logf("%s stats: %+v\n", futName, stats)
 }
 
 func TestFutures_GetFundingRates(t *testing.T) {

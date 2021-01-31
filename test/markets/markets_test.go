@@ -11,6 +11,8 @@ import (
 	"github.com/uscott/go-ftx/models"
 )
 
+const N int = 9
+
 var (
 	PtrInt   = api.PtrInt
 	PtrInt64 = api.PtrInt64
@@ -22,12 +24,14 @@ func TestMarkets_GetMarkets(t *testing.T) {
 	markets, err := ftx.Markets.GetMarkets()
 	assert.NoError(t, err)
 	assert.NotNil(t, markets)
+
+	cnt := 0
 	for _, p := range markets {
-		m := *p
-		if m.Type != "future" {
-			continue
+		if cnt > N {
+			return
 		}
-		t.Logf("Underlying: %s\n", m.Underlying)
+		cnt++
+		t.Logf("%s market: %+v\n", p.Name, *p)
 	}
 }
 
@@ -39,9 +43,9 @@ func TestMarkets_GetMarketByName(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		expected := &models.Market{
-			Name:          "ETH/BTC",
-			BaseCurrency:  "ETH",
-			QuoteCurrency: "BTC",
+			Name:          "BTC/USD",
+			BaseCurrency:  "BTC",
+			QuoteCurrency: "USD",
 			Enabled:       true,
 		}
 
@@ -52,6 +56,7 @@ func TestMarkets_GetMarketByName(t *testing.T) {
 		req.Equal(expected.BaseCurrency, market.BaseCurrency)
 		req.Equal(expected.QuoteCurrency, market.QuoteCurrency)
 		req.Equal(expected.Enabled, market.Enabled)
+		t.Logf("\n%s market: %+v\n", market.Name, market)
 	})
 
 	t.Run("not_found", func(t *testing.T) {
@@ -65,6 +70,12 @@ func TestMarkets_GetMarketByName(t *testing.T) {
 		err := ftx.Markets.GetMarketByName(expected.Name, &market)
 		req.Error(err)
 	})
+
+	if err := ftx.Markets.GetMarketByName("BTC-PERP", &market); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("\n%s market: %+v\n", market.Name, market)
+
 }
 
 func TestMarkets_GetOrderBook(t *testing.T) {

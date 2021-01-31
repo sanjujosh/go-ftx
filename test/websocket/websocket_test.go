@@ -29,7 +29,7 @@ func prepForTest() (*api.Client, *context.Context, chan struct{}) {
 	return ftx, &ctx, done
 }
 
-func sleep() { time.Sleep(time.Millisecond) }
+func sleep() { time.Sleep(time.Microsecond) }
 
 func TestStream_SubscribeToTickers(t *testing.T) {
 
