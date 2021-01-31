@@ -238,8 +238,7 @@ func (s *Stream) reconnect(
 
 func (s *Stream) subscribe(requests []models.WSRequest) (err error) {
 	for _, req := range requests {
-		err = s.conn.WriteJSON(req)
-		if err != nil {
+		if err = s.conn.WriteJSON(req); err != nil {
 			return errors.WithStack(err)
 		}
 	}
@@ -251,21 +250,25 @@ func (s *Stream) Authorize(subaccounts ...string) (err error) {
 	if s.isLoggedIn {
 		return
 	}
-	ms := time.Now().UTC().UnixNano() / int64(time.Millisecond)
 
+	ms := time.Now().UTC().UnixNano() / int64(time.Millisecond)
 	mac := hmac.New(sha256.New, []byte(s.client.secret))
+
 	_, err = mac.Write([]byte(fmt.Sprintf("%dwebsocket_login", ms)))
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	args := map[string]interface{}{
 		"key":  s.client.apiKey,
 		"sign": hex.EncodeToString(mac.Sum(nil)),
 		"time": ms,
 	}
+
 	if len(subaccounts) > 0 {
 		args["subaccount"] = subaccounts[0]
 	}
+
 	err = s.conn.WriteJSON(&models.WSRequestAuthorize{
 		Op:   "login",
 		Args: args,
@@ -273,7 +276,9 @@ func (s *Stream) Authorize(subaccounts ...string) (err error) {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	s.isLoggedIn = true
+
 	return
 }
 
@@ -281,7 +286,7 @@ func (s *Stream) SubscribeToTickers(
 	ctx context.Context, symbols ...string) (chan *models.TickerResponse, error) {
 
 	if len(symbols) == 0 {
-		errors.New("symbols missing")
+		return nil, errors.New("symbols missing")
 	}
 
 	requests := make([]models.WSRequest, len(symbols))
@@ -301,7 +306,9 @@ func (s *Stream) SubscribeToTickers(
 	s.tickersC = make(chan *models.TickerResponse)
 
 	go func() {
+
 		for {
+
 			select {
 			case <-ctx.Done():
 				return
@@ -350,11 +357,12 @@ func (s *Stream) SubscribeToMarkets(
 				var markets struct {
 					Data map[string]*models.Market `json:"data"`
 				}
-				err = json.Unmarshal(data, &markets)
-				if err != nil {
+
+				if err = json.Unmarshal(data, &markets); err != nil {
 					s.printf("unmarshal markets: %+v", err)
 					return
 				}
+
 				for _, market := range markets.Data {
 					s.marketsC <- market
 				}
