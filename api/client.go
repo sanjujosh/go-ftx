@@ -107,28 +107,23 @@ func New(opts ...Option) *Client {
 }
 
 func (c *Client) Get(params interface{}, url string, auth bool) ([]byte, error) {
-	if params == nil {
-		return c.GetResponse(&struct{}{}, url, http.MethodGet, auth)
-	}
 	return c.GetResponse(params, url, http.MethodGet, auth)
 }
 
 func (c *Client) Post(params interface{}, url string) ([]byte, error) {
-	if params == nil {
-		return c.GetResponse(&struct{}{}, url, http.MethodPost)
-	}
 	return c.GetResponse(params, url, http.MethodPost)
 }
 
 func (c *Client) Delete(params interface{}, url string) ([]byte, error) {
-	if params == nil {
-		return c.GetResponse(&struct{}{}, url, http.MethodDelete)
-	}
 	return c.GetResponse(params, url, http.MethodDelete)
 }
 
 func (c *Client) GetResponse(
 	params interface{}, url string, method string, auth ...bool) ([]byte, error) {
+
+	if params == nil {
+		return c.GetResponse(&struct{}{}, url, method, auth...)
+	}
 
 	var (
 		err     error
