@@ -43,17 +43,33 @@ type Stream struct {
 	ordersC                chan *models.OrdersResponse
 }
 
-func (s *Stream) Authorize() (err error) {
+func MakeRequests(
+	symbols []string, chantype models.ChannelType, op models.Operation) []models.WSRequest {
 
-	if s.isLoggedIn {
-		return
+	requests := make([]models.WSRequest, len(symbols))
+
+	for i, s := range symbols {
+		requests[i] = models.WSRequest{
+			ChannelType: chantype,
+			Market:      s,
+			Op:          op,
+		}
 	}
+
+	return requests
+}
+
+func (s *Stream) Authorize() (err error) {
 
 	if s.conn == nil {
 		s.conn, _, err = s.dialer.Dial(s.url, nil)
 		if err != nil {
 			return errors.WithStack(err)
 		}
+	}
+
+	if s.isLoggedIn {
+		return
 	}
 
 	ms := time.Now().UTC().UnixNano() / int64(time.Millisecond)
@@ -144,13 +160,13 @@ func (s *Stream) GetEventResponse(
 		return nil
 	}
 
-	if msg.Type == models.Subscribed || msg.Type == models.UnSubscribed {
+	if msg.ResponseType == models.Subscribed || msg.ResponseType == models.UnSubscribed {
 		return
 	}
 
 	var response interface{}
 
-	switch msg.Channel {
+	switch msg.ChannelType {
 	case models.TickerChannel:
 		response, err = msg.MapToTickerResponse()
 	case models.TradesChannel:
@@ -235,7 +251,7 @@ func (s *Stream) Serve(
 	ctx context.Context, requests ...models.WSRequest) (chan interface{}, error) {
 
 	for _, req := range requests {
-		if req.Channel == models.FillsChannel || req.Channel == models.OrdersChannel {
+		if req.ChannelType == models.FillsChannel || req.ChannelType == models.OrdersChannel {
 			if err := s.Authorize(); err != nil {
 				return nil, errors.WithStack(err)
 			}
@@ -314,14 +330,7 @@ func (s *Stream) SubscribeToTickers(
 		return nil, errors.New("symbols missing")
 	}
 
-	requests := make([]models.WSRequest, len(symbols))
-	for i, symb := range symbols {
-		requests[i] = models.WSRequest{
-			Channel: models.TickerChannel,
-			Market:  symb,
-			Op:      models.Subscribe,
-		}
-	}
+	requests := MakeRequests(symbols, models.TickerChannel, models.Subscribe)
 
 	eventsC, err := s.Serve(ctx, requests...)
 	if err != nil {
@@ -354,8 +363,8 @@ func (s *Stream) SubscribeToMarkets(
 	ctx context.Context) (chan *models.Market, error) {
 
 	eventsC, err := s.Serve(ctx, models.WSRequest{
-		Channel: models.MarketsChannel,
-		Op:      models.Subscribe,
+		ChannelType: models.MarketsChannel,
+		Op:          models.Subscribe,
 	})
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -399,14 +408,7 @@ func (s *Stream) SubscribeToTrades(
 		return nil, errors.New("symbols missing")
 	}
 
-	requests := make([]models.WSRequest, len(symbols))
-	for i, symb := range symbols {
-		requests[i] = models.WSRequest{
-			Channel: models.TradesChannel,
-			Market:  symb,
-			Op:      models.Subscribe,
-		}
-	}
+	requests := MakeRequests(symbols, models.TradesChannel, models.Subscribe)
 
 	eventsC, err := s.Serve(ctx, requests...)
 	if err != nil {
@@ -446,14 +448,7 @@ func (s *Stream) SubscribeToOrderBooks(
 		return nil, errors.New("symbols is missing")
 	}
 
-	requests := make([]models.WSRequest, len(symbols))
-	for i, symb := range symbols {
-		requests[i] = models.WSRequest{
-			Channel: models.OrderBookChannel,
-			Market:  symb,
-			Op:      models.Subscribe,
-		}
-	}
+	requests := MakeRequests(symbols, models.OrderBookChannel, models.Subscribe)
 
 	eventsC, err := s.Serve(ctx, requests...)
 	if err != nil {
@@ -485,8 +480,8 @@ func (s *Stream) SubscribeToOrderBooks(
 func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillResponse, error) {
 
 	eventsC, err := s.Serve(ctx, models.WSRequest{
-		Channel: models.FillsChannel,
-		Op:      models.Subscribe,
+		ChannelType: models.FillsChannel,
+		Op:          models.Subscribe,
 	})
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -514,8 +509,8 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 func (s *Stream) SubscribeToOrders(ctx context.Context) (chan *models.OrdersResponse, error) {
 
 	eventsC, err := s.Serve(ctx, models.WSRequest{
-		Channel: models.OrdersChannel,
-		Op:      models.Subscribe,
+		ChannelType: models.OrdersChannel,
+		Op:          models.Subscribe,
 	})
 	if err != nil {
 		return nil, errors.WithStack(err)

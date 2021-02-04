@@ -25,15 +25,15 @@ type NumberTimeLimit struct {
 	EndTime   *int64 `json:"end_time,omitempty"`
 }
 
-type Channel string
+type ChannelType string
 
 const (
-	OrderBookChannel = Channel("orderbook")
-	TradesChannel    = Channel("trades")
-	TickerChannel    = Channel("ticker")
-	MarketsChannel   = Channel("markets")
-	FillsChannel     = Channel("fills")
-	OrdersChannel    = Channel("orders")
+	OrderBookChannel = ChannelType("orderbook")
+	TradesChannel    = ChannelType("trades")
+	TickerChannel    = ChannelType("ticker")
+	MarketsChannel   = ChannelType("markets")
+	FillsChannel     = ChannelType("fills")
+	OrdersChannel    = ChannelType("orders")
 )
 
 type Operation string
