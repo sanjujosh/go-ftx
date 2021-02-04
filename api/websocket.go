@@ -44,11 +44,11 @@ type Stream struct {
 }
 
 func MakeRequests(
-	chantype models.ChannelType, op models.Operation, symbols ...string) []models.WSRequest {
+	chantype models.ChannelType, symbols ...string) []models.WSRequest {
 
 	if len(symbols) == 0 {
 		return []models.WSRequest{
-			models.WSRequest{ChannelType: chantype, Op: op},
+			models.WSRequest{ChannelType: chantype, Op: models.Subscribe},
 		}
 	}
 
@@ -58,7 +58,7 @@ func MakeRequests(
 		requests[i] = models.WSRequest{
 			ChannelType: chantype,
 			Market:      s,
-			Op:          op,
+			Op:          models.Subscribe,
 		}
 	}
 
@@ -206,7 +206,7 @@ func (s *Stream) GetEventsChannel(
 	op models.Operation,
 	symbols ...string) (eventC chan interface{}, err error) {
 
-	requests := MakeRequests(ct, op, symbols...)
+	requests := MakeRequests(ct, symbols...)
 	if err = s.Subscribe(requests); err != nil {
 		return
 	}
@@ -363,7 +363,7 @@ func (s *Stream) SubscribeToTickers(
 		return nil, errors.New("symbols missing")
 	}
 
-	requests := MakeRequests(models.TickerChannel, models.Subscribe, symbols...)
+	requests := MakeRequests(models.TickerChannel, symbols...)
 
 	eventsC, err := s.Serve(ctx, requests...)
 	if err != nil {
@@ -441,7 +441,7 @@ func (s *Stream) SubscribeToTrades(
 		return nil, errors.New("symbols missing")
 	}
 
-	requests := MakeRequests(models.TradesChannel, models.Subscribe, symbols...)
+	requests := MakeRequests(models.TradesChannel, symbols...)
 
 	eventsC, err := s.Serve(ctx, requests...)
 	if err != nil {
@@ -481,7 +481,7 @@ func (s *Stream) SubscribeToOrderBooks(
 		return nil, errors.New("symbols is missing")
 	}
 
-	requests := MakeRequests(models.OrderBookChannel, models.Subscribe, symbols...)
+	requests := MakeRequests(models.OrderBookChannel, symbols...)
 
 	eventsC, err := s.Serve(ctx, requests...)
 	if err != nil {
