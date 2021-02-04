@@ -62,9 +62,8 @@ func MakeRequests(
 func (s *Stream) Authorize() (err error) {
 
 	if s.conn == nil {
-		s.conn, _, err = s.dialer.Dial(s.url, nil)
-		if err != nil {
-			return errors.WithStack(err)
+		if err = s.CreateNewConnection(); err != nil {
+			return
 		}
 	}
 
@@ -106,9 +105,8 @@ func (s *Stream) Authorize() (err error) {
 func (s *Stream) Connect(requests ...models.WSRequest) (err error) {
 
 	if s.conn == nil {
-		s.conn, _, err = s.dialer.Dial(s.url, nil)
-		if err != nil {
-			return errors.WithStack(err)
+		if err = s.CreateNewConnection(); err != nil {
+			return
 		}
 	}
 
@@ -133,6 +131,16 @@ func (s *Stream) Connect(requests ...models.WSRequest) (err error) {
 			return nil
 		})
 	return nil
+}
+
+func (s *Stream) CreateNewConnection() (err error) {
+
+	s.conn, _, err = s.dialer.Dial(s.url, nil)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return
 }
 
 func (s *Stream) GetEventResponse(
