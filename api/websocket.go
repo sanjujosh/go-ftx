@@ -203,7 +203,6 @@ func (s *Stream) GetEventResponse(
 func (s *Stream) GetEventsChannel(
 	ctx context.Context,
 	ct models.ChannelType,
-	op models.Operation,
 	symbols ...string) (eventC chan interface{}, err error) {
 
 	requests := MakeRequests(ct, symbols...)
