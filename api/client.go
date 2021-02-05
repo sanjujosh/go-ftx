@@ -102,6 +102,7 @@ func New(opts ...Option) *Client {
 		dialer:                 websocket.DefaultDialer,
 		wsReconnectionCount:    reconnectCount,
 		wsReconnectionInterval: reconnectInterval,
+		Subs:                   make([]*WsSub, 0, 4),
 	}
 	return client
 }
