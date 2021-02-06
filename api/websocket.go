@@ -43,44 +43,85 @@ type Stream struct {
 	ordersC                chan *models.OrdersResponse
 }
 
-func (s *Stream) SetReconnectionCount(count int) {
-	s.mu.Lock()
-	s.wsReconnectionCount = count
-	s.mu.Unlock()
-}
+func MakeRequests(
+	chantype models.ChannelType, symbols ...string) []models.WSRequest {
 
-func (s *Stream) SetDebugMode(isDebugMode bool) {
-	s.mu.Lock()
-	s.isDebugMode = isDebugMode
-	s.mu.Unlock()
-}
-
-func (s *Stream) SetReconnectionInterval(interval time.Duration) {
-	s.mu.Lock()
-	s.wsReconnectionInterval = interval
-	s.mu.Unlock()
-}
-
-func (s *Stream) printf(format string, v ...interface{}) {
-	if s.isDebugMode {
-		log.Printf(format+"\n", v)
+	if len(symbols) == 0 {
+		return []models.WSRequest{
+			models.WSRequest{ChannelType: chantype, Op: models.Subscribe},
+		}
 	}
+
+	requests := make([]models.WSRequest, len(symbols))
+
+	for i, s := range symbols {
+		requests[i] = models.WSRequest{
+			ChannelType: chantype,
+			Market:      s,
+			Op:          models.Subscribe,
+		}
+	}
+
+	return requests
 }
 
-func (s *Stream) connect(requests ...models.WSRequest) (err error) {
+func (s *Stream) Authorize() (err error) {
 
 	if s.conn == nil {
-		s.conn, _, err = s.dialer.Dial(s.url, nil)
-		if err != nil {
-			return errors.WithStack(err)
+		if err = s.CreateNewConnection(); err != nil {
+			return
+		}
+	}
+
+	if s.isLoggedIn {
+		return
+	}
+
+	ms := time.Now().UTC().UnixNano() / int64(time.Millisecond)
+	mac := hmac.New(sha256.New, []byte(s.client.secret))
+
+	_, err = mac.Write([]byte(fmt.Sprintf("%dwebsocket_login", ms)))
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	args := map[string]interface{}{
+		"key":  s.client.apiKey,
+		"sign": hex.EncodeToString(mac.Sum(nil)),
+		"time": ms,
+	}
+
+	if s.client.SubAccount != nil {
+		args["subaccount"] = *s.client.SubAccount
+	}
+
+	err = s.conn.WriteJSON(&models.WSRequestAuthorize{
+		Op:   "login",
+		Args: args,
+	})
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	s.isLoggedIn = true
+
+	return
+}
+
+func (s *Stream) Connect(requests ...models.WSRequest) (err error) {
+
+	if s.conn == nil {
+		if err = s.CreateNewConnection(); err != nil {
+			return
 		}
 	}
 
 	s.printf("connected to %v", s.url)
 
-	if err = s.subscribe(requests); err != nil {
+	if err = s.Subscribe(requests); err != nil {
 		return errors.WithStack(err)
 	}
+
 	lastPong := time.Now()
 	s.conn.SetPongHandler(
 		func(msg string) error {
@@ -98,7 +139,17 @@ func (s *Stream) connect(requests ...models.WSRequest) (err error) {
 	return nil
 }
 
-func (s *Stream) getEventResponse(
+func (s *Stream) CreateNewConnection() (err error) {
+
+	s.conn, _, err = s.dialer.Dial(s.url, nil)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return
+}
+
+func (s *Stream) GetEventResponse(
 	ctx context.Context,
 	eventsC chan interface{},
 	msg *models.WsResponse,
@@ -114,7 +165,7 @@ func (s *Stream) getEventResponse(
 			return
 		}
 
-		err = s.reconnect(ctx, requests)
+		err = s.Reconnect(ctx, requests)
 		if err != nil {
 			s.printf("reconnect: %+v", err)
 			return
@@ -123,13 +174,13 @@ func (s *Stream) getEventResponse(
 		return nil
 	}
 
-	if msg.Type == models.Subscribed || msg.Type == models.UnSubscribed {
+	if msg.ResponseType == models.Subscribed || msg.ResponseType == models.UnSubscribed {
 		return
 	}
 
 	var response interface{}
 
-	switch msg.Channel {
+	switch msg.ChannelType {
 	case models.TickerChannel:
 		response, err = msg.MapToTickerResponse()
 	case models.TradesChannel:
@@ -149,11 +200,90 @@ func (s *Stream) getEventResponse(
 	return
 }
 
-func (s *Stream) serve(
+func (s *Stream) GetEventsChannel(
+	ctx context.Context,
+	ct models.ChannelType,
+	symbols ...string) (eventC chan interface{}, err error) {
+
+	requests := MakeRequests(ct, symbols...)
+	if err = s.Subscribe(requests); err != nil {
+		return
+	}
+
+	if eventC, err = s.Serve(ctx, requests...); err != nil {
+		return
+	}
+
+	return
+}
+
+func (s *Stream) IsLoggedIn() bool {
+	return s.isLoggedIn
+}
+
+func (s *Stream) Reconnect(
+	ctx context.Context, requests []models.WSRequest) (err error) {
+
+	for i := 0; i < s.wsReconnectionCount; i++ {
+		if err = s.Connect(requests...); err == nil {
+			return nil
+		}
+		select {
+		case <-time.After(s.wsReconnectionInterval):
+			if err = s.Connect(requests...); err != nil {
+				continue
+			}
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+
+	return errors.New("Reconnection failed")
+}
+
+func (s *Stream) SetDebugMode(isDebugMode bool) {
+	s.mu.Lock()
+	s.isDebugMode = isDebugMode
+	s.mu.Unlock()
+}
+
+func (s *Stream) SetReconnectionCount(count int) {
+	s.mu.Lock()
+	s.wsReconnectionCount = count
+	s.mu.Unlock()
+}
+
+func (s *Stream) SetReconnectionInterval(interval time.Duration) {
+	s.mu.Lock()
+	s.wsReconnectionInterval = interval
+	s.mu.Unlock()
+}
+
+func (s *Stream) Subscribe(requests []models.WSRequest) (err error) {
+	for _, req := range requests {
+		if err = s.conn.WriteJSON(req); err != nil {
+			return errors.WithStack(err)
+		}
+	}
+	return nil
+}
+
+func (s *Stream) WSConn() *websocket.Conn {
+	return s.conn
+}
+
+func (s *Stream) printf(format string, v ...interface{}) {
+	if s.isDebugMode {
+		log.Printf(fmt.Sprintf("%s%s", format, "\n"), v)
+	}
+}
+
+func (s *Stream) Serve(
 	ctx context.Context, requests ...models.WSRequest) (chan interface{}, error) {
 
 	for _, req := range requests {
-		if req.Channel == models.FillsChannel || req.Channel == models.OrdersChannel {
+		if req.ChannelType == models.FillsChannel || req.ChannelType == models.OrdersChannel {
 			if err := s.Authorize(); err != nil {
 				return nil, errors.WithStack(err)
 			}
@@ -161,7 +291,7 @@ func (s *Stream) serve(
 		}
 	}
 
-	err := s.connect(requests...)
+	err := s.Connect(requests...)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -173,7 +303,7 @@ func (s *Stream) serve(
 		go func() {
 			for {
 				s.client.mu.Lock()
-				if err = s.getEventResponse(ctx, eventsC, &msg, requests...); err != nil {
+				if err = s.GetEventResponse(ctx, eventsC, &msg, requests...); err != nil {
 					s.client.mu.Unlock()
 					return
 				}
@@ -225,80 +355,6 @@ func (s *Stream) serve(
 	return eventsC, err
 }
 
-func (s *Stream) reconnect(
-	ctx context.Context, requests []models.WSRequest) (err error) {
-
-	for i := 0; i < s.wsReconnectionCount; i++ {
-		if err = s.connect(requests...); err == nil {
-			return nil
-		}
-		select {
-		case <-time.After(s.wsReconnectionInterval):
-			if err = s.connect(requests...); err != nil {
-				continue
-			}
-			return nil
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
-
-	return errors.New("Reconnection failed")
-}
-
-func (s *Stream) subscribe(requests []models.WSRequest) (err error) {
-	for _, req := range requests {
-		if err = s.conn.WriteJSON(req); err != nil {
-			return errors.WithStack(err)
-		}
-	}
-	return nil
-}
-
-func (s *Stream) Authorize() (err error) {
-
-	if s.isLoggedIn {
-		return
-	}
-
-	if s.conn == nil {
-		s.conn, _, err = s.dialer.Dial(s.url, nil)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-	}
-
-	ms := time.Now().UTC().UnixNano() / int64(time.Millisecond)
-	mac := hmac.New(sha256.New, []byte(s.client.secret))
-
-	_, err = mac.Write([]byte(fmt.Sprintf("%dwebsocket_login", ms)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	args := map[string]interface{}{
-		"key":  s.client.apiKey,
-		"sign": hex.EncodeToString(mac.Sum(nil)),
-		"time": ms,
-	}
-
-	if s.client.SubAccount != nil {
-		args["subaccount"] = *s.client.SubAccount
-	}
-
-	err = s.conn.WriteJSON(&models.WSRequestAuthorize{
-		Op:   "login",
-		Args: args,
-	})
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	s.isLoggedIn = true
-
-	return
-}
-
 func (s *Stream) SubscribeToTickers(
 	ctx context.Context, symbols ...string) (chan *models.TickerResponse, error) {
 
@@ -306,16 +362,9 @@ func (s *Stream) SubscribeToTickers(
 		return nil, errors.New("symbols missing")
 	}
 
-	requests := make([]models.WSRequest, len(symbols))
-	for i, symb := range symbols {
-		requests[i] = models.WSRequest{
-			Channel: models.TickerChannel,
-			Market:  symb,
-			Op:      models.Subscribe,
-		}
-	}
+	requests := MakeRequests(models.TickerChannel, symbols...)
 
-	eventsC, err := s.serve(ctx, requests...)
+	eventsC, err := s.Serve(ctx, requests...)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -329,10 +378,7 @@ func (s *Stream) SubscribeToTickers(
 			select {
 			case <-ctx.Done():
 				return
-			case event, ok := <-eventsC:
-				if !ok {
-					return
-				}
+			case event := <-eventsC:
 				ticker, ok := event.(*models.TickerResponse)
 				if !ok {
 					return
@@ -348,9 +394,9 @@ func (s *Stream) SubscribeToTickers(
 func (s *Stream) SubscribeToMarkets(
 	ctx context.Context) (chan *models.Market, error) {
 
-	eventsC, err := s.serve(ctx, models.WSRequest{
-		Channel: models.MarketsChannel,
-		Op:      models.Subscribe,
+	eventsC, err := s.Serve(ctx, models.WSRequest{
+		ChannelType: models.MarketsChannel,
+		Op:          models.Subscribe,
 	})
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -363,10 +409,7 @@ func (s *Stream) SubscribeToMarkets(
 			select {
 			case <-ctx.Done():
 				return
-			case event, ok := <-eventsC:
-				if !ok {
-					return
-				}
+			case event := <-eventsC:
 				data, ok := event.(json.RawMessage)
 				if !ok {
 					return
@@ -397,16 +440,9 @@ func (s *Stream) SubscribeToTrades(
 		return nil, errors.New("symbols missing")
 	}
 
-	requests := make([]models.WSRequest, len(symbols))
-	for i, symb := range symbols {
-		requests[i] = models.WSRequest{
-			Channel: models.TradesChannel,
-			Market:  symb,
-			Op:      models.Subscribe,
-		}
-	}
+	requests := MakeRequests(models.TradesChannel, symbols...)
 
-	eventsC, err := s.serve(ctx, requests...)
+	eventsC, err := s.Serve(ctx, requests...)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -418,10 +454,7 @@ func (s *Stream) SubscribeToTrades(
 			select {
 			case <-ctx.Done():
 				return
-			case event, ok := <-eventsC:
-				if !ok {
-					return
-				}
+			case event := <-eventsC:
 				trades, ok := event.(*models.TradesResponse)
 				if !ok {
 					return
@@ -447,16 +480,9 @@ func (s *Stream) SubscribeToOrderBooks(
 		return nil, errors.New("symbols is missing")
 	}
 
-	requests := make([]models.WSRequest, len(symbols))
-	for i, symb := range symbols {
-		requests[i] = models.WSRequest{
-			Channel: models.OrderBookChannel,
-			Market:  symb,
-			Op:      models.Subscribe,
-		}
-	}
+	requests := MakeRequests(models.OrderBookChannel, symbols...)
 
-	eventsC, err := s.serve(ctx, requests...)
+	eventsC, err := s.Serve(ctx, requests...)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -468,10 +494,7 @@ func (s *Stream) SubscribeToOrderBooks(
 			select {
 			case <-ctx.Done():
 				return
-			case event, ok := <-eventsC:
-				if !ok {
-					return
-				}
+			case event := <-eventsC:
 				book, ok := event.(*models.OrderBookResponse)
 				if !ok {
 					return
@@ -488,9 +511,9 @@ func (s *Stream) SubscribeToOrderBooks(
 
 func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillResponse, error) {
 
-	eventsC, err := s.serve(ctx, models.WSRequest{
-		Channel: models.FillsChannel,
-		Op:      models.Subscribe,
+	eventsC, err := s.Serve(ctx, models.WSRequest{
+		ChannelType: models.FillsChannel,
+		Op:          models.Subscribe,
 	})
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -502,10 +525,7 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 			select {
 			case <-ctx.Done():
 				return
-			case event, ok := <-eventsC:
-				if !ok {
-					return
-				}
+			case event := <-eventsC:
 				fill, ok := event.(*models.FillResponse)
 				if !ok {
 					return
@@ -520,9 +540,9 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 
 func (s *Stream) SubscribeToOrders(ctx context.Context) (chan *models.OrdersResponse, error) {
 
-	eventsC, err := s.serve(ctx, models.WSRequest{
-		Channel: models.OrdersChannel,
-		Op:      models.Subscribe,
+	eventsC, err := s.Serve(ctx, models.WSRequest{
+		ChannelType: models.OrdersChannel,
+		Op:          models.Subscribe,
 	})
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -534,10 +554,7 @@ func (s *Stream) SubscribeToOrders(ctx context.Context) (chan *models.OrdersResp
 			select {
 			case <-ctx.Done():
 				return
-			case event, ok := <-eventsC:
-				if !ok {
-					return
-				}
+			case event := <-eventsC:
 				order, ok := event.(*models.OrdersResponse)
 				if !ok {
 					return

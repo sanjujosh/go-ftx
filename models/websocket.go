@@ -42,9 +42,9 @@ type OrdersResponse struct {
 }
 
 type WSRequest struct {
-	Channel Channel   `json:"channel"`
-	Market  string    `json:"market"`
-	Op      Operation `json:"op"`
+	ChannelType ChannelType `json:"channel"`
+	Market      string      `json:"market"`
+	Op          Operation   `json:"op"`
 }
 
 type WSRequestAuthorize struct {
@@ -53,12 +53,12 @@ type WSRequestAuthorize struct {
 }
 
 type WsResponse struct {
-	Channel Channel         `json:"channel"`
-	Market  string          `json:"market"`
-	Type    ResponseType    `json:"type"`
-	Code    int             `json:"code"`
-	Message string          `json:"msg"`
-	Data    json.RawMessage `json:"data"`
+	ChannelType  ChannelType     `json:"channel"`
+	Market       string          `json:"market"`
+	ResponseType ResponseType    `json:"type"`
+	Code         int             `json:"code"`
+	Message      string          `json:"msg"`
+	Data         json.RawMessage `json:"data"`
 }
 
 func (wr *WsResponse) MapToTradesResponse() (*TradesResponse, error) {
@@ -71,7 +71,7 @@ func (wr *WsResponse) MapToTradesResponse() (*TradesResponse, error) {
 	return &TradesResponse{
 		Trades: trades,
 		BaseResponse: BaseResponse{
-			ResponseType: wr.Type,
+			ResponseType: wr.ResponseType,
 			Symbol:       wr.Market,
 		},
 	}, nil
@@ -87,7 +87,7 @@ func (wr *WsResponse) MapToTickerResponse() (*TickerResponse, error) {
 	return &TickerResponse{
 		Ticker: ticker,
 		BaseResponse: BaseResponse{
-			ResponseType: wr.Type,
+			ResponseType: wr.ResponseType,
 			Symbol:       wr.Market,
 		},
 	}, nil
@@ -103,7 +103,7 @@ func (wr *WsResponse) MapToOrderBookResponse() (*OrderBookResponse, error) {
 	return &OrderBookResponse{
 		OrderBook: book,
 		BaseResponse: BaseResponse{
-			ResponseType: wr.Type,
+			ResponseType: wr.ResponseType,
 			Symbol:       wr.Market,
 		},
 	}, nil
@@ -118,7 +118,7 @@ func (wr *WsResponse) MapToFillResponse() (*FillResponse, error) {
 	return &FillResponse{
 		Fill: fill,
 		BaseResponse: BaseResponse{
-			ResponseType: wr.Type,
+			ResponseType: wr.ResponseType,
 		},
 	}, nil
 }
@@ -132,7 +132,7 @@ func (wr *WsResponse) MapToOrdersResponse() (*OrdersResponse, error) {
 	return &OrdersResponse{
 		Order: order,
 		BaseResponse: BaseResponse{
-			ResponseType: wr.Type,
+			ResponseType: wr.ResponseType,
 		},
 	}, nil
 }
