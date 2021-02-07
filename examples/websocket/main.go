@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -67,7 +68,7 @@ func main() {
 			if ok {
 				ticker, ok := event.(*models.TickerResponse)
 				if ok && ticker != nil {
-					log.Printf("%+v\n", *ticker)
+					fmt.Printf("Ticker %+v\n", *ticker)
 				}
 			}
 
@@ -75,8 +76,9 @@ func main() {
 			if ok {
 				markets, err := api.MapToMarketData(event)
 				if err == nil {
+					fmt.Println("Market")
 					for c, m := range markets {
-						log.Printf("%s: %+v\n", c, *m)
+						fmt.Printf("%s: %+v\n", c, *m)
 					}
 				}
 			}
@@ -85,8 +87,9 @@ func main() {
 			if ok {
 				trades, ok := event.(*models.TradesResponse)
 				if ok && trades != nil {
+					fmt.Println("Trades")
 					for _, t := range trades.Trades {
-						log.Printf("Trade: %+v\n", t)
+						fmt.Printf("Trade: %+v\n", t)
 					}
 				}
 			}
@@ -95,7 +98,7 @@ func main() {
 			if ok {
 				book, ok := event.(*models.OrderBookResponse)
 				if ok && book != nil {
-					log.Printf("Book Response %s: %+v\n", book.Symbol, *book)
+					fmt.Printf("Book Response %s: %+v\n", book.Symbol, *book)
 				}
 			}
 
@@ -103,18 +106,4 @@ func main() {
 			time.Sleep(time.Millisecond)
 		}
 	}
-}
-
-func subscribeToOrderBooks(ctx context.Context, client *api.Client, symbols ...string) (err error) {
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
-
-	return
 }
