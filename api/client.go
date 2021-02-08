@@ -12,10 +12,8 @@ import (
 	"net/url"
 	"reflect"
 	"strconv"
-	"sync"
 	"time"
 
-	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 )
 
@@ -95,15 +93,7 @@ func New(opts ...Option) *Client {
 	client.Staking = Staking{client: client}
 	client.SubAccounts = SubAccounts{client: client}
 	client.Wallet = Wallet{client: client}
-	client.Stream = Stream{
-		client:                 client,
-		mu:                     &sync.Mutex{},
-		url:                    wsUrl,
-		dialer:                 websocket.DefaultDialer,
-		wsReconnectionCount:    reconnectCount,
-		wsReconnectionInterval: reconnectInterval,
-		Subs:                   make([]*WsSub, 0, 4),
-	}
+	client.Stream = *NewStream(client)
 	return client
 }
 
