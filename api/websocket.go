@@ -112,33 +112,29 @@ func (s *Stream) Authorize() (err error) {
 		return nil
 	}
 
-	ms := time.Now().UTC().UnixNano() / int64(time.Millisecond)
-	mac := hmac.New(sha256.New, []byte(s.client.secret))
-
-	_, err = mac.Write([]byte(fmt.Sprintf("%dwebsocket_login", ms)))
+	wsra, err := s.GetAuthRequest()
 	if err != nil {
-		return errors.WithStack(err)
+		return
 	}
 
-	args := map[string]interface{}{
-		"key":  s.client.apiKey,
-		"sign": hex.EncodeToString(mac.Sum(nil)),
-		"time": ms,
-	}
-
-	if s.client.SubAccount != nil {
-		args["subaccount"] = *s.client.SubAccount
-	}
-
-	err = s.conn.WriteJSON(&models.WSRequestAuthorize{
-		Op:   "login",
-		Args: args,
-	})
-	if err != nil {
+	if err = s.conn.WriteJSON(wsra); err != nil {
 		return errors.WithStack(err)
 	}
 
 	s.isLoggedIn = true
+
+	return
+}
+
+func (s *Stream) AuthorizeSubscribe() (err error) {
+
+	if err = s.Authorize(); err != nil {
+		return
+	}
+
+	if err = s.sub(); err != nil {
+		return errors.WithStack(err)
+	}
 
 	return
 }
@@ -175,12 +171,40 @@ func (s *Stream) Connect(requests ...models.WSRequest) (err error) {
 
 func (s *Stream) CreateNewConnection() (err error) {
 
+	s.isLoggedIn = false
+
 	s.conn, _, err = s.dialer.Dial(s.url, nil)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
 	return
+}
+
+func (s *Stream) GetAuthRequest() (*models.WSRequestAuthorize, error) {
+
+	ms := time.Now().UTC().UnixNano() / int64(time.Millisecond)
+	mac := hmac.New(sha256.New, []byte(s.client.secret))
+
+	_, err := mac.Write([]byte(fmt.Sprintf("%dwebsocket_login", ms)))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	args := map[string]interface{}{
+		"key":  s.client.apiKey,
+		"sign": hex.EncodeToString(mac.Sum(nil)),
+		"time": ms,
+	}
+
+	if s.client.SubAccount != nil {
+		args["subaccount"] = *s.client.SubAccount
+	}
+
+	return &models.WSRequestAuthorize{
+		Op:   "login",
+		Args: args,
+	}, nil
 }
 
 func (s *Stream) GetEventResponse(ctx context.Context, msg *models.WsResponse) (err error) {
@@ -277,6 +301,10 @@ func (s *Stream) GetEventResponse(ctx context.Context, msg *models.WsResponse) (
 	return
 }
 
+func (s *Stream) IsLoggedIn() bool {
+	return s.isLoggedIn
+}
+
 func (s *Stream) Reconnect(ctx context.Context) (err error) {
 
 	for i := 0; i < s.wsReconnectionCount; i++ {
@@ -315,13 +343,27 @@ func (s *Stream) SetReconnectionInterval(interval time.Duration) {
 	s.mu.Unlock()
 }
 
-func (s *Stream) Subscribe() (err error) {
-	for _, req := range s.WsSub.Requests {
-		if err = s.conn.WriteJSON(req); err != nil {
+func (s *Stream) sub() (err error) {
+	for _, r := range s.WsSub.Requests {
+		if err = s.conn.WriteJSON(r); err != nil {
 			return errors.WithStack(err)
 		}
 	}
 	return nil
+}
+
+func (s *Stream) Subscribe() (err error) {
+
+	if !s.isLoggedIn {
+		for _, r := range s.WsSub.Requests {
+			ct := r.ChannelType
+			if ct == models.FillsChannel || ct == models.OrdersChannel {
+				return s.AuthorizeSubscribe()
+			}
+		}
+	}
+
+	return s.sub()
 }
 
 func (s *Stream) printf(format string, v ...interface{}) {
@@ -473,9 +515,6 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 	ct, ws := models.OrderBookChannel, s.WsSub
 
 	ws.AppendRequests(ct)
-	if err := s.Authorize(); err != nil {
-		return nil, errors.WithStack(err)
-	}
 
 	err := s.Serve(ctx)
 	if err != nil {
@@ -495,9 +534,6 @@ func (s *Stream) SubscribeToOrders(
 	ct, ws := models.OrderBookChannel, s.WsSub
 
 	ws.AppendRequests(ct, symbols...)
-	if err := s.Authorize(); err != nil {
-		return nil, errors.WithStack(err)
-	}
 
 	err := s.Serve(ctx)
 	if err != nil {
