@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"github.com/uscott/go-ftx/api"
@@ -17,36 +16,22 @@ func Test_Orders(t *testing.T) {
 	ftx, ctx, done := test.PrepForTest()
 	defer ftx.CancelAllOrders(&models.CancelAllParams{Market: api.PtrString(test.USDTSWAP)})
 
-	err := ftx.SetServerTimeDiff()
-	if err != nil {
-		t.Fatal(errors.WithStack(err))
-	}
-	require.NoError(t, err)
+	var err error
 
 	go test.PlaceSampleOrders(ftx, t, test.USDTSWAP, decimal.NewFromInt(1), &err)
+	require.NoError(t, err)
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	orderdata, err := ftx.Stream.SubscribeToOrders(*ctx)
-	if err != nil {
-		t.Fatal(errors.WithStack(err))
-	}
+	orderC, err := ftx.Stream.SubscribeToOrders(ctx)
+	require.NoError(t, err)
 
 	for {
-
 		select {
-
 		case <-done:
 			return
-		case order := <-orderdata:
-			t.Log("yay!")
+		case order := <-orderC:
 			t.Logf("Order: %+v\n", *order)
 		default:
 			time.Sleep(time.Millisecond)
-
 		}
-
 	}
 }

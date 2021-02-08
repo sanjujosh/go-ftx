@@ -31,14 +31,8 @@ func PrepForTest() (*api.Client, context.Context, chan struct{}) {
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
-	ctx, cancel := context.WithCancel(context.Background())
-	done := make(chan struct{})
-	go func() {
-		time.Sleep(RunTime)
-		cancel()
-		done <- struct{}{}
-	}()
-	return ftx, ctx, done
+	ctx, _ := context.WithCancel(context.Background())
+	return ftx, ctx, MakeDoneChan()
 }
 
 func PlaceSampleOrders(
