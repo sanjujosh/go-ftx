@@ -254,49 +254,7 @@ func (s *Stream) GetEventResponse(ctx context.Context, msg *models.WsResponse) (
 		return
 	}
 
-	go func() {
-		switch msg.ChannelType {
-		case models.TickerChannel:
-			ticker, ok := response.(*models.TickerResponse)
-			if ok && ticker != nil {
-				s.tickersC <- ticker
-			}
-		case models.TradesChannel:
-			trades, ok := response.(*models.TradesResponse)
-			if ok && trades != nil {
-				for _, t := range trades.Trades {
-					s.tradesC <- &models.TradeResponse{
-						Trade:        t,
-						BaseResponse: trades.BaseResponse,
-					}
-				}
-			}
-		case models.OrderBookChannel:
-			book, ok := response.(*models.OrderBookResponse)
-			if ok && book != nil {
-				s.booksC <- book
-			}
-		case models.MarketsChannel:
-			markets, err := MapToMarketData(response)
-			if err == nil {
-				for _, m := range markets {
-					if m != nil {
-						s.marketsC <- m
-					}
-				}
-			}
-		case models.FillsChannel:
-			fill, ok := response.(*models.FillResponse)
-			if ok && fill != nil {
-				s.fillsC <- fill
-			}
-		case models.OrdersChannel:
-			order, ok := response.(*models.OrdersResponse)
-			if ok && order != nil {
-				s.ordersC <- order
-			}
-		}
-	}()
+	go s.SendToChannel(msg.ChannelType, response)
 
 	return
 }
@@ -369,6 +327,51 @@ func (s *Stream) Subscribe() (err error) {
 func (s *Stream) printf(format string, v ...interface{}) {
 	if s.isDebugMode {
 		log.Printf(fmt.Sprintf("%s%s", format, "\n"), v)
+	}
+}
+
+func (s *Stream) SendToChannel(ct models.ChannelType, response interface{}) {
+
+	switch ct {
+	case models.TickerChannel:
+		ticker, ok := response.(*models.TickerResponse)
+		if ok && ticker != nil {
+			s.tickersC <- ticker
+		}
+	case models.TradesChannel:
+		trades, ok := response.(*models.TradesResponse)
+		if ok && trades != nil {
+			for _, t := range trades.Trades {
+				s.tradesC <- &models.TradeResponse{
+					Trade:        t,
+					BaseResponse: trades.BaseResponse,
+				}
+			}
+		}
+	case models.OrderBookChannel:
+		book, ok := response.(*models.OrderBookResponse)
+		if ok && book != nil {
+			s.booksC <- book
+		}
+	case models.MarketsChannel:
+		markets, err := MapToMarketData(response)
+		if err == nil {
+			for _, m := range markets {
+				if m != nil {
+					s.marketsC <- m
+				}
+			}
+		}
+	case models.FillsChannel:
+		fill, ok := response.(*models.FillResponse)
+		if ok && fill != nil {
+			s.fillsC <- fill
+		}
+	case models.OrdersChannel:
+		order, ok := response.(*models.OrdersResponse)
+		if ok && order != nil {
+			s.ordersC <- order
+		}
 	}
 }
 
@@ -512,7 +515,7 @@ func (s *Stream) SubscribeToOrderBooks(
 
 func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillResponse, error) {
 
-	ct, ws := models.OrderBookChannel, s.WsSub
+	ct, ws := models.FillsChannel, s.WsSub
 
 	ws.AppendRequests(ct)
 
@@ -531,7 +534,7 @@ func (s *Stream) SubscribeToOrders(
 		return nil, errors.New("symbols missing")
 	}
 
-	ct, ws := models.OrderBookChannel, s.WsSub
+	ct, ws := models.OrdersChannel, s.WsSub
 
 	ws.AppendRequests(ct, symbols...)
 
