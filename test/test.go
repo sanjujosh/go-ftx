@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	N                      = 5
+	N                      = 10
 	RunTime  time.Duration = 75 * time.Second / 10
 	USDTSWAP               = "USDT-PERP"
 )
