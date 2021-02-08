@@ -34,6 +34,7 @@ type Stream struct {
 	wsReconnectionCount    int
 	wsReconnectionInterval time.Duration
 	isDebugMode            bool
+	isLoggedIn             bool
 	WsSub                  *WsSub
 	tickersC               chan *models.TickerResponse
 	marketsC               chan *models.Market
@@ -45,13 +46,8 @@ type Stream struct {
 
 type TrivialMap map[string]struct{}
 
-type ChannelInfo struct {
-	Subscribed bool
-	Symbols    TrivialMap
-}
-
 type WsSub struct {
-	ChannelTypes map[models.ChannelType]*ChannelInfo
+	ChannelTypes map[models.ChannelType]TrivialMap
 	EventC       chan interface{}
 	Requests     []models.WSRequest
 }
@@ -76,7 +72,7 @@ func NewStream(client *Client) *Stream {
 
 func NewWsSub() *WsSub {
 	return &WsSub{
-		ChannelTypes: make(map[models.ChannelType]*ChannelInfo),
+		ChannelTypes: make(map[models.ChannelType]TrivialMap),
 		EventC:       make(chan interface{}),
 		Requests:     make([]models.WSRequest, 0, 64),
 	}
@@ -114,6 +110,10 @@ func (s *Stream) Authorize() (err error) {
 		}
 	}
 
+	if s.isLoggedIn {
+		return nil
+	}
+
 	ms := time.Now().UTC().UnixNano() / int64(time.Millisecond)
 	mac := hmac.New(sha256.New, []byte(s.client.secret))
 
@@ -139,6 +139,8 @@ func (s *Stream) Authorize() (err error) {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	s.isLoggedIn = true
 
 	return
 }
@@ -290,15 +292,6 @@ func (s *Stream) printf(format string, v ...interface{}) {
 
 func (s *Stream) Serve(ctx context.Context) (chan interface{}, error) {
 
-	for _, req := range s.WsSub.Requests {
-		if req.ChannelType == models.FillsChannel || req.ChannelType == models.OrdersChannel {
-			if err := s.Authorize(); err != nil {
-				return nil, errors.WithStack(err)
-			}
-			break
-		}
-	}
-
 	err := s.Connect()
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -389,8 +382,9 @@ func (s *Stream) SubscribeToTickers(
 				if ok {
 					s.tickersC <- ticker
 				}
+			default:
+				time.Sleep(time.Microsecond)
 			}
-
 		}
 	}()
 
@@ -459,6 +453,8 @@ func (s *Stream) SubscribeToTrades(
 						}
 					}
 				}
+			default:
+				time.Sleep(time.Microsecond)
 			}
 		}
 	}()
@@ -493,6 +489,8 @@ func (s *Stream) SubscribeToOrderBooks(
 				if ok {
 					s.booksC <- book
 				}
+			default:
+				time.Sleep(time.Microsecond)
 			}
 		}
 	}()
@@ -507,6 +505,9 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 	ct, ws := models.OrderBookChannel, s.WsSub
 
 	ws.AppendRequests(ct)
+	if err := s.Authorize(); err != nil {
+		return nil, errors.WithStack(err)
+	}
 
 	eventC, err := s.Serve(ctx)
 
@@ -524,6 +525,8 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 				if ok {
 					s.fillsC <- fill
 				}
+			default:
+				time.Sleep(time.Microsecond)
 			}
 		}
 	}()
@@ -541,6 +544,9 @@ func (s *Stream) SubscribeToOrders(
 	ct, ws := models.OrderBookChannel, s.WsSub
 
 	ws.AppendRequests(ct, symbols...)
+	if err := s.Authorize(); err != nil {
+		return nil, errors.WithStack(err)
+	}
 
 	eventC, err := s.Serve(ctx)
 
@@ -558,6 +564,8 @@ func (s *Stream) SubscribeToOrders(
 				if ok {
 					s.ordersC <- order
 				}
+			default:
+				time.Sleep(time.Microsecond)
 			}
 		}
 	}()
@@ -606,19 +614,16 @@ func (ws *WsSub) AppendRequests(ct models.ChannelType, symbols ...string) {
 			tm[s] = struct{}{}
 		}
 
-		ctypes[ct] = &ChannelInfo{
-			Subscribed: false,
-			Symbols:    tm,
-		}
-
+		ctypes[ct] = tm
 		ws.Requests = append(ws.Requests, MakeRequests(ct, tm)...)
+
 		return
 	}
 
 	for _, s := range symbols {
-		_, ok := ctypes[ct].Symbols[s]
+		_, ok := ctypes[ct][s]
 		if !ok {
-			ctypes[ct].Symbols[s] = struct{}{}
+			ctypes[ct][s] = struct{}{}
 			tm[s] = struct{}{}
 		}
 	}
