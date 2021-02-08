@@ -48,7 +48,6 @@ type TrivialMap map[string]struct{}
 
 type WsSub struct {
 	ChannelTypes map[models.ChannelType]TrivialMap
-	EventC       chan interface{}
 	Requests     []models.WSRequest
 }
 
@@ -73,7 +72,6 @@ func NewStream(client *Client) *Stream {
 func NewWsSub() *WsSub {
 	return &WsSub{
 		ChannelTypes: make(map[models.ChannelType]TrivialMap),
-		EventC:       make(chan interface{}),
 		Requests:     make([]models.WSRequest, 0, 64),
 	}
 }
@@ -228,11 +226,51 @@ func (s *Stream) GetEventResponse(ctx context.Context, msg *models.WsResponse) (
 		response, err = msg.MapToOrdersResponse()
 	}
 
-	if s.WsSub.EventC == nil {
-		s.WsSub.EventC = make(chan interface{})
+	if err != nil {
+		return
 	}
 
-	s.WsSub.EventC <- response
+	switch msg.ChannelType {
+	case models.TickerChannel:
+		ticker, ok := response.(*models.TickerResponse)
+		if ok && ticker != nil {
+			s.tickersC <- ticker
+		}
+	case models.TradesChannel:
+		trades, ok := response.(*models.TradesResponse)
+		if ok && trades != nil {
+			for _, t := range trades.Trades {
+				s.tradesC <- &models.TradeResponse{
+					Trade:        t,
+					BaseResponse: trades.BaseResponse,
+				}
+			}
+		}
+	case models.OrderBookChannel:
+		book, ok := response.(*models.OrderBookResponse)
+		if ok && book != nil {
+			s.booksC <- book
+		}
+	case models.MarketsChannel:
+		markets, err := MapToMarketData(response)
+		if err == nil {
+			for _, m := range markets {
+				if m != nil {
+					s.marketsC <- m
+				}
+			}
+		}
+	case models.FillsChannel:
+		fill, ok := response.(*models.FillResponse)
+		if ok && fill != nil {
+			s.fillsC <- fill
+		}
+	case models.OrdersChannel:
+		order, ok := response.(*models.OrdersResponse)
+		if ok && order != nil {
+			s.ordersC <- order
+		}
+	}
 
 	return
 }
@@ -290,11 +328,10 @@ func (s *Stream) printf(format string, v ...interface{}) {
 	}
 }
 
-func (s *Stream) Serve(ctx context.Context) (chan interface{}, error) {
+func (s *Stream) Serve(ctx context.Context) (err error) {
 
-	err := s.Connect()
-	if err != nil {
-		return nil, errors.WithStack(err)
+	if err = s.Connect(); err != nil {
+		return errors.WithStack(err)
 	}
 
 	msg := models.WsResponse{}
@@ -353,7 +390,7 @@ func (s *Stream) Serve(ctx context.Context) (chan interface{}, error) {
 		}
 	}()
 
-	return s.WsSub.EventC, err
+	return err
 }
 
 func (s *Stream) SubscribeToTickers(
@@ -367,26 +404,10 @@ func (s *Stream) SubscribeToTickers(
 
 	ws.AppendRequests(ct, symbols...)
 
-	eventC, err := s.Serve(ctx)
+	err := s.Serve(ctx)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case event := <-eventC:
-				ticker, ok := event.(*models.TickerResponse)
-				if ok {
-					s.tickersC <- ticker
-				}
-			default:
-				time.Sleep(time.Microsecond)
-			}
-		}
-	}()
 
 	return s.tickersC, nil
 }
@@ -397,26 +418,10 @@ func (s *Stream) SubscribeToMarkets(ctx context.Context) (chan *models.Market, e
 
 	ws.AppendRequests(ct)
 
-	eventC, err := s.Serve(ctx)
+	err := s.Serve(ctx)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case event := <-eventC:
-				markets, err := MapToMarketData(event)
-				if err == nil {
-					for _, m := range markets {
-						s.marketsC <- m
-					}
-				}
-			}
-		}
-	}()
 
 	return s.marketsC, nil
 }
@@ -432,32 +437,10 @@ func (s *Stream) SubscribeToTrades(
 
 	ws.AppendRequests(ct, symbols...)
 
-	eventC, err := s.Serve(ctx)
-
+	err := s.Serve(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case event := <-eventC:
-				trades, ok := event.(*models.TradesResponse)
-				if ok {
-					for _, t := range trades.Trades {
-						s.tradesC <- &models.TradeResponse{
-							Trade:        t,
-							BaseResponse: trades.BaseResponse,
-						}
-					}
-				}
-			default:
-				time.Sleep(time.Microsecond)
-			}
-		}
-	}()
 
 	return s.tradesC, nil
 }
@@ -473,27 +456,10 @@ func (s *Stream) SubscribeToOrderBooks(
 
 	ws.AppendRequests(ct, symbols...)
 
-	eventC, err := s.Serve(ctx)
-
+	err := s.Serve(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case event := <-eventC:
-				book, ok := event.(*models.OrderBookResponse)
-				if ok {
-					s.booksC <- book
-				}
-			default:
-				time.Sleep(time.Microsecond)
-			}
-		}
-	}()
 
 	return s.booksC, nil
 }
@@ -509,27 +475,10 @@ func (s *Stream) SubscribeToFills(ctx context.Context) (chan *models.FillRespons
 		return nil, errors.WithStack(err)
 	}
 
-	eventC, err := s.Serve(ctx)
-
+	err := s.Serve(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case event := <-eventC:
-				fill, ok := event.(*models.FillResponse)
-				if ok {
-					s.fillsC <- fill
-				}
-			default:
-				time.Sleep(time.Microsecond)
-			}
-		}
-	}()
 
 	return s.fillsC, nil
 }
@@ -548,27 +497,10 @@ func (s *Stream) SubscribeToOrders(
 		return nil, errors.WithStack(err)
 	}
 
-	eventC, err := s.Serve(ctx)
-
+	err := s.Serve(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case event := <-eventC:
-				order, ok := event.(*models.OrdersResponse)
-				if ok {
-					s.ordersC <- order
-				}
-			default:
-				time.Sleep(time.Microsecond)
-			}
-		}
-	}()
 
 	return s.ordersC, nil
 }
