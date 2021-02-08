@@ -12,11 +12,21 @@ import (
 )
 
 const (
-	SleepDuration time.Duration = 10 * time.Second
-	USDTSWAP                    = "USDT-PERP"
+	N                      = 5
+	RunTime  time.Duration = 75 * time.Second / 10
+	USDTSWAP               = "USDT-PERP"
 )
 
-func PrepForTest() (*api.Client, *context.Context, chan struct{}) {
+func MakeDoneChan() chan struct{} {
+	done := make(chan struct{})
+	go func() {
+		time.Sleep(RunTime)
+		done <- struct{}{}
+	}()
+	return done
+}
+
+func PrepForTest() (*api.Client, context.Context, chan struct{}) {
 
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
@@ -24,11 +34,11 @@ func PrepForTest() (*api.Client, *context.Context, chan struct{}) {
 	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan struct{})
 	go func() {
-		time.Sleep(SleepDuration)
+		time.Sleep(RunTime)
 		cancel()
 		done <- struct{}{}
 	}()
-	return ftx, &ctx, done
+	return ftx, ctx, done
 }
 
 func PlaceSampleOrders(
@@ -38,7 +48,7 @@ func PlaceSampleOrders(
 		panic("Nil pointer")
 	}
 
-	time.Sleep(SleepDuration / 2)
+	time.Sleep(RunTime / 2)
 
 	perp := &models.Future{}
 	*err = ftx.Futures.GetFutureByName(USDTSWAP, perp)
