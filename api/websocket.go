@@ -546,6 +546,10 @@ func (s *Stream) SubscribeToOrders(
 	return s.ordersC, nil
 }
 
+func (s *Stream) WSConn() *websocket.Conn {
+	return s.conn
+}
+
 func MapToMarketData(event interface{}) (map[string]*models.Market, error) {
 
 	data, ok := event.(json.RawMessage)
@@ -562,15 +566,6 @@ func MapToMarketData(event interface{}) (map[string]*models.Market, error) {
 	}
 
 	return markets.Data, nil
-}
-
-func (tm TrivialMap) StringSlice() []string {
-	i, slc := 0, make([]string, len(tm))
-	for c := range tm {
-		slc[i] = c
-		i++
-	}
-	return slc
 }
 
 func (ws *WsSub) AppendRequests(ct models.ChannelType, symbols ...string) {
