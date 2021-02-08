@@ -230,47 +230,49 @@ func (s *Stream) GetEventResponse(ctx context.Context, msg *models.WsResponse) (
 		return
 	}
 
-	switch msg.ChannelType {
-	case models.TickerChannel:
-		ticker, ok := response.(*models.TickerResponse)
-		if ok && ticker != nil {
-			s.tickersC <- ticker
-		}
-	case models.TradesChannel:
-		trades, ok := response.(*models.TradesResponse)
-		if ok && trades != nil {
-			for _, t := range trades.Trades {
-				s.tradesC <- &models.TradeResponse{
-					Trade:        t,
-					BaseResponse: trades.BaseResponse,
+	go func() {
+		switch msg.ChannelType {
+		case models.TickerChannel:
+			ticker, ok := response.(*models.TickerResponse)
+			if ok && ticker != nil {
+				s.tickersC <- ticker
+			}
+		case models.TradesChannel:
+			trades, ok := response.(*models.TradesResponse)
+			if ok && trades != nil {
+				for _, t := range trades.Trades {
+					s.tradesC <- &models.TradeResponse{
+						Trade:        t,
+						BaseResponse: trades.BaseResponse,
+					}
 				}
 			}
-		}
-	case models.OrderBookChannel:
-		book, ok := response.(*models.OrderBookResponse)
-		if ok && book != nil {
-			s.booksC <- book
-		}
-	case models.MarketsChannel:
-		markets, err := MapToMarketData(response)
-		if err == nil {
-			for _, m := range markets {
-				if m != nil {
-					s.marketsC <- m
+		case models.OrderBookChannel:
+			book, ok := response.(*models.OrderBookResponse)
+			if ok && book != nil {
+				s.booksC <- book
+			}
+		case models.MarketsChannel:
+			markets, err := MapToMarketData(response)
+			if err == nil {
+				for _, m := range markets {
+					if m != nil {
+						s.marketsC <- m
+					}
 				}
 			}
+		case models.FillsChannel:
+			fill, ok := response.(*models.FillResponse)
+			if ok && fill != nil {
+				s.fillsC <- fill
+			}
+		case models.OrdersChannel:
+			order, ok := response.(*models.OrdersResponse)
+			if ok && order != nil {
+				s.ordersC <- order
+			}
 		}
-	case models.FillsChannel:
-		fill, ok := response.(*models.FillResponse)
-		if ok && fill != nil {
-			s.fillsC <- fill
-		}
-	case models.OrdersChannel:
-		order, ok := response.(*models.OrdersResponse)
-		if ok && order != nil {
-			s.ordersC <- order
-		}
-	}
+	}()
 
 	return
 }
