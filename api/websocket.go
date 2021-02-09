@@ -141,10 +141,8 @@ func (s *Stream) AuthorizeSubscribe() (err error) {
 
 func (s *Stream) Connect(requests ...models.WSRequest) (err error) {
 
-	if s.conn == nil {
-		if err = s.CreateNewConnection(); err != nil {
-			return
-		}
+	if err = s.CreateNewConnection(); err != nil {
+		return
 	}
 
 	s.printf("connected to %v", s.url)
