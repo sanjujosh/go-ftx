@@ -126,19 +126,6 @@ func (s *Stream) Authorize() (err error) {
 	return
 }
 
-func (s *Stream) AuthorizeSubscribe() (err error) {
-
-	if err = s.Authorize(); err != nil {
-		return
-	}
-
-	if err = s.sub(); err != nil {
-		return errors.WithStack(err)
-	}
-
-	return
-}
-
 func (s *Stream) Connect(requests ...models.WSRequest) (err error) {
 
 	if err = s.CreateNewConnection(); err != nil {
@@ -314,7 +301,10 @@ func (s *Stream) Subscribe() (err error) {
 		for _, r := range s.WsSub.Requests {
 			ct := r.ChannelType
 			if ct == models.FillsChannel || ct == models.OrdersChannel {
-				return s.AuthorizeSubscribe()
+				if err = s.Authorize(); err != nil {
+					return
+				}
+				break
 			}
 		}
 	}
