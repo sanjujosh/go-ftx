@@ -4,28 +4,31 @@ import (
 	"os"
 	"testing"
 
-	"github.com/joho/godotenv"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
 )
 
 func TestSubAccounts_CRUD(t *testing.T) {
-	godotenv.Load()
 
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	nickname := "testSubAccount"
 	newNickname := "newTestSubAccount"
 
 	subs, err := ftx.SubAccounts.GetSubaccounts()
-	assert.NoError(t, err)
-	assert.NotNil(t, subs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if subs == nil {
+		t.Fatal("subs should not be nil")
+	}
+
 	for _, sub := range subs {
 		t.Logf("Subaccount: %+v\n", *sub)
 		if sub.Nickname == nickname || sub.Nickname == newNickname {
@@ -38,11 +41,21 @@ func TestSubAccounts_CRUD(t *testing.T) {
 	}
 
 	sub, err := ftx.SubAccounts.CreateSubaccount(nickname)
-	assert.NoError(t, err)
-	assert.NotNil(t, sub)
-	assert.Equal(t, nickname, sub.Nickname)
-	assert.True(t, sub.Deletable)
-	assert.True(t, sub.Editable)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if sub == nil {
+		t.Fatal("sub should not be nil")
+	}
+	if sub.Nickname != nickname {
+		t.Fatalf("Wrong nickname: %s, %s", sub.Nickname, nickname)
+	}
+	if !sub.Deletable {
+		t.Fatal("Not deletable")
+	}
+	if !sub.Editable {
+		t.Fatal("Not editable")
+	}
 	t.Logf("Subaccount: %+v\n", *sub)
 
 	ftx.SubAccount = api.PtrString(nickname)
@@ -64,26 +77,45 @@ func TestSubAccounts_CRUD(t *testing.T) {
 	ftx.SubAccount = nil
 
 	balances, err := ftx.SubAccounts.GetSubaccountBalances(nickname)
-	assert.NoError(t, err)
-	assert.NotNil(t, balances)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if balances == nil {
+		t.Fatal("balance should not be nil")
+	}
+
 	for _, bal := range balances {
 		t.Logf("Balance: %+v\n", *bal)
 	}
 
 	result, err := ftx.SubAccounts.ChangeSubaccount(nickname, newNickname)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Logf("Update result: %+v\n", result)
 
 	result, err = ftx.SubAccounts.DeleteSubaccount(newNickname)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Logf("Delete result: %+v\n", result)
 
 	subs, err = ftx.SubAccounts.GetSubaccounts()
-	assert.NoError(t, err)
-	assert.NotNil(t, subs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if subs == nil {
+		t.Fatal("subs should not be nil")
+	}
+
 	for _, sub := range subs {
-		require.True(t, sub.Nickname != nickname)
-		require.True(t, sub.Nickname != newNickname)
+		if sub.Nickname == nickname {
+			t.Fatal("Wrong nickname: %s, %s", sub.Nickname, newNickname)
+		}
+		if sub.Nickname != newNickname {
+			t.Fatal("Wrong nickname: %s, %s", sub.Nickname, newNickname)
+		}
 		t.Logf("Check subaccount: %+v\n", *sub)
 	}
 }

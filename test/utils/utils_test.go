@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	"github.com/stretchr/testify/require"
 
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
@@ -78,14 +77,24 @@ func TestPrepareQueryParams(t *testing.T) {
 		msg := fmt.Sprintf("test #%d", i+1)
 		result, err := api.PrepareQueryParams(test.params)
 		if err != nil {
-			require.NotNil(t, test.err)
-			require.Equal(t, test.err.Error(), err.Error(), msg)
+			if test.err == nil {
+				t.Fatal("test err should be nil")
+			}
+			if test.err.Error() != err.Error() {
+				t.Fatalf("Should be equal: %s, %s - %s", test.err.Error(), err.Error(), msg)
+			}
 		}
-		require.Len(t, result, len(test.expected), msg)
+		if len(result) != len(test.expected) {
+			t.Fatalf("Length inequality: %d, %d, %s", len(result), len(test.expected), msg)
+		}
 		for k, v := range test.expected {
 			value, ok := result[k]
-			require.Equal(t, true, ok, msg)
-			require.Equal(t, v, value, msg)
+			if !ok {
+				t.Fatalf("Could not find result: %s, %s", k, msg)
+			}
+			if v != value {
+				t.Fatalf("Should be equal: %+v, %+v, %s", v, value, msg)
+			}
 		}
 	}
 }

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	"github.com/stretchr/testify/require"
 
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
@@ -20,7 +19,6 @@ func TestFills_GetFills(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	require.NoError(t, err)
 	/*
 		for _, side := range []models.Side{models.Buy, models.Sell} {
 			_, err := ftx.Orders.PlaceOrder(&models.OrderParams{

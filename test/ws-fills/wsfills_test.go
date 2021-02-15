@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/require"
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
 	"github.com/uscott/go-ftx/test"
@@ -19,10 +18,14 @@ func Test_Fills(t *testing.T) {
 	var err error
 
 	go test.PlaceSampleOrders(ftx, t, test.USDTSWAP, decimal.NewFromInt(1), &err)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	fillC, err := ftx.Stream.SubscribeToFills(ctx)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for {
 		select {

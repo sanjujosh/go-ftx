@@ -5,8 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/test"
 )
@@ -24,16 +22,24 @@ func Test_WS(t *testing.T) {
 	symbols := []string{"BTC-PERP", "BTC/USD", "FTT-PERP", "FTT/USD"}
 
 	tickerC, err := client.Stream.SubscribeToTickers(ctx, symbols...)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	marketsC, err := client.Stream.SubscribeToMarkets(ctx)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tradesC, err := client.Stream.SubscribeToTrades(ctx, symbols...)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	booksC, err := client.Stream.SubscribeToOrderBooks(ctx, symbols...)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	done := test.MakeDoneChan()
 

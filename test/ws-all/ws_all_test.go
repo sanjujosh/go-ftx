@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/require"
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
 	"github.com/uscott/go-ftx/test"
@@ -18,21 +17,33 @@ func Test_WsAll(t *testing.T) {
 
 	var err error
 	go test.PlaceSampleOrders(ftx, t, test.USDTSWAP, decimal.NewFromInt(1), &err)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	symbols := []string{test.USDTSWAP, "BTC-PERP", "BTC/USD"}
 
 	booksC, err := ftx.Stream.SubscribeToOrderBooks(ctx, symbols...)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	fillsC, err := ftx.Stream.SubscribeToFills(ctx)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	marketsC, err := ftx.Stream.SubscribeToMarkets(ctx)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	ordersC, err := ftx.Stream.SubscribeToOrders(ctx, symbols...)
 	tickersC, err := ftx.Stream.SubscribeToTickers(ctx, symbols...)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	tradesC, err := ftx.Stream.SubscribeToTrades(ctx, symbols...)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	ibooks, ifills, imarkets, iorders, itickers, itrades := 0, 0, 0, 0, 0, 0
 	for {

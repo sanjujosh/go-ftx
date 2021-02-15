@@ -5,11 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
@@ -32,17 +30,22 @@ func client(t *testing.T) *api.Client {
 }
 
 func TestOrders_GetOpenOrders(t *testing.T) {
-	godotenv.Load()
 
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	orders, err := ftx.Orders.GetOpenOrders(nil)
-	assert.NoError(t, err)
-	assert.NotNil(t, orders)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if orders == nil {
+		t.Fatal("Orders should not be nil")
+	}
 
 	for i, o := range orders {
 		if i > N {
@@ -53,13 +56,14 @@ func TestOrders_GetOpenOrders(t *testing.T) {
 }
 
 func TestOrders_GetOrdersHistory(t *testing.T) {
-	godotenv.Load()
 
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	limit := 10
 
@@ -69,8 +73,12 @@ func TestOrders_GetOrdersHistory(t *testing.T) {
 		StartTime: nil,
 		EndTime:   nil,
 	})
-	assert.NoError(t, err)
-	assert.NotNil(t, orders)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if orders == nil {
+		t.Fatal("Orders should not be nil")
+	}
 
 	for i, o := range orders {
 		if i > N {
@@ -81,17 +89,22 @@ func TestOrders_GetOrdersHistory(t *testing.T) {
 }
 
 func TestOrders_GetOpenTriggerOrders(t *testing.T) {
-	godotenv.Load()
 
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	orders, err := ftx.Orders.GetOpenTriggerOrders(nil, nil)
-	assert.NoError(t, err)
-	assert.NotNil(t, orders)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if orders == nil {
+		t.Fatal("Orders should not be nil")
+	}
 
 	for i, o := range orders {
 		if i > N {
@@ -102,13 +115,14 @@ func TestOrders_GetOpenTriggerOrders(t *testing.T) {
 }
 
 func TestOrders_GetTriggerOrderTriggers(t *testing.T) {
-	godotenv.Load()
 
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	orderID := int64(1111)
 
@@ -143,7 +157,9 @@ func TestOrders_PlaceOrderModifyAndCancel(t *testing.T) {
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	future := models.Future{}
 	err = ftx.Futures.GetFutureByName(swap, &future)
@@ -195,7 +211,9 @@ func TestOrders_PlaceTriggerOrderModifyAndCancel(t *testing.T) {
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	future := models.Future{}
 	err = ftx.Futures.GetFutureByName(swap, &future)
@@ -249,7 +267,9 @@ func TestOrders_CancelAll(t *testing.T) {
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
 	)
 	err := ftx.SetServerTimeDiff()
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	future, order1, order2 := models.Future{}, models.Order{}, models.Order{}
 	contract := "BTC-0924"
