@@ -7,6 +7,8 @@
 *.idea
 **/*~
 
+/examples/websocket/websocket
+
 # Test binary, built with `go test -c`
 *.test
 
