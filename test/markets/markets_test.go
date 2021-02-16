@@ -4,8 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
 )
@@ -38,7 +36,6 @@ func TestMarkets_GetMarkets(t *testing.T) {
 func TestMarkets_GetMarketByName(t *testing.T) {
 
 	ftx := api.New()
-	req := require.New(t)
 	market := models.Market{}
 
 	expected := &models.Market{
@@ -94,6 +91,10 @@ func TestMarkets_GetTrades(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if trades == nil {
+		t.Fatal("Trades should not be nil")
+	}
+
 	limit := 10
 	trades, err = ftx.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
 		Limit: &limit,
