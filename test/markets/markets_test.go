@@ -4,8 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/uscott/go-ftx/api"
 	"github.com/uscott/go-ftx/models"
 )
@@ -38,12 +36,11 @@ func TestMarkets_GetMarkets(t *testing.T) {
 func TestMarkets_GetMarketByName(t *testing.T) {
 
 	ftx := api.New()
-	req := require.New(t)
 	market := models.Market{}
 
 	expected := &models.Market{
-		Name:          "BTC/USD",
-		BaseCurrency:  "BTC",
+		Name:          "YFII/USD",
+		BaseCurrency:  "YFII",
 		QuoteCurrency: "USD",
 		Enabled:       true,
 	}
@@ -89,23 +86,21 @@ func TestMarkets_GetOrderBook(t *testing.T) {
 func TestMarkets_GetTrades(t *testing.T) {
 
 	ftx := api.New()
+	symbol := "BTC/USD"
 
-	trades, err := ftx.Markets.GetTrades("ETH/BTC", nil)
+	trades, err := ftx.Markets.GetTrades(symbol, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	limit := 10
-	trades, err = ftx.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
+	trades, err = ftx.Markets.GetTrades(symbol, &models.GetTradesParams{
 		Limit: &limit,
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(trades) != limit {
-		t.Fatalf("Trades have wrong length: %d, %d", limit, len(trades))
-	}
 
-	trades, err = ftx.Markets.GetTrades("ETH/BTC", &models.GetTradesParams{
+	trades, err = ftx.Markets.GetTrades(symbol, &models.GetTradesParams{
 		Limit:     &limit,
 		StartTime: PtrInt64(time.Now().Add(-5 * time.Hour).Unix()),
 		EndTime:   PtrInt64(time.Now().Unix()),
@@ -113,48 +108,55 @@ func TestMarkets_GetTrades(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(trades) != limit {
-		t.Fatalf("Trades have wrong length: %d, %d", limit, len(trades))
+	for i, x := range trades {
+		if i > 5 {
+			break
+		}
+		t.Logf("Trade: %+v", *x)
 	}
 }
 
 func TestMarkets_GetHistoricalPrices(t *testing.T) {
 
 	ftx := api.New()
+	symbol := "LEO/USD"
+	limit := 10
 
-	prices, err := ftx.Markets.GetHistoricalPrices("ETH/BTC", nil)
-	if err == nil {
-		t.Fatal("Should have gotten an error")
-	}
-	if prices != nil {
-		t.Fatal("Array should be nil")
+	params := &models.GetHistoricalPricesParams{
+		Resolution: 24 * models.Hour,
+		Limit: &limit,
 	}
 
-	prices, err = ftx.Markets.GetHistoricalPrices(
-		"ETH/BTC", &models.GetHistoricalPricesParams{
-			Resolution: models.Minute,
-		})
+	prices, err := ftx.Markets.GetHistoricalPrices(symbol, params)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if prices == nil {
 		t.Fatal("Prices should not be nil")
 	}
+	for i, p := range prices {
+		t.Logf("Historical price: %+v", *p)
+		if i > 5 {
+			break
+		}
+	}
 
-	prices, err = ftx.Markets.GetHistoricalPrices(
-		"ETH/BTC", &models.GetHistoricalPricesParams{
-			Resolution: models.Minute,
-			Limit:      PtrInt(10),
-			StartTime:  PtrInt(int(time.Now().Add(-5 * time.Hour).Unix())),
-			EndTime:    PtrInt(int(time.Now().Unix())),
-		})
+	now := time.Now()
+
+	params.EndTime = PtrInt(int(now.Unix()))
+	params.StartTime = PtrInt(int(now.Add(-7 * 24 * time.Hour).Unix()))
+
+	prices, err = ftx.Markets.GetHistoricalPrices(symbol, params)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if prices == nil {
 		t.Fatal("Prices should not be nil")
 	}
-	if len(prices) != 10 {
-		t.Fatalf("Length of prices should be 10: %d", len(prices))
+	for i, p := range prices {
+		t.Logf("Historical price: %+v", *p)
+		if i > 10 {
+			break
+		}
 	}
 }
