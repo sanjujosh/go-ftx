@@ -92,6 +92,10 @@ func TestMarkets_GetTrades(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if trades == nil {
+		t.Fatal("Trades should not be nil")
+	}
+
 	limit := 10
 	trades, err = ftx.Markets.GetTrades(symbol, &models.GetTradesParams{
 		Limit: &limit,
