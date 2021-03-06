@@ -3,36 +3,55 @@ package api
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
-func PrepareQueryParams(params interface{}) (map[string]string, error) {
-	result := make(map[string]string)
+const (
+	CommaOmitEmpty string = "," + OmitEmpty
+	OmitEmpty      string = "omit_empty"
+	ZeroString     string = ""
+)
 
-	val := reflect.ValueOf(params).Elem()
+func PrepareQueryParams(params interface{}) (map[string]string, error) {
+
+	result, val := make(map[string]string), reflect.ValueOf(params).Elem()
+
 	if val.Kind() != reflect.Struct {
 		return result, nil
 	}
 
 	for i := 0; i < val.NumField(); i++ {
-		valueField := val.Field(i)
-		typeField := val.Type().Field(i)
-		tag := typeField.Tag.Get("json")
 
-		switch valueField.Kind() {
+		vf := val.Field(i)
+		vt := val.Type().Field(i)
+		tag := vt.Tag.Get("json")
+
+		omitempty := strings.Contains(tag, OmitEmpty)
+		tag = strings.ReplaceAll(
+			strings.ReplaceAll(tag, " ", ZeroString),
+			CommaOmitEmpty,
+			ZeroString,
+		)
+
+		switch vf.Kind() {
 		case reflect.Ptr:
-			if valueField.IsNil() {
+			if vf.IsNil() {
 				continue
 			}
-			result[tag] = fmt.Sprintf("%v", valueField.Elem().Interface())
+			result[tag] = fmt.Sprintf("%v", vf.Elem().Interface())
 		default:
-			if valueField.IsZero() {
-				return result, errors.Errorf("required field: %v", tag)
+			if vf.IsZero() {
+				if omitempty {
+					continue
+				} else {
+					return result, errors.Errorf("Required field: %v", tag)
+				}
 			}
-			result[tag] = fmt.Sprintf("%v", valueField.Interface())
+			result[tag] = fmt.Sprintf("%v", vf.Interface())
 		}
 	}
 

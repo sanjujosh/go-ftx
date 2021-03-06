@@ -249,6 +249,7 @@ func (c *Client) prepareRequest(request Request) (*http.Request, error) {
 }
 
 func (c *Client) do(req *http.Request) ([]byte, error) {
+
 	resp, err := c.client.Do(req)
 	if resp != nil {
 		defer resp.Body.Close()
