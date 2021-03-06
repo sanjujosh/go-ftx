@@ -12,7 +12,7 @@ import (
 
 const (
 	CommaOmitEmpty string = "," + OmitEmpty
-	OmitEmpty      string = "omit_empty"
+	OmitEmpty      string = "omitempty"
 	ZeroString     string = ""
 )
 
