@@ -84,10 +84,10 @@ type FutureExpired struct {
 }
 
 type HistoricalIndexParams struct {
-	Resolution *int `json:"resolution"`
-	Limit      *int `json:"limit,omitempty"`
-	StartTime  *int `json:"start_time,omitempty"`
-	EndTime    *int `json:"end_time,omitempty"`
+	Resolution *int   `json:"resolution"`
+	Limit      *int   `json:"limit,omitempty"`
+	StartTime  *int64 `json:"start_time,omitempty"`
+	EndTime    *int64 `json:"end_time,omitempty"`
 }
 
 type HistoricalIndex struct {
