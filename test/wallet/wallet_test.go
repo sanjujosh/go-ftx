@@ -2,7 +2,9 @@ package testwallet
 
 import (
 	"os"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/uscott/go-ftx/api"
@@ -28,9 +30,14 @@ func TestWallet_GetCoins(t *testing.T) {
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
+
+	leoprinted := false
 	for i, c := range coins {
-		if i > 9 {
+		if i > 9 && leoprinted {
 			return
+		}
+		if strings.Contains(c.ID, "LEO") {
+			leoprinted = true
 		}
 		t.Logf("Coin: %+v\n", *c)
 	}
@@ -67,14 +74,20 @@ func TestWallet_GetDepositHistory(t *testing.T) {
 
 	ftx := prepForTest(t)
 
-	hist, err := ftx.Wallet.GetDepositHistory(&models.DepositHistoryParams{})
+	start := time.Date(2020, 9, 1, 0, 0, 0, 0, time.UTC).Unix()
+	end := time.Now().UTC().Unix()
+
+	pars := &models.DepositHistoryParams{
+		StartTime: &start,
+		EndTime:   &end,
+	}
+
+	hist, err := ftx.Wallet.GetDepositHistory(pars)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	for i, h := range hist {
-		if i > 9 {
-			return
-		}
+
+	for _, h := range hist {
 		t.Logf("Deposit: %+v\n", *h)
 	}
 }
@@ -83,14 +96,19 @@ func TestWallet_GetWithdrawalHistory(t *testing.T) {
 
 	ftx := prepForTest(t)
 
-	hist, err := ftx.Wallet.GetWithdrawalHistory(&models.WithdrawalHistoryParams{})
+	start := time.Date(2020, 9, 1, 0, 0, 0, 0, time.UTC).Unix()
+	end := time.Now().UTC().Unix()
+
+	pars := &models.WithdrawalHistoryParams{
+		StartTime: &start,
+		EndTime:   &end,
+	}
+	hist, err := ftx.Wallet.GetWithdrawalHistory(pars)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	for i, h := range hist {
-		if i > 9 {
-			return
-		}
+
+	for _, h := range hist {
 		t.Logf("Withdrawal: %+v\n", *h)
 	}
 }
