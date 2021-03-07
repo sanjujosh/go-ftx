@@ -45,27 +45,27 @@ type CoinTxBase struct {
 }
 
 type WalletTransaction struct {
-	CoinTxBase `json:"coinTxBase"`
-	Fee        decimal.Decimal `json:"fee"`
-	Notes      string          `json:"notes"`
-	Txid       string          `json:"txid"`
+	*CoinTxBase
+	Fee   decimal.Decimal `json:"fee"`
+	Notes string          `json:"notes"`
+	Txid  string          `json:"txid"`
 }
 
 type DepositHistoryParams NumberTimeLimit
 
 type Deposit struct {
-	WalletTransaction `json:"walletTransaction"`
-	Confirmations     int       `json:"confirmations"`
-	ConfirmedTime     time.Time `json:"confirmedTime"`
-	SentTime          time.Time `json:"sentTime"`
+	*WalletTransaction
+	Confirmations int       `json:"confirmations"`
+	ConfirmedTime time.Time `json:"confirmedTime"`
+	SentTime      time.Time `json:"sentTime"`
 }
 
 type WithdrawalHistoryParams DepositHistoryParams
 
 type Withdrawal struct {
-	WalletTransaction `json:"walletTransaction"`
-	Address           string `json:"address"`
-	Tag               string `json:"tag"`
+	*WalletTransaction
+	Address string `json:"address"`
+	Tag     string `json:"tag"`
 }
 
 type RequestWithdrawalParams struct {
@@ -79,7 +79,13 @@ type RequestWithdrawalParams struct {
 
 type AirDropParams NumberTimeLimit
 
-type AirDrop CoinTxBase
+type AirDrop struct {
+	Coin   string          `json:"coin"`
+	ID     int64           `json:"id"`
+	Size   decimal.Decimal `json:"size"`
+	Status string          `json:"status"`
+	Time   time.Time       `json:"time"`
+}
 
 type SavedAddressParams struct {
 	Address      *string `json:"address"`
