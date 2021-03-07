@@ -36,36 +36,35 @@ type DepositAddress struct {
 	Tag     string `json:"tag"`
 }
 
-type CoinTxBase struct {
-	Coin   string          `json:"coin"`
-	ID     int64           `json:"id"`
-	Size   decimal.Decimal `json:"size"`
-	Status string          `json:"status"`
-	Time   time.Time       `json:"time"`
-}
-
-type WalletTransaction struct {
-	*CoinTxBase
-	Fee   decimal.Decimal `json:"fee"`
-	Notes string          `json:"notes"`
-	Txid  string          `json:"txid"`
-}
-
 type DepositHistoryParams NumberTimeLimit
 
 type Deposit struct {
-	*WalletTransaction
-	Confirmations int       `json:"confirmations"`
-	ConfirmedTime time.Time `json:"confirmedTime"`
-	SentTime      time.Time `json:"sentTime"`
+	Coin          string          `json:"coin"`
+	ID            int64           `json:"id"`
+	Size          decimal.Decimal `json:"size"`
+	Status        string          `json:"status"`
+	Time          time.Time       `json:"time"`
+	Fee           decimal.Decimal `json:"fee"`
+	Notes         string          `json:"notes"`
+	Txid          string          `json:"txid"`
+	Confirmations int             `json:"confirmations"`
+	ConfirmedTime time.Time       `json:"confirmedTime"`
+	SentTime      time.Time       `json:"sentTime"`
 }
 
 type WithdrawalHistoryParams DepositHistoryParams
 
 type Withdrawal struct {
-	*WalletTransaction
-	Address string `json:"address"`
-	Tag     string `json:"tag"`
+	Coin    string          `json:"coin"`
+	ID      int64           `json:"id"`
+	Size    decimal.Decimal `json:"size"`
+	Status  string          `json:"status"`
+	Time    time.Time       `json:"time"`
+	Fee     decimal.Decimal `json:"fee"`
+	Notes   string          `json:"notes"`
+	Txid    string          `json:"txid"`
+	Address string          `json:"address"`
+	Tag     string          `json:"tag"`
 }
 
 type RequestWithdrawalParams struct {
