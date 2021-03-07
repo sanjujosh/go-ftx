@@ -15,10 +15,16 @@ type Funding struct {
 	client *Client
 }
 
-func (f *Funding) GetFundingPayments(start, end *int64) ([]*models.FundingPayment, error) {
+func (f *Funding) GetFundingPayments(
+	future *string,
+	start, end *int64) ([]*models.FundingPayment, error) {
 
 	url := FormURL(apiGetFundingPayments)
-	params := &models.FundingPaymentParams{StartTime: start, EndTime: end}
+	params := &models.FundingPaymentParams{
+		StartTime: start,
+		EndTime:   end,
+		Future:    future,
+	}
 
 	response, err := f.client.Get(params, url, true)
 	if err != nil {
