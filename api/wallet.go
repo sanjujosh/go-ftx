@@ -103,13 +103,11 @@ func (w *Wallet) GetDepositAddress(
 	return
 }
 
-func (w *Wallet) GetDepositHistory(
-	params *models.DepositHistoryParams,
-) ([]*models.Deposit, error) {
+func (w *Wallet) GetDepositHistory(pars *models.DepositHistoryParams) ([]*models.Deposit, error) {
 
 	url := FormURL(apiGetDepositHistory)
 
-	response, err := w.client.Get(params, url, true)
+	response, err := w.client.Get(pars, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

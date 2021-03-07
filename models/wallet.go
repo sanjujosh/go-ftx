@@ -36,35 +36,36 @@ type DepositAddress struct {
 	Tag     string `json:"tag"`
 }
 
+type CoinTxBase struct {
+	Coin   string          `json:"coin"`
+	ID     int64           `json:"id"`
+	Size   decimal.Decimal `json:"size"`
+	Status string          `json:"status"`
+	Time   time.Time       `json:"time"`
+}
+
+type WalletTransaction struct {
+	CoinTxBase `json:"coinTxBase"`
+	Fee        decimal.Decimal `json:"fee"`
+	Notes      string          `json:"notes"`
+	Txid       string          `json:"txid"`
+}
+
 type DepositHistoryParams NumberTimeLimit
 
 type Deposit struct {
-	Coin          string          `json:"coin"`
-	Confirmations int             `json:"confirmations"`
-	ConfirmedTime time.Time       `json:"confirmedTime"`
-	Fee           decimal.Decimal `json:"fee"`
-	ID            int64           `json:"id"`
-	Notes         string          `json:"notes"`
-	SentTime      time.Time       `json:"sentTime"`
-	Size          decimal.Decimal `json:"size"`
-	Status        string          `json:"status"`
-	Time          time.Time       `json:"time"`
-	Txid          string          `json:"txid"`
+	WalletTransaction `json:"walletTransaction"`
+	Confirmations     int       `json:"confirmations"`
+	ConfirmedTime     time.Time `json:"confirmedTime"`
+	SentTime          time.Time `json:"sentTime"`
 }
 
 type WithdrawalHistoryParams DepositHistoryParams
 
 type Withdrawal struct {
-	Address string          `json:"address"`
-	Coin    string          `json:"coin"`
-	Fee     decimal.Decimal `json:"fee"`
-	ID      int64           `json:"id"`
-	Notes   string          `json:"notes"`
-	Size    decimal.Decimal `json:"size"`
-	Status  string          `json:"status"`
-	Tag     string          `json:"tag"`
-	Time    time.Time       `json:"time"`
-	Txid    string          `json:"txid"`
+	WalletTransaction `json:"walletTransaction"`
+	Address           string `json:"address"`
+	Tag               string `json:"tag"`
 }
 
 type RequestWithdrawalParams struct {
@@ -78,13 +79,7 @@ type RequestWithdrawalParams struct {
 
 type AirDropParams NumberTimeLimit
 
-type AirDrop struct {
-	Coin   string          `json:"coin"`
-	ID     int64           `json:"id"`
-	Size   decimal.Decimal `json:"size"`
-	Status string          `json:"status"`
-	Time   time.Time       `json:"time"`
-}
+type AirDrop CoinTxBase
 
 type SavedAddressParams struct {
 	Address      *string `json:"address"`
