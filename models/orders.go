@@ -28,8 +28,8 @@ type Order struct {
 type OrdersHistoryParams struct {
 	Market    *string `json:"market"`
 	Limit     *int    `json:"limit"`
-	StartTime *int    `json:"start_time"`
-	EndTime   *int    `json:"end_time"`
+	StartTime *int64  `json:"start_time"`
+	EndTime   *int64  `json:"end_time"`
 }
 
 type TriggerOrder struct {

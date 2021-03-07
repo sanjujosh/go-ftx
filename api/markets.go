@@ -112,7 +112,8 @@ func (m *Markets) GetTrades(
 }
 
 func (m *Markets) GetHistoricalPrices(
-	market string, params *models.GetHistoricalPricesParams,
+	market string,
+	params *models.GetHistoricalPricesParams,
 ) ([]*models.HistoricalPrice, error) {
 
 	url := FormURL(fmt.Sprintf(apiGetHistoricalPrices, market))

@@ -89,6 +89,6 @@ type GetTradesParams NumberTimeLimit
 type GetHistoricalPricesParams struct {
 	Resolution Resolution `json:"resolution"`
 	Limit      *int       `json:"limit"`
-	StartTime  *int       `json:"start_time"`
-	EndTime    *int       `json:"end_time"`
+	StartTime  *int64     `json:"start_time"`
+	EndTime    *int64     `json:"end_time"`
 }

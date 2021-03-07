@@ -124,17 +124,18 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 
 	ftx := api.New()
 	symbol := "LEO/USD"
-	limit := 10
+	limit, resolution := 1000, models.Resolution(24*models.Hour)
 
 	params := &models.GetHistoricalPricesParams{
-		Resolution: 24 * models.Hour,
-		Limit: &limit,
+		Resolution: resolution,
+		Limit:      &limit,
 	}
 
 	prices, err := ftx.Markets.GetHistoricalPrices(symbol, params)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	if prices == nil {
 		t.Fatal("Prices should not be nil")
 	}
@@ -145,10 +146,12 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 		}
 	}
 
-	now := time.Now()
-
-	params.EndTime = PtrInt(int(now.Unix()))
-	params.StartTime = PtrInt(int(now.Add(-7 * 24 * time.Hour).Unix()))
+	now := time.Now().UTC().Unix()
+	start := now - 3600
+	params.EndTime = &now
+	params.StartTime = &start
+	resolution = models.Resolution(15)
+	params.Resolution = resolution
 
 	prices, err = ftx.Markets.GetHistoricalPrices(symbol, params)
 	if err != nil {
@@ -157,6 +160,7 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 	if prices == nil {
 		t.Fatal("Prices should not be nil")
 	}
+
 	for i, p := range prices {
 		t.Logf("Historical price: %+v", *p)
 		if i > 10 {
