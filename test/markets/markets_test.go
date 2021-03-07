@@ -139,6 +139,9 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 	if prices == nil {
 		t.Fatal("Prices should not be nil")
 	}
+
+	t.Logf("Length: %d", len(prices))
+
 	for i, p := range prices {
 		t.Logf("Historical price: %+v", *p)
 		if i > 5 {
@@ -160,6 +163,8 @@ func TestMarkets_GetHistoricalPrices(t *testing.T) {
 	if prices == nil {
 		t.Fatal("Prices should not be nil")
 	}
+
+	t.Logf("Length: %d", len(prices))
 
 	for i, p := range prices {
 		t.Logf("Historical price: %+v", *p)
