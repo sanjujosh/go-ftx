@@ -34,14 +34,14 @@ func TestFutures_GetFutures(t *testing.T) {
 	}
 }
 
-const futName string = "BTC-PERP"
+const fut string = "YFII-PERP"
 
 func TestFutures_GetFutureByName(t *testing.T) {
 
 	ftx := api.New()
 
 	future := models.Future{}
-	err := ftx.Futures.GetFutureByName(futName, &future)
+	err := ftx.Futures.GetFutureByName(fut, &future)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
@@ -52,11 +52,11 @@ func TestFutures_GetFutureStats(t *testing.T) {
 
 	ftx := api.New()
 	stats := models.FutureStats{}
-	err := ftx.Futures.GetFutureStats(futName, &stats)
+	err := ftx.Futures.GetFutureStats(fut, &stats)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	t.Logf("%s stats: %+v\n", futName, stats)
+	t.Logf("%s stats: %+v\n", fut, stats)
 }
 
 func TestFutures_GetFundingRates(t *testing.T) {
@@ -76,26 +76,29 @@ func TestFutures_GetFundingRates(t *testing.T) {
 
 }
 
-const index string = "BTC"
-
 func TestFutures_GetIndexWeights(t *testing.T) {
 
-	ftx := api.New()
+	/*
+		ftx := api.New()
+		index := "BTC-PERP"
 
-	weights, err := ftx.Futures.GetIndexWeights(index)
-	if err != nil {
-		t.Fatal(errors.WithStack(err))
-	}
-	t.Logf("Weights: %+v\n", weights)
+		weights, err := ftx.Futures.GetIndexWeights(index)
+		if err != nil {
+			t.Fatal(errors.WithStack(err))
+		}
+		t.Logf("Weights: %+v\n", weights)
+	*/
 }
 
 func TestFutures_GetExpiredFutures(t *testing.T) {
 
 	ftx := api.New()
+
 	futures, err := ftx.Futures.GetExpiredFutures()
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
+
 	for i, p := range futures {
 		if p == nil {
 			t.Fatal("nil pointer")
@@ -110,25 +113,30 @@ func TestFutures_GetExpiredFutures(t *testing.T) {
 func TestFutures_GetHistoricalIndex(t *testing.T) {
 
 	ftx := api.New()
-	limit, resolution, now := 30, 60, time.Now()
+
+	index := "BTC"
+	resolution := 60
+	start := time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC).Unix()
+	end := start + 60
+
 	histIndex, err := ftx.Futures.GetHistoricalIndex(
 		index,
 		&models.HistoricalIndexParams{
 			Resolution: api.PtrInt(resolution),
-			Limit:      api.PtrInt(limit),
-			StartTime:  api.PtrInt(int(now.Add(-5 * time.Hour).Unix())),
-			EndTime:    api.PtrInt(int(now.Unix())),
+			StartTime:  &start,
+			EndTime:    &end,
 		})
+
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
-	for i, p := range histIndex {
+
+	t.Logf("Length: %d", len(histIndex))
+
+	for _, p := range histIndex {
 		if p == nil {
 			t.Fatal("nil pointer")
 		}
 		t.Logf("Historical Index: %+v\n", *p)
-		if i > 10 {
-			break
-		}
 	}
 }
