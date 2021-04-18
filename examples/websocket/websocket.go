@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/uscott/go-clog"
 	"github.com/uscott/go-ftx/api"
 )
 
@@ -26,7 +27,7 @@ func main() {
 	defer cancel()
 
 	client := api.New()
-	client.Stream.SetDebugMode(true)
+	client.Logger.SetLevel(clog.DebugLevel)
 
 	tickersC, err := client.Stream.SubscribeToTickers(ctx, symbols...)
 	if err != nil {
