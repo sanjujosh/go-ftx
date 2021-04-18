@@ -266,12 +266,6 @@ func (s *Stream) Reconnect(ctx context.Context) (err error) {
 	return errors.New("Reconnection failed")
 }
 
-func (s *Stream) SetDebugMode(isDebugMode bool) {
-	s.mu.Lock()
-	s.isDebugMode = isDebugMode
-	s.mu.Unlock()
-}
-
 func (s *Stream) SetReconnectionCount(count int) {
 	s.mu.Lock()
 	s.wsReconnectionCount = count
