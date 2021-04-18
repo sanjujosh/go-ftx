@@ -6,7 +6,11 @@
 *.dylib
 *.idea
 
+*.swp
+
 **/*~
+
+**/log
 
 examples/rest/rest
 examples/websocket/websocket
