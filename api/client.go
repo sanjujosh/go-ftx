@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/uscott/go-clog"
 )
 
 const (
@@ -54,6 +55,7 @@ type Client struct {
 	secret         string
 	serverTimeDiff time.Duration
 	SubAccount     *string
+	Logger         *clog.Logger
 	Buf            *bytes.Buffer
 	Account
 	Convert
@@ -75,6 +77,7 @@ func New(opts ...Option) *Client {
 
 	client := &Client{
 		client: http.DefaultClient,
+		Logger: clog.New(),
 		Buf:    bytes.NewBuffer(make([]byte, 128)),
 	}
 	for _, opt := range opts {

@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -33,7 +32,6 @@ type Stream struct {
 	dialer                 *websocket.Dialer
 	wsReconnectionCount    int
 	wsReconnectionInterval time.Duration
-	isDebugMode            bool
 	isLoggedIn             bool
 	WsSub                  *WsSub
 	tickersC               chan *models.TickerResponse
@@ -132,7 +130,7 @@ func (s *Stream) Connect(requests ...models.WSRequest) (err error) {
 		return
 	}
 
-	s.printf("connected to %v", s.url)
+	s.client.Logger.Debugf("connected to %v", s.url)
 
 	if err = s.Subscribe(); err != nil {
 		return errors.WithStack(err)
@@ -145,10 +143,10 @@ func (s *Stream) Connect(requests ...models.WSRequest) (err error) {
 			if time.Since(lastPong) > websocketTimeout {
 				// TODO handle this case
 				errmsg := "PONG response time has been exceeded"
-				s.printf(errmsg)
+				s.client.Logger.Debug(errmsg)
 				return errors.New(errmsg) // Handled?
 			}
-			s.printf("PONG")
+			s.client.Logger.Debug("PONG")
 			return nil
 		})
 	return nil
@@ -200,14 +198,14 @@ func (s *Stream) GetEventResponse(ctx context.Context, msg *models.WsResponse) (
 
 	if err = s.conn.ReadJSON(&msg); err != nil {
 
-		s.printf("read msg: %v", err)
+		s.client.Logger.Debugf("read msg: %v", err)
 
 		if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 			return
 		}
 
 		if err = s.Reconnect(ctx); err != nil {
-			s.printf("reconnect: %+v", err)
+			s.client.Logger.Debugf("reconnect: %+v", err)
 			return
 		}
 
@@ -312,12 +310,6 @@ func (s *Stream) Subscribe() (err error) {
 	return s.sub()
 }
 
-func (s *Stream) printf(format string, v ...interface{}) {
-	if s.isDebugMode {
-		log.Printf(fmt.Sprintf("%s%s", format, "\n"), v)
-	}
-}
-
 func (s *Stream) SendToChannel(ct models.ChannelType, response interface{}) {
 
 	switch ct {
@@ -396,7 +388,7 @@ func (s *Stream) Serve(ctx context.Context) (err error) {
 					websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 
 				if err != nil {
-					s.printf("write close msg: %v", err)
+					s.client.Logger.Debugf("write close msg: %v", err)
 					s.client.mu.Unlock()
 					return
 				}
@@ -408,7 +400,7 @@ func (s *Stream) Serve(ctx context.Context) (err error) {
 
 			case <-time.After(pingPeriod):
 
-				s.printf("PING")
+				s.client.Logger.Debug("PING")
 
 				s.client.mu.Lock()
 				err = s.conn.WriteControl(
@@ -417,7 +409,7 @@ func (s *Stream) Serve(ctx context.Context) (err error) {
 					time.Now().UTC().Add(10*time.Second))
 
 				if err != nil && err != websocket.ErrCloseSent {
-					s.printf("write ping: %v", err)
+					s.client.Logger.Debugf("write ping: %v", err)
 				}
 				s.client.mu.Unlock()
 
