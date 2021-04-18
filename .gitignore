@@ -7,9 +7,9 @@
 *.idea
 
 **/*~
-go.sum
 
-/examples/websocket/websocket
+examples/rest/rest
+examples/websocket/websocket
 
 # Test binary, built with `go test -c`
 *.test
