@@ -95,10 +95,14 @@ func main() {
 ```
 
 ### Websocket Debug Mode
-If needed, it is possible to set debug mode to look at error and system messages in stream methods
+
+The client now uses package go-clog which is a minor extension of https://github.com/sirupsen/logrus for logging.
+
+Debug messages or others can be logged via the logger.
+
 ```go
     client := ftx.New()
-    client.Stream.SetDebugMode(true)
+    client.Logger.SetLevel(clog.DebugLevel) // Exactly like logrus.DebugLevel
 ```
 
 ### No Logged In Error
