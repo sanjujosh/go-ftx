@@ -64,14 +64,22 @@ func (c *Convert) AcceptQuote(id int64) error {
 
 	path := fmt.Sprintf(apiAcceptQuote, id)
 
-	_, err := c.client.prepareRequest(Request{
+	request, err := c.client.prepareRequest(Request{
 		Auth:       true,
 		Method:     http.MethodPost,
 		URL:        fmt.Sprintf("%s%s", apiUrl, path),
 		SubAccount: c.client.SubAccount,
 	})
+
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	_, errReq := c.client.do(request)
+
+	if errReq != nil {
+		return errors.WithStack(errReq)
+	}
+
 	return nil
 }
