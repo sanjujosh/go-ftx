@@ -1,4 +1,4 @@
-module github.com/jmvermeulen/go-ftx
+module github.com/uscott/go-ftx
 
 go 1.16
 
