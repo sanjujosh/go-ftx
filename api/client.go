@@ -45,7 +45,9 @@ func WithAuth(key, secret string) Option {
 
 func SetSubAccount(nickname string) Option {
 	return func(c *Client) {
-		c.SubAccount = &nickname
+		if len(nickname) > 0 {
+			c.SubAccount = &nickname
+		}
 	}
 }
 
