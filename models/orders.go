@@ -88,7 +88,7 @@ type OrderParams struct {
 	ReduceOnly *bool            `json:"reduceOnly,omitempty"`
 	IOC        *bool            `json:"ioc,omitempty"`
 	PostOnly   *bool            `json:"postOnly,omitempty"`
-	ClientID   *string          `json:"clienId,omitempty"`
+	ClientID   *string          `json:"clientId,omitempty"`
 }
 
 type TriggerOrderParams struct {
