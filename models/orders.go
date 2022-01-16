@@ -121,6 +121,7 @@ type CancelOrderParams struct {
 
 type CancelAllParams struct {
 	Market                *string `json:"market,omitempty"`
+	Side                  *string `json:"side,omitempty"`
 	ConditionalOrdersOnly *bool   `json:"conditionalOrdersOnly,omitempty"`
 	LimitOrdersOnly       *bool   `json:"limitOrdersOnly"`
 }
