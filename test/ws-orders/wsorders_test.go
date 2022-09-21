@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sanjujosh/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/models"
+	"github.com/sanjujosh/go-ftx/test"
 	"github.com/shopspring/decimal"
-	"github.com/uscott/go-ftx/api"
-	"github.com/uscott/go-ftx/models"
-	"github.com/uscott/go-ftx/test"
 )
 
 func Test_Orders(t *testing.T) {

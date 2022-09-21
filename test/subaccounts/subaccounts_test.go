@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/uscott/go-ftx/api"
-	"github.com/uscott/go-ftx/models"
+	"github.com/sanjujosh/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/models"
 )
 
 func TestSubAccounts_CRUD(t *testing.T) {

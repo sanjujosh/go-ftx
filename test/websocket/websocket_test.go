@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/uscott/go-ftx/api"
-	"github.com/uscott/go-ftx/test"
+	"github.com/sanjujosh/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/test"
 )
 
 func sleep() { time.Sleep(time.Microsecond) }
@@ -17,7 +17,6 @@ func Test_WS(t *testing.T) {
 	defer cancel()
 
 	client := api.New()
-	client.Stream.SetDebugMode(true)
 
 	symbols := []string{"BTC-PERP", "BTC/USD", "FTT-PERP", "FTT/USD"}
 

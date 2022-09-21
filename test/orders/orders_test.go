@@ -9,8 +9,8 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/uscott/go-ftx/api"
-	"github.com/uscott/go-ftx/models"
+	"github.com/sanjujosh/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/models"
 )
 
 const (

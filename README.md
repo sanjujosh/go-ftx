@@ -1,7 +1,7 @@
 # go-ftx
 FTX exchange golang library
 
-Forked from https://github.com/grishinsana/goftx
+Forked from https://github.com/uscott/go-ftx
 
 This is a full implementation of the FTX REST and Websocket API.
 
@@ -25,8 +25,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/uscott/go-ftx/api"
-	"github.com/uscott/go-ftx/models"
+	"github.com/sanjujosh/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/models"
 )
 
 func main() {
@@ -62,8 +62,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/uscott/go-clog"
-	"github.com/uscott/go-ftx/api"
+	"github.com/sanjujosh/go-clog"
+	"github.com/sanjujosh/go-ftx/api"
 )
 
 var symbols []string = []string{"BTC-PERP", "BTC/USD"}

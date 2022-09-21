@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/uscott/go-ftx/api"
-	"github.com/uscott/go-ftx/models"
+	"github.com/sanjujosh/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/models"
 )
 
 const N = 9

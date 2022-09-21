@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/uscott/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/api"
 )
 
 func TestClient_GetServerTime(t *testing.T) {

@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sanjujosh/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/models"
 	"github.com/shopspring/decimal"
-	"github.com/uscott/go-ftx/api"
-	"github.com/uscott/go-ftx/models"
 )
 
 const (

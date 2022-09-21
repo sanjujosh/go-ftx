@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	"github.com/uscott/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/api"
 )
 
 func client(t *testing.T) *api.Client {

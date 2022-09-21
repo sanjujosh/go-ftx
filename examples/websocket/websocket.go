@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/sanjujosh/go-ftx/api"
 	"github.com/uscott/go-clog"
-	"github.com/uscott/go-ftx/api"
 )
 
 var symbols []string = []string{"BTC-PERP", "BTC/USD"}

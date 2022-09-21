@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/sanjujosh/go-ftx/models"
 	"github.com/shopspring/decimal"
-	"github.com/uscott/go-ftx/models"
 )
 
 type Convert struct {

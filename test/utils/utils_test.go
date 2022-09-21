@@ -6,8 +6,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/uscott/go-ftx/api"
-	"github.com/uscott/go-ftx/models"
+	"github.com/sanjujosh/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/models"
 )
 
 func TestPrepareQueryParams(t *testing.T) {
@@ -60,8 +60,8 @@ func TestPrepareQueryParams(t *testing.T) {
 			params: &models.GetHistoricalPricesParams{
 				Resolution: models.Minute,
 				Limit:      api.PtrInt(10),
-				StartTime:  api.PtrInt(20),
-				EndTime:    api.PtrInt(0),
+				StartTime:  api.PtrInt64(20),
+				EndTime:    api.PtrInt64(0),
 			},
 			expected: map[string]string{
 				"resolution": "60",

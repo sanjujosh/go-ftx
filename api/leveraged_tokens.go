@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	"github.com/sanjujosh/go-ftx/models"
 	"github.com/shopspring/decimal"
-	"github.com/uscott/go-ftx/models"
 )
 
 const (

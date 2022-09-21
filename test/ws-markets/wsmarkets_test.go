@@ -5,13 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/uscott/go-ftx/api"
+	"github.com/sanjujosh/go-ftx/api"
 )
 
 func Test_WsMarkets(t *testing.T) {
 
 	client := api.New()
-	client.Stream.SetDebugMode(true)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

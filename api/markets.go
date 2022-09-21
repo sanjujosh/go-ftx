@@ -8,7 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/uscott/go-ftx/models"
+	"github.com/sanjujosh/go-ftx/models"
 	"github.com/uscott/go-tools/errs"
 )
 
