@@ -33,7 +33,7 @@ type Orders struct {
 	client *Client
 }
 
-func (o *Orders) GetOpenOrders(market *string) ([]*models.Order, error) {
+func (o *Orders) GetOpenOrders(market string) ([]*models.Order, error) {
 
 	var (
 		err      error
@@ -41,7 +41,7 @@ func (o *Orders) GetOpenOrders(market *string) ([]*models.Order, error) {
 	)
 	url := FormURL(apiGetOpenOrders)
 
-	if market == nil {
+	if market == "" {
 		response, err = o.client.Get(nil, url, true)
 		if err != nil {
 			return nil, errors.WithStack(err)
@@ -53,7 +53,7 @@ func (o *Orders) GetOpenOrders(market *string) ([]*models.Order, error) {
 			URL:        url,
 			SubAccount: o.client.SubAccount,
 			Params: map[string]string{
-				"market": *market,
+				"market": market,
 			},
 		})
 		if err != nil {

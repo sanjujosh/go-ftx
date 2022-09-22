@@ -1,6 +1,9 @@
 package models
 
-import "github.com/shopspring/decimal"
+import (
+	"fmt"
+	"github.com/shopspring/decimal"
+)
 
 type AccountInformation struct {
 	BackstopProvider             bool            `json:"backstopProvider"`
@@ -36,4 +39,8 @@ type Position struct {
 	Size                         decimal.Decimal `json:"size"`
 	UnrealizedPnl                decimal.Decimal `json:"unrealizedPnl"`
 	CollateralUsed               decimal.Decimal `json:"collateralUsed"`
+}
+
+func (p Position) String() string {
+	return fmt.Sprintf("Future:%v Entry:%v Size:%v Side:%v", p.Future, p.EntryPrice, p.Size, p.Side)
 }

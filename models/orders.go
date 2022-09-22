@@ -80,15 +80,15 @@ type TriggerOrdersHistoryParams struct {
 }
 
 type OrderParams struct {
-	Market     *string          `json:"market"`
-	Side       *string          `json:"side"`
-	Price      *decimal.Decimal `json:"price"`
-	Type       *string          `json:"type"`
-	Size       *decimal.Decimal `json:"size"`
-	ReduceOnly *bool            `json:"reduceOnly,omitempty"`
-	IOC        *bool            `json:"ioc,omitempty"`
-	PostOnly   *bool            `json:"postOnly,omitempty"`
-	ClientID   *string          `json:"clientId,omitempty"`
+	Market     string          `json:"market"`
+	Side       OrderSide       `json:"side"`
+	Price      decimal.Decimal `json:"price"`
+	Type       OrderType       `json:"type"`
+	Size       decimal.Decimal `json:"size"`
+	ReduceOnly bool            `json:"reduceOnly,omitempty"`
+	IOC        bool            `json:"ioc,omitempty"`
+	PostOnly   bool            `json:"postOnly,omitempty"`
+	ClientID   string          `json:"clientId,omitempty"`
 }
 
 type TriggerOrderParams struct {

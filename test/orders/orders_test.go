@@ -2,26 +2,39 @@ package testorders
 
 import (
 	"os"
+	"path"
 	"testing"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/sanjujosh/go-ftx/api"
 	"github.com/sanjujosh/go-ftx/models"
+	"github.com/shopspring/decimal"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
-	swap = "BTC-PERP"
+	swap = "USDT-PERP"
 	N    = 5
 )
 
 func client(t *testing.T) *api.Client {
 
+	// Load the config from user's home directory
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = godotenv.Load(path.Join(homeDir, ".custom_project_config", ".go-ftx", ".env"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	ftx := api.New(
 		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
+		api.SetSubAccount(os.Getenv("FTX_PROD_MAIN_ACC")),
 	)
 	if err := ftx.SetServerTimeDiff(); err != nil {
 		t.Fatal(errors.WithStack(err))
@@ -31,15 +44,14 @@ func client(t *testing.T) *api.Client {
 
 func TestOrders_GetOpenOrders(t *testing.T) {
 
-	ftx := api.New(
-		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
-	)
+	ftx := client(t)
+
 	err := ftx.SetServerTimeDiff()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	orders, err := ftx.Orders.GetOpenOrders(nil)
+	orders, err := ftx.Orders.GetOpenOrders("")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -153,9 +165,8 @@ func TestOrders_GetTriggerOrdersHistory(t *testing.T) {
 
 func TestOrders_PlaceOrderModifyAndCancel(t *testing.T) {
 
-	ftx := api.New(
-		api.WithAuth(os.Getenv("FTX_PROD_MAIN_KEY"), os.Getenv("FTX_PROD_MAIN_SECRET")),
-	)
+	ftx := client(t)
+
 	err := ftx.SetServerTimeDiff()
 	if err != nil {
 		t.Fatal(err)
@@ -169,23 +180,23 @@ func TestOrders_PlaceOrderModifyAndCancel(t *testing.T) {
 
 	bid, _ := future.Bid.Float64()
 
-	order, price := models.Order{}, decimal.NewFromFloat(bid-100)
-	orderType, size := models.LimitOrder, decimal.NewFromFloat(0.01)
+	order, price := models.Order{}, decimal.NewFromFloat(bid-0.50)
+	orderType, size := models.LimitOrder, decimal.NewFromFloat(1)
 
 	err = ftx.Orders.PlaceOrder(&models.OrderParams{
-		Market:   api.PtrString(swap),
-		Side:     api.PtrString(string(models.Buy)),
-		Price:    &price,
-		Type:     api.PtrString(string(orderType)),
-		Size:     &size,
-		PostOnly: api.PtrBool(true),
+		Market:   swap,
+		Side:     models.Buy,
+		Price:    price,
+		Type:     orderType,
+		Size:     size,
+		PostOnly: true,
 	}, &order)
 	if err != nil {
 		t.Fatal(errors.WithStack(err))
 	}
 	t.Logf("Place Order Result: %+v\n", order)
 	orderID := order.ID
-	price = price.Sub(decimal.NewFromInt(100))
+	price = price.Sub(decimal.NewFromFloat(0.25))
 	err = ftx.Orders.ModifyOrder(
 		orderID,
 		&models.ModifyOrderParams{
@@ -283,12 +294,12 @@ func TestOrders_CancelAll(t *testing.T) {
 		price := future.Bid.Sub(decimal.NewFromFloat(1000))
 
 		err = ftx.Orders.PlaceOrder(&models.OrderParams{
-			Market:   api.PtrString(c),
-			Side:     api.PtrString(string(models.Buy)),
-			Price:    &price,
-			Type:     api.PtrString(string(models.LimitOrder)),
-			Size:     api.PtrDecimal(decimal.NewFromFloat(0.01)),
-			PostOnly: api.PtrBool(true),
+			Market:   c,
+			Side:     models.Buy,
+			Price:    price,
+			Type:     models.LimitOrder,
+			Size:     decimal.NewFromFloat(0.01),
+			PostOnly: true,
 		}, o)
 
 		if err != nil {
