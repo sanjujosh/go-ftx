@@ -56,12 +56,12 @@ func PlaceSampleOrders(
 	o := &models.Order{}
 
 	e := ftx.Orders.PlaceOrder(&models.OrderParams{
-		Market:   api.PtrString(USDTSWAP),
-		Side:     api.PtrString(string(models.Buy)),
-		Price:    api.PtrDecimal(bid.Sub(incr)),
-		Type:     api.PtrString(string(models.LimitOrder)),
-		Size:     &size,
-		PostOnly: api.PtrBool(false),
+		Market:   USDTSWAP,
+		Side:     models.Buy,
+		Price:    bid.Sub(incr),
+		Type:     models.LimitOrder,
+		Size:     size,
+		PostOnly: false,
 	}, o)
 	if e != nil {
 		t.Log(e.Error())
@@ -69,12 +69,12 @@ func PlaceSampleOrders(
 	oidbid := o.ID
 
 	e = ftx.Orders.PlaceOrder(&models.OrderParams{
-		Market:   api.PtrString(USDTSWAP),
-		Side:     api.PtrString(string(models.Sell)),
-		Price:    api.PtrDecimal(ask.Add(incr)),
-		Type:     api.PtrString(string(models.LimitOrder)),
-		Size:     &size,
-		PostOnly: api.PtrBool(false),
+		Market:   USDTSWAP,
+		Side:     models.Sell,
+		Price:    ask.Add(incr),
+		Type:     models.LimitOrder,
+		Size:     size,
+		PostOnly: false,
 	}, o)
 	if e != nil {
 		t.Log(e.Error())

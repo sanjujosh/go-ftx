@@ -41,7 +41,12 @@ func (a *Account) GetAccountInformation(result *models.AccountInformation) (err 
 func (a *Account) GetPositions() ([]*models.Position, error) {
 
 	url := FormURL(apiGetPositions)
-	response, err := a.client.Get(nil, url, true)
+	// Show average Entry Price
+	params := &struct {
+		ShowAvgPrice bool `json:"showAvgPrice"`
+	}{ShowAvgPrice: true}
+
+	response, err := a.client.Get(params, url, true)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

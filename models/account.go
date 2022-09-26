@@ -25,6 +25,8 @@ type AccountInformation struct {
 
 type Position struct {
 	Cost                         decimal.Decimal `json:"cost"`
+	CumulativeBuySize            decimal.Decimal `json:"cumulativeBuySize"`
+	CumulativeSellSize           decimal.Decimal `json:"cumulativeSellSize"`
 	EntryPrice                   decimal.Decimal `json:"entryPrice"`
 	EstimatedLiquidationPrice    decimal.Decimal `json:"estimatedLiquidationPrice"`
 	Future                       string          `json:"future"`
@@ -34,6 +36,8 @@ type Position struct {
 	NetSize                      decimal.Decimal `json:"netSize"`
 	OpenSize                     decimal.Decimal `json:"openSize"`
 	RealizedPnl                  decimal.Decimal `json:"realizedPnl"`
+	RecentAverageOpenPrice       decimal.Decimal `json:"recentAverageOpenPrice"`
+	RecentBreakEvenPrice         decimal.Decimal `json:"recentBreakEvenPrice"`
 	ShortOrderSize               decimal.Decimal `json:"shortOrderSize"`
 	Side                         string          `json:"side"`
 	Size                         decimal.Decimal `json:"size"`
