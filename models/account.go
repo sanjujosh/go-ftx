@@ -46,5 +46,5 @@ type Position struct {
 }
 
 func (p Position) String() string {
-	return fmt.Sprintf("Future:%v Entry:%v Size:%v Side:%v", p.Future, p.EntryPrice, p.Size, p.Side)
+	return fmt.Sprintf("Future:%v Entry:%v Size:%v Side:%v", p.Future, p.RecentAverageOpenPrice, p.Size, p.Side)
 }
